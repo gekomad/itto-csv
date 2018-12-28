@@ -321,7 +321,7 @@ assert(toCsv(l) == "\"Yel,low\",3,2000-11-11 11:11:11.0,1,eee,7,2000-11-11 11:11
 See [Doobie Recepies project](https://github.com/gekomad/doobie-recipes/blob/master/src/test/scala/Itto.scala)
 
 ## Scaladoc API
-[config API](https://javadoc.io/doc/com.github.gekomad/itto-csv)
+[config API](https://javadoc.io/doc/com.github.gekomad/itto-csv_2.12)
 
 ## Bugs and Feedback
 For bugs, questions and discussions please use [Github Issues](https://github.com/gekomad/itto-csv/issues).
