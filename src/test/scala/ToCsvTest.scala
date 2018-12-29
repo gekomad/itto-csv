@@ -111,7 +111,9 @@ class ToCsvTest extends FunSuite {
 
       case class Employee(name: String, date: java.util.Date, salary: Double)
 
-      implicit val dateEncoder: CsvStringEncoder[java.util.Date] = _.toString
+      implicit val dateEncoder: CsvStringEncoder[java.util.Date] = new CsvStringEncoder[java.util.Date] {
+        override def encode(value: java.util.Date): String = value.toString
+      }
 
       val d = (new java.util.Date(0)).toString
 
@@ -126,7 +128,9 @@ class ToCsvTest extends FunSuite {
       import com.github.gekomad.ittocsv.core.ToCsv._
       import com.github.gekomad.ittocsv.parser.IttoCSVFormat
       implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.tab.withRecordSeparator("\n")
-      implicit val dateEncoder: CsvStringEncoder[java.util.Date] = _.toString
+      implicit val dateEncoder: CsvStringEncoder[java.util.Date] = new CsvStringEncoder[java.util.Date] {
+        override def encode(value: java.util.Date): String = value.toString
+      }
 
       case class Employee(name: String, date: java.util.Date, salary: Double)
       val d = (new java.util.Date(0)).toString
@@ -200,8 +204,9 @@ class ToCsvTest extends FunSuite {
     import com.github.gekomad.ittocsv.core.ToCsv._
     implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default.withPrintHeader(false)
 
-    implicit def localDateTimeEncoder(implicit csvFormat: com.github.gekomad.ittocsv.parser.IttoCSVFormat): CsvStringEncoder[LocalDateTime] =
-      (value: LocalDateTime) => value.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.0"))
+    implicit def localDateTimeEncoder(implicit csvFormat: com.github.gekomad.ittocsv.parser.IttoCSVFormat): CsvStringEncoder[LocalDateTime] = new CsvStringEncoder[LocalDateTime] {
+      override def encode(value: LocalDateTime): String = value.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.0"))
+    }
 
     val localDateTime = LocalDateTime.parse("2000-11-11 11:11:11.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.0"))
 
@@ -274,7 +279,9 @@ class ToCsvTest extends FunSuite {
     import com.github.gekomad.ittocsv.core.ToCsv._
     implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.tab
 
-    implicit val dateEncoder: CsvStringEncoder[java.util.Date] = _.toString
+    implicit val dateEncoder: CsvStringEncoder[java.util.Date] = new CsvStringEncoder[java.util.Date] {
+      override def encode(value: java.util.Date): String = value.toString
+    }
 
     def g[A: FieldNames](a: A)(implicit enc: CsvStringEncoder[A]): String = toCsv(a)
 

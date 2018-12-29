@@ -109,7 +109,9 @@ object FromCsv {
     def to[V](input: String)(implicit C: Convert[V]): Result[V] =
       C.parse(input)
 
-    def instance[V](body: String => Result[V]): Convert[V] = (input: String) => body(input)
+    def instance[V](body: String => Result[V]): Convert[V] = new Convert[V]{
+      def parse(input: String): Result[V]= body(input)
+    }
 
     implicit def optionLists[A: ConvertTo](implicit csvFormat: IttoCSVFormat): Convert[Option[List[A]]] =
       Convert.instance {
@@ -245,6 +247,15 @@ object FromCsv {
       case "" => (Right(None): Either[ParseFailure, Option[Double]]).toValidatedNel
       case s => tryCatch(Some(s.toDouble))(s"Not a Double for input string: $s").toValidatedNel
     }
+
+//    implicit def optionGeneral[A](implicit f : String => Convert[A]):Convert[Option[A]] = { s =>
+//      s match {TODO
+//        case "" => (Right(None): Either[ParseFailure, Option[A]]).toValidatedNel
+//        case s => val p: Convert[A] =f(s)
+//          p.map(r => r)
+//          ???
+//      }
+//    }
 
     implicit val optionInt: Convert[Option[Int]] = Convert.instance {
       case "" => (Right(None): Either[ParseFailure, Option[Int]]).toValidatedNel
