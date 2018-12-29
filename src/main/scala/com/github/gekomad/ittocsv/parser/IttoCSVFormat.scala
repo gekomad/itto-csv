@@ -32,7 +32,7 @@ import Constants._
   * @param printHeader     if true prints the header
   * @param trim            if true trims the fields
   * @see See test code for more information
-  * @see See [[https://github.com/gekomad/itto-csb/blob/master/README.md]] for more information.
+  * @see See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information.
   */
 final case class IttoCSVFormat(delimeter: Char,
                                quote: Char, recordSeparator: String, quoteEmpty: Boolean, forceQuote: Boolean,

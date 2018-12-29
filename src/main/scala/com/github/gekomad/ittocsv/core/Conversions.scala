@@ -16,7 +16,7 @@ import com.github.gekomad.ittocsv.util.TryCatch.tryCatch
   * @author Giuseppe Cannella
   * @since 0.0.1
   * @see See test code for more information
-  * @see See [[https://github.com/gekomad/itto-csb/blob/master/README.md]] for more information.
+  * @see See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information.
   */
 
 object Conversions {
