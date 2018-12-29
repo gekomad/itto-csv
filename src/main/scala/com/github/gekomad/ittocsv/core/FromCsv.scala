@@ -109,7 +109,9 @@ object FromCsv {
     def to[V](input: String)(implicit C: Convert[V]): Result[V] =
       C.parse(input)
 
-    def instance[V](body: String => Result[V]): Convert[V] = (input: String) => body(input)
+    def instance[V](body: String => Result[V]): Convert[V] = new Convert[V]{
+      def parse(input: String): Result[V]= body(input)
+    }
 
     implicit def optionLists[A: ConvertTo](implicit csvFormat: IttoCSVFormat): Convert[Option[List[A]]] =
       Convert.instance {
