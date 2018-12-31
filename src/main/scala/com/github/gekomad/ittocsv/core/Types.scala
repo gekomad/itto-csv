@@ -1,8 +1,5 @@
 package com.github.gekomad.ittocsv.core
-
-import com.github.gekomad.ittocsv.core.FromCsv.ParseFailure
-
-import scala.util.matching.Regex
+import com.github.gekomad.regexcollection.Collection.Validator
 
 object Types {
 
@@ -10,13 +7,17 @@ object Types {
 
     case class URL(url: String)
 
-    case class UrlValidator(urlRegex: String) {
-
+    case class UrlValidator(urlRegex: String = com.github.gekomad.regexcollection.Collection.validatorURL.regexp) {
+      implicit val validator: Validator[com.github.gekomad.regexcollection.URL] = Validator[com.github.gekomad.regexcollection.URL](urlRegex)
       def validate(url: String): Either[ParseFailure, URL] =
-        if (urlRegex.r.findFirstMatchIn(url).isDefined) Right(URL(url)) else Left(ParseFailure(s"Not a URL $url")): Either[ParseFailure, URL]
+        com.github.gekomad.regexcollection.Validate
+          .validate[com.github.gekomad.regexcollection.URL](url)
+          .map(_ => Right(URL(url)))
+          .getOrElse(Left(ParseFailure(s"Not a URL $url")): Either[ParseFailure, URL])
+
     }
 
-    implicit val validator: UrlValidator = UrlValidator( """^((\w+:\/\/)[-a-zA-Z0-9:@;?&=\/%\+\.\*!'\(\),\$_\{\}\^~\[\]`#|]+)$""")
+    implicit val validator: UrlValidator = UrlValidator()
 
   }
 
@@ -24,14 +25,17 @@ object Types {
 
     case class Email(email: String)
 
-    case class EmailValidator(emailRegex: String) {
-
-      def validate(email: String): Either[ParseFailure, Email] =
-        if (emailRegex.r.findFirstMatchIn(email).isDefined) Right(Email(email)) else Left(ParseFailure(s"Not a Email $email")): Either[ParseFailure, Email]
+    case class EmailValidator(emailRegex: String = com.github.gekomad.regexcollection.Collection.validatorEmail.regexp) {
+      implicit val validator: Validator[com.github.gekomad.regexcollection.Email] = Validator[com.github.gekomad.regexcollection.Email](emailRegex)
+      def validate(email: String): Either[ParseFailure, Email] = {
+        com.github.gekomad.regexcollection.Validate
+          .validate[com.github.gekomad.regexcollection.Email](email)
+          .map(_ => Right(Email(email)))
+          .getOrElse(Left(ParseFailure(s"Not a Email $email")): Either[ParseFailure, Email])
+      }
     }
 
-    implicit val validator: EmailValidator = EmailValidator( """^[a-zA-Z0-9\.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$""")
-
+    implicit val validator: EmailValidator = EmailValidator()
   }
 
   object MD5Ops {
@@ -47,7 +51,6 @@ object Types {
 
   }
 
-
   object IPOps {
 
     case class IP(code: String)
@@ -55,8 +58,4 @@ object Types {
 
   }
 
-
-
 }
-
-

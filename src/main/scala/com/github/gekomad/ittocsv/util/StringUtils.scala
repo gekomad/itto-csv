@@ -10,7 +10,6 @@ import scala.annotation.tailrec
   * @author Giuseppe Cannella
   * @since 0.0.1
   */
-
 object StringUtils {
 
   /**
@@ -57,10 +56,10 @@ object StringUtils {
     case _ if csv.count(_ == csvFormat.quote) % 2 != 0 => None
     case _ =>
       val delimiter = getDelimiter(csv)
-      val string = csv.replace(s"${csvFormat.quote}${csvFormat.quote}", delimiter.toString)
+      val string    = csv.replace(s"${csvFormat.quote}${csvFormat.quote}", delimiter.toString)
 
       var inside = false
-      val arr = string.toCharArray
+      val arr    = string.toCharArray
       val commas = scala.collection.mutable.ListBuffer.empty[Int]
 
       var c = 0

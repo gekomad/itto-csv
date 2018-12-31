@@ -1,12 +1,10 @@
 package com.github.gekomad.ittocsv.util
 
-import com.github.gekomad.ittocsv.core.FromCsv.ParseFailure
+import com.github.gekomad.ittocsv.core.ParseFailure
+
+import scala.util.Try
 
 object TryCatch {
-  def tryCatch[A](a: => A)(b: String): Either[ParseFailure, A] = try {
-    Right(a)
-  } catch {
-    case _: Throwable => Left(ParseFailure(b))
-  }
+  def tryCatch[A](a: => A)(b: String): Either[ParseFailure, A] = Try(a).map(Right(_)).getOrElse(Left(ParseFailure(b)))
 
 }

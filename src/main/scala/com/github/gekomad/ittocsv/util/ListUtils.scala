@@ -19,7 +19,7 @@ object ListUtils {
     import java.io.{BufferedWriter, File, FileWriter}
 
     import scala.util.{Failure, Success}
-    val file = new File(filePath)
+    val file               = new File(filePath)
     var bw: BufferedWriter = null
     try {
       bw = new BufferedWriter(new FileWriter(file))
@@ -30,11 +30,9 @@ object ListUtils {
         list.foreach(bw.write)
 
       Success(filePath)
-    }
-    catch {
+    } catch {
       case e: Throwable => Failure(e)
-    }
-    finally {
+    } finally {
       if (bw != null)
         bw.close()
     }

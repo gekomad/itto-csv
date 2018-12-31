@@ -29,4 +29,4 @@ pomExtra :=
 
 ThisBuild / publishMavenStyle := true
 
-
+publishConfiguration := publishConfiguration.value.withOverwrite(true)

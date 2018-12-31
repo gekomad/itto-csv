@@ -1,4 +1,5 @@
 import cats.data.NonEmptyList
+import com.github.gekomad.ittocsv.core.{ParseFailure, Schema}
 import org.scalatest.FunSuite
 
 class FromCsvTest extends FunSuite {
@@ -14,9 +15,9 @@ class FromCsvTest extends FunSuite {
 
     case class Foo(a: Int, b: Double, c: String, d: Option[Boolean])
 
-    val schema = Schema.of[Foo]
-    val fields: List[String] = fieldNames[Foo]
-    val csv: List[String] = List("1", "3.14", "foo", "true")
+    val schema                 = Schema.of[Foo]
+    val fields: List[String]   = fieldNames[Foo]
+    val csv: List[String]      = List("1", "3.14", "foo", "true")
     val p: Map[String, String] = fields.zip(csv).toMap
     assert(schema.readFrom(p) == Valid(Foo(1, 3.14, "foo", Some(true))))
 
@@ -37,9 +38,9 @@ class FromCsvTest extends FunSuite {
 
     case class Foo(a: Int, b: Double, c: String, d: Option[Boolean], e: Option[String], f: Option[String], e1: Option[Double], f1: Option[Double], e2: Option[Int], f2: Option[Int])
 
-    val schema = Schema.of[Foo]
-    val fields: List[String] = fieldNames[Foo]
-    val csv: List[String] = List("1", "3.14", "foo", "", "", "hi", "", "3.3", "", "100")
+    val schema                 = Schema.of[Foo]
+    val fields: List[String]   = fieldNames[Foo]
+    val csv: List[String]      = List("1", "3.14", "foo", "", "", "hi", "", "3.3", "", "100")
     val p: Map[String, String] = fields.zip(csv).toMap
     assert(schema.readFrom(p) == Valid(Foo(1, 3.14, "foo", None, None, Some("hi"), None, Some(3.3), None, Some(100))))
 
@@ -56,14 +57,13 @@ class FromCsvTest extends FunSuite {
 
     case class Foo(a: Int, b: Char, c: String, d: Option[Boolean])
 
-    val schema = Schema.of[Foo]
-    val fields: List[String] = fieldNames[Foo]
-    val csv: List[String] = List("1", "λ", "foo", "baz")
+    val schema                 = Schema.of[Foo]
+    val fields: List[String]   = fieldNames[Foo]
+    val csv: List[String]      = List("1", "λ", "foo", "baz")
     val p: Map[String, String] = fields.zip(csv).toMap
     assert(schema.readFrom(p) == Invalid(NonEmptyList(ParseFailure("Not a Boolean for input string: baz"), List())))
 
   }
-
 
   test("tokenizeCsvLine to types ok") {
     import cats.data.NonEmptyList
@@ -76,13 +76,13 @@ class FromCsvTest extends FunSuite {
 
     case class Foo(a: Int, b: Double, c: String, d: Boolean)
 
-    val fields: List[String] = fieldNames[Foo]
+    val fields: List[String]      = fieldNames[Foo]
     val csv: Option[List[String]] = tokenizeCsvLine("1,3.14,foo,true")
     csv match {
       case None => assert(false)
       case Some(g) =>
         assert(g == List("1", "3.14", "foo", "true"))
-        val schema = Schema.of[Foo]
+        val schema                 = Schema.of[Foo]
         val p: Map[String, String] = fields.zip(g).toMap
         assert(schema.readFrom(p) == Valid(Foo(1, 3.14, "foo", true)))
     }
@@ -99,13 +99,13 @@ class FromCsvTest extends FunSuite {
 
     case class Foo(a: Int, b: Double, c: String, d: Boolean)
 
-    val fields: List[String] = fieldNames[Foo]
+    val fields: List[String]      = fieldNames[Foo]
     val csv: Option[List[String]] = tokenizeCsvLine("1,3.14,foo,bar")
     csv match {
       case None => assert(false)
       case Some(g) =>
         assert(g == List("1", "3.14", "foo", "bar"))
-        val schema = Schema.of[Foo]
+        val schema                 = Schema.of[Foo]
         val p: Map[String, String] = fields.zip(g).toMap
         assert(schema.readFrom(p) == Invalid(NonEmptyList(ParseFailure("bar is not Boolean"), Nil)))
     }
@@ -122,13 +122,13 @@ class FromCsvTest extends FunSuite {
 
     case class Foo(a: Int, b: Double, c: String, d: Option[Double])
 
-    val fields: List[String] = fieldNames[Foo]
+    val fields: List[String]      = fieldNames[Foo]
     val csv: Option[List[String]] = tokenizeCsvLine("1,3.14,foo,bar")
     csv match {
       case None => assert(false)
       case Some(g) =>
         assert(g == List("1", "3.14", "foo", "bar"))
-        val schema = Schema.of[Foo]
+        val schema                 = Schema.of[Foo]
         val p: Map[String, String] = fields.zip(g).toMap
         assert(schema.readFrom(p) == Invalid(NonEmptyList(ParseFailure("""Not a Double for input string: bar"""), Nil)))
     }
@@ -139,7 +139,7 @@ class FromCsvTest extends FunSuite {
     import com.github.gekomad.ittocsv.core.Types.SHAOps.SHA1
     import com.github.gekomad.ittocsv.core.FromCsv._
     import com.github.gekomad.ittocsv.core.Conversions.toSHA1s
-    import com.github.gekomad.ittocsv.core.FromCsv.ParseFailure
+    import com.github.gekomad.ittocsv.core.ParseFailure
     implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
 
     case class Bar(a: String, b: SHA1)
@@ -206,9 +206,9 @@ class FromCsvTest extends FunSuite {
 
     case class Bar(a: String, b: UUID)
 
-    assert(fromCsv[Bar]("abc,1CC3CCBB-C749-3078-E050-1AACBE064651") == List(Right(Bar("abc", UUID.fromString("1CC3CCBB-C749-3078-E050-1AACBE064651")))))
+    assert(fromCsv[Bar]("abc,487d414d-67a6-4c2f-b95b-d811561ccd75") == List(Right(Bar("abc", UUID.fromString("487d414d-67a6-4c2f-b95b-d811561ccd75")))))
 
-    assert(fromCsv[Bar]("abc,a8c586e2-7cc3-4d39-a449-") == List(Left(NonEmptyList(ParseFailure("a8c586e2-7cc3-4d39-a449- is not UUID"), Nil))))
+    assert(fromCsv[Bar]("abc,xxc586e2-7cc3-4d39-a449-") == List(Left(NonEmptyList(ParseFailure("xxc586e2-7cc3-4d39-a449- is not UUID"), Nil))))
 
   }
 
@@ -266,7 +266,7 @@ class FromCsvTest extends FunSuite {
 
     import com.github.gekomad.ittocsv.core.FromCsv._
     implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
-    import com.github.gekomad.ittocsv.core.Types.EmailOps.{Email, EmailValidator}
+    import com.github.gekomad.ittocsv.core.Types.EmailOps.Email
 
     case class Bar(a: String, b: Email)
 
@@ -310,7 +310,7 @@ class FromCsvTest extends FunSuite {
     import com.github.gekomad.ittocsv.core.FromCsv._
     case class Foo(a: Int, b: Double, c: String, d: Boolean)
     implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
-    val o = fromCsv[Foo](List("1,3.14,foo,true", "2,3.14,bar,false")) // List[Either[NonEmptyList[ParseFailure], Foo]]
+    val o                                 = fromCsv[Foo](List("1,3.14,foo,true", "2,3.14,bar,false")) // List[Either[NonEmptyList[ParseFailure], Foo]]
     assert(o == List(Right(Foo(1, 3.14, "foo", true)), Right(Foo(2, 3.14, "bar", false))))
   }
 
@@ -319,7 +319,7 @@ class FromCsvTest extends FunSuite {
     import com.github.gekomad.ittocsv.core.FromCsv._
     case class Foo(a: Int)
     implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
-    val o = fromCsv[Foo](List("1", "")) // List[Either[NonEmptyList[ParseFailure], Foo]]
+    val o                                 = fromCsv[Foo](List("1", "")) // List[Either[NonEmptyList[ParseFailure], Foo]]
     assert(o == List(Right(Foo(1)), Left(NonEmptyList(ParseFailure(" is not Int"), Nil))))
   }
 
@@ -328,10 +328,9 @@ class FromCsvTest extends FunSuite {
     import com.github.gekomad.ittocsv.core.FromCsv._
     case class Foo(a: Int)
     implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withIgnoreEmptyLines(true)
-    val o = fromCsv[Foo](List("1", "", "2")) // List[Either[NonEmptyList[ParseFailure], Foo]]
+    val o                                 = fromCsv[Foo](List("1", "", "2")) // List[Either[NonEmptyList[ParseFailure], Foo]]
     assert(o == List(Right(Foo(1)), Right(Foo(2))))
   }
-
 
   test("decode Option[List[Int]]") {
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
@@ -362,7 +361,6 @@ class FromCsvTest extends FunSuite {
     assert(fromCsv[Foo]("abc,\"1,xy,3\"") == List(Left(cats.data.NonEmptyList(ParseFailure("Not a List[type] 1,xy,3"), Nil))))
 
   }
-
 
   test("decode List[Boolean]") {
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
@@ -405,14 +403,13 @@ class FromCsvTest extends FunSuite {
 
   }
 
-
   test("decode LocalDateTime") {
 
     import java.time.LocalDateTime
 
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     import com.github.gekomad.ittocsv.core.FromCsv._
-    import com.github.gekomad.ittocsv.core.FromCsv.Convert.fromStringToLocalDateTime
+    import com.github.gekomad.ittocsv.core.Conversions._
 
     case class Foo(a: Int, b: LocalDateTime)
 
@@ -431,10 +428,9 @@ class FromCsvTest extends FunSuite {
 
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     import com.github.gekomad.ittocsv.core.FromCsv._
-    import com.github.gekomad.ittocsv.core.FromCsv.Convert._
+    import com.github.gekomad.ittocsv.core.Conversions._
 
     case class Foo(a: Int, b: Option[LocalDateTime])
-
 
     implicit val csvFormat = IttoCSVFormat.default
 
@@ -453,21 +449,20 @@ class FromCsvTest extends FunSuite {
 
     case class Foo(a: Int, b: Option[java.time.LocalDateTime])
 
+    import scala.util.Try
     import java.time.LocalDateTime
     import java.time.format.DateTimeFormatter
 
     implicit val csvFormat = IttoCSVFormat.default
 
-    //generic
     implicit def localDateTimeToCsv: String => Either[ParseFailure, Option[LocalDateTime]] = {
       case "" => Right(None)
-      case s => try {
-        val x = LocalDateTime.parse(s, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.0"))
-        Right(Some(x))
-      }
-      catch {
-        case _: Throwable => Left(ParseFailure(s"Not a LocalDataTime $s"))
-      }
+      case s =>
+        Try {
+          val x = LocalDateTime.parse(s, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.0"))
+          Right(Some(x))
+        }.getOrElse(Left(ParseFailure(s"Not a LocalDataTime $s")))
+
     }
 
     {
@@ -483,4 +478,3 @@ class FromCsvTest extends FunSuite {
   }
 
 }
-

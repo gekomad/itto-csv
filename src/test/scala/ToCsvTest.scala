@@ -29,7 +29,6 @@ class ToCsvTest extends FunSuite {
 
   }
 
-
   test("IP") {
     import com.github.gekomad.ittocsv.core.Types.IPOps.IP
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
@@ -76,7 +75,6 @@ class ToCsvTest extends FunSuite {
 
   }
 
-
   test("UUID") {
     import java.util.UUID
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
@@ -95,7 +93,8 @@ class ToCsvTest extends FunSuite {
       import com.github.gekomad.ittocsv.core.ToCsv._
       import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 
-      implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withDelimiter('.')
+      implicit val csvFormat: IttoCSVFormat =
+        IttoCSVFormat.default.withDelimiter('.')
 
       case class Employee(i: Int, salary: Double)
 
@@ -107,43 +106,54 @@ class ToCsvTest extends FunSuite {
       import com.github.gekomad.ittocsv.core.CsvStringEncoder
       import com.github.gekomad.ittocsv.core.ToCsv._
       import com.github.gekomad.ittocsv.parser.IttoCSVFormat
-      implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withPrintHeader(false)
+      implicit val csvFormat: IttoCSVFormat =
+        IttoCSVFormat.default.withPrintHeader(false)
 
       case class Employee(name: String, date: java.util.Date, salary: Double)
 
-      implicit val dateEncoder: CsvStringEncoder[java.util.Date] = new CsvStringEncoder[java.util.Date] {
-        override def encode(value: java.util.Date): String = value.toString
-      }
+      implicit val dateEncoder: CsvStringEncoder[java.util.Date] =
+        new CsvStringEncoder[java.util.Date] {
+          override def encode(value: java.util.Date): String = value.toString
+        }
 
-      val d = (new java.util.Date(0)).toString
+      val d = new java.util.Date(0).toString
 
       assert(toCsv(Employee("Bo,b", new java.util.Date(0), 33003.3)) == s""""Bo,b",$d,33003.3""")
 
-      assert(toCsv(List(Employee("Bob", new java.util.Date(0), 1111.3), Employee("Jim", new java.util.Date(0), 2222.2))) ==
-        s"Bob,$d,1111.3,Jim,$d,2222.2")
+      assert(
+        toCsv(List(Employee("Bob", new java.util.Date(0), 1111.3), Employee("Jim", new java.util.Date(0), 2222.2))) ==
+          s"Bob,$d,1111.3,Jim,$d,2222.2"
+      )
     }
 
     { // use tab formatter
       import com.github.gekomad.ittocsv.core.CsvStringEncoder
       import com.github.gekomad.ittocsv.core.ToCsv._
       import com.github.gekomad.ittocsv.parser.IttoCSVFormat
-      implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.tab.withRecordSeparator("\n")
-      implicit val dateEncoder: CsvStringEncoder[java.util.Date] = new CsvStringEncoder[java.util.Date] {
-        override def encode(value: java.util.Date): String = value.toString
-      }
+      implicit val csvFormat: IttoCSVFormat =
+        IttoCSVFormat.tab.withRecordSeparator("\n")
+      implicit val dateEncoder: CsvStringEncoder[java.util.Date] =
+        new CsvStringEncoder[java.util.Date] {
+          override def encode(value: java.util.Date): String = value.toString
+        }
 
       case class Employee(name: String, date: java.util.Date, salary: Double)
-      val d = (new java.util.Date(0)).toString
-      assert(toCsv(Employee("Bo,b", new java.util.Date(0), 33003.3)) ==
-        s"Bo,b\t$d\t33003.3")
+      val d = new java.util.Date(0).toString
+      assert(
+        toCsv(Employee("Bo,b", new java.util.Date(0), 33003.3)) ==
+          s"Bo,b\t$d\t33003.3"
+      )
 
-      assert(toCsv(List(Employee("Bob", new java.util.Date(0), 1111.3), Employee("Jim", new java.util.Date(0), 2222.2))) ==
-        s"Bob\t$d\t1111.3\tJim\t$d\t2222.2")
+      assert(
+        toCsv(List(Employee("Bob", new java.util.Date(0), 1111.3), Employee("Jim", new java.util.Date(0), 2222.2))) ==
+          s"Bob\t$d\t1111.3\tJim\t$d\t2222.2"
+      )
     }
 
     {
       import com.github.gekomad.ittocsv.core.ToCsv._
-      implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+      implicit val csvFormat =
+        com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
 
       case class Baz(x: String)
       case class Foo(a: Int, c: Baz)
@@ -168,11 +178,11 @@ class ToCsvTest extends FunSuite {
     }
 
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withDelimiter(';').withRecordSeparator("\n")
+    implicit val csvFormat: IttoCSVFormat =
+      IttoCSVFormat.default.withDelimiter(';').withRecordSeparator("\n")
 
     import com.github.gekomad.ittocsv.core.ToCsv._
     import ToCsvT._
-
 
     case class Foo(name: String)
 
@@ -182,66 +192,70 @@ class ToCsvTest extends FunSuite {
 
     assert(l.mkString == "name\nid0\nid1\nid2\nid3\nid4\nid5")
 
-
   }
 
   test("type to csv with localDateTime") {
     import com.github.gekomad.ittocsv.core.ToCsv._
     import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default.withPrintHeader(false)
+    implicit val csvFormat =
+      com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+        .withPrintHeader(false)
 
-    val localDateTime = LocalDateTime.parse("2000-12-31T12:13:14", ISO_LOCAL_DATE_TIME)
+    val localDateTime =
+      LocalDateTime.parse("2000-12-31T12:13:14", ISO_LOCAL_DATE_TIME)
 
     case class Bar(a: String, b: Long, c: Option[LocalDateTime], e: Option[Int])
-    val l: List[Bar] = List(
-      Bar("Yel,low", 3L, Some(localDateTime), Some(1)),
-      Bar("eee", 7L, Some(localDateTime), None)
-    )
+    val l: List[Bar] = List(Bar("Yel,low", 3L, Some(localDateTime), Some(1)), Bar("eee", 7L, Some(localDateTime), None))
     assert(toCsv(l) == "\"Yel,low\",3,2000-12-31T12:13:14,1,eee,7,2000-12-31T12:13:14,")
   }
 
   test("type to csv with custom localDateTime") {
     import com.github.gekomad.ittocsv.core.ToCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default.withPrintHeader(false)
+    implicit val csvFormat =
+      com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+        .withPrintHeader(false)
 
     implicit def localDateTimeEncoder(implicit csvFormat: com.github.gekomad.ittocsv.parser.IttoCSVFormat): CsvStringEncoder[LocalDateTime] = new CsvStringEncoder[LocalDateTime] {
-      override def encode(value: LocalDateTime): String = value.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.0"))
+      override def encode(value: LocalDateTime): String =
+        value.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.0"))
     }
 
-    val localDateTime = LocalDateTime.parse("2000-11-11 11:11:11.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.0"))
+    val localDateTime =
+      LocalDateTime.parse("2000-11-11 11:11:11.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.0"))
 
     case class Bar(a: String, b: Long, c: LocalDateTime, e: Option[Int])
-    val l: List[Bar] = List(
-      Bar("Yel,low", 3L, localDateTime, Some(1)),
-      Bar("eee", 7L, localDateTime, None)
-    )
+    val l: List[Bar] = List(Bar("Yel,low", 3L, localDateTime, Some(1)), Bar("eee", 7L, localDateTime, None))
     assert(toCsv(l) == "\"Yel,low\",3,2000-11-11 11:11:11.0,1,eee,7,2000-11-11 11:11:11.0,")
   }
 
   test("from type to csv") {
     import com.github.gekomad.ittocsv.core.ToCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    implicit val csvFormat =
+      com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
     case class Bar(a: String, b: Int)
     assert(toCsv(Bar("Bar", 42)) == "Bar,42")
   }
 
   test("from list of type to csv") {
     import com.github.gekomad.ittocsv.core.ToCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    implicit val csvFormat =
+      com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
     case class Bar(a: String, b: Int)
     assert(toCsv(List(Bar("abc", 42), Bar("def", 24))) == "abc,42,def,24")
   }
 
   test("from list of type to List of csv") {
     import com.github.gekomad.ittocsv.core.ToCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    implicit val csvFormat =
+      com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
     case class Bar(a: String, b: Int)
     assert(toCsvL(List(Bar("abc", 42), Bar("def", 24))) == "a,b\r\nabc,42\r\ndef,24")
   }
 
   test("serialize List[Type]") {
 
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    implicit val csvFormat =
+      com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
     case class Bar(c: String, a: Int)
     import com.github.gekomad.ittocsv.core.ToCsv._
 
@@ -252,7 +266,8 @@ class ToCsvTest extends FunSuite {
 
   test("serialize List[Double]") {
 
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    implicit val csvFormat =
+      com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.ToCsv._
 
@@ -263,7 +278,8 @@ class ToCsvTest extends FunSuite {
   test("serialize with record separator") {
 
     case class Foo(a: String, b: String)
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    implicit val csvFormat =
+      com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
     import com.github.gekomad.ittocsv.core.ToCsv._
 
     assert(toCsv(Foo("aaa", "bbb"), true) == "\r\naaa,bbb")
@@ -274,7 +290,8 @@ class ToCsvTest extends FunSuite {
 
     case class Foo(v: String, a: List[Short])
 
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    implicit val csvFormat =
+      com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.ToCsv._
 
@@ -292,11 +309,13 @@ class ToCsvTest extends FunSuite {
     import com.github.gekomad.ittocsv.core.ToCsv._
     implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.tab
 
-    implicit val dateEncoder: CsvStringEncoder[java.util.Date] = new CsvStringEncoder[java.util.Date] {
-      override def encode(value: java.util.Date): String = value.toString
-    }
+    implicit val dateEncoder: CsvStringEncoder[java.util.Date] =
+      new CsvStringEncoder[java.util.Date] {
+        override def encode(value: java.util.Date): String = value.toString
+      }
 
-    def g[A: FieldNames](a: A)(implicit enc: CsvStringEncoder[A]): String = toCsv(a)
+    def g[A: FieldNames](a: A)(implicit enc: CsvStringEncoder[A]): String =
+      toCsv(a)
 
     val d = new java.util.Date(0).toString
     assert(g(Employee("Bo,b", new java.util.Date(0), 33003.3)) == s"Bo,b\t$d\t33003.3")
@@ -320,11 +339,11 @@ class ToCsvTest extends FunSuite {
     import com.github.gekomad.ittocsv.core.Header._
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     case class Record(X: Int, d: Double, s: String, b: Boolean)
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withDelimiter('X')
+    implicit val csvFormat: IttoCSVFormat =
+      IttoCSVFormat.default.withDelimiter('X')
 
     val header = csvHeader[Record]
 
     assert(header == "\"X\"XdXsXb")
   }
 }
-

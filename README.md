@@ -1,6 +1,9 @@
 
 [![Build Status](https://travis-ci.com/gekomad/itto-csv.svg?branch=master)](https://travis-ci.com/gekomad/itto-csv)  
   
+[![codecov.io](http://codecov.io/github/gekomad/itto-csv/coverage.svg?branch=master)](http://codecov.io/github/gekomad/itto-csv?branch=master)
+
+  
 Itto-CSV  
 =====================  
   
@@ -8,7 +11,7 @@ Itto-CSV
 =  
 Itto-CSV is a pure scala library for working with the CSV format  
 ## Add the library to your project  
-`libraryDependencies += "com.github.gekomad" %% "itto-csv" % "0.0.2"`
+`libraryDependencies += "com.github.gekomad" %% "itto-csv" % "0.0.3"`
   
  ## Using Library  
   
@@ -30,13 +33,15 @@ Two formatters are available:
   
 | Method   |    Description        |  Default Formatter| Tab formatter|  
 |----------|:-------------:|------:|-:|  
-| withDelimiter(c: Char)   |  the separator between fields | , |\t|  
-| withQuote(c: Char)        |    the quoteChar character   | " |"|  
-| withQuoteEmpty(c: Boolean)  | quotes field if empty |    false |false|  
-| withForceQuote(c: Boolean) | quotes all fields |    false |false|  
-| withPrintHeader(c: Boolean)  | if true prints the header (method toCsvL) |    false |false|  
-| withTrim(c: Boolean)   | trims the field |    false |false|  
-| withRecordSeparator(c: String) | the rows separator|    \r\n |\r\n|  
+| withDelimiter(Char)   |  the separator between fields | , |\t|
+| withQuote(Char)        |    the quoteChar character   | " |"|
+| withQuoteEmpty(Boolean)  | quotes field if empty |    false |false|
+| withForceQuote(Boolean) | quotes all fields |    false |false|
+| withPrintHeader(Boolean)  | if true prints the header (method toCsvL) |    false |false|
+| withTrim(Boolean)   | trims the field |    false |false|
+| withRecordSeparator(String) | the rows separator|    \r\n |\r\n|
+| withIgnoreEmptyLines(Boolean) | skips empty lines |   false |false |
+| withQuoteLowerChar(Boolean) | quotes lower chars|    false |false |
   
 It's possible to create custom formatters editing the default ones, example:  
 `implicit val newFormatter = default.withForceQuote(true).withRecordSeparator("\n").with.....`  
@@ -187,11 +192,10 @@ import com.github.gekomad.ittocsv.core.FromCsv._
 assert(fromCsv[Bar]("abc,1c18da5dbf74e3fc1820469cf1f54355b7eec92d,000020f89134d831f48541b2d8ec39397bc99fccf4cc86a3861257dbe6d819d1,23f8e84c1f4e7c8814634267bd456194,1CC3CCBB-C749-3078-E050-1AACBE064651,daigoro@itto.com,10.168.1.108,2001:db8:a0b:12f0::1,http://www.aaa.cdd.com") ==List(Right(bar)))  
 ```  
   
-### Encode/Decode a complex type  
-View [TreeTest.scala](https://github.com/gekomad/itto-csv/blob/master/src/test/scala/TreeTest.scala)   for complete test
-It's possible to generate a complex data CSV specifying the encoder/decoder. Here an example with a Tree[Int]  
-  
- ```  
+### Encode/Decode your own type
+View [TreeTest.scala](https://github.com/gekomad/itto-csv/blob/master/src/test/scala/TreeTest.scala) for complete test
+
+```
   
 import com.github.gekomad.ittocsv.core.CsvStringEncoder  
 import com.github.gekomad.ittocsv.parser.IttoCSVFormat  
@@ -204,8 +208,7 @@ import com.github.gekomad.ittocsv.core.ToCsv._
   
 implicit def _f(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Tree[Int]] = createEncoder { node => csvConverter.stringToCsvField(serialize(Some(node))) }  
   
-val tree: Tree[Int] = Tree(  
- 1, Some(Tree(2, Some(Tree(3)))), Some(Tree(4, Some(Tree(5)), Some(Tree(6)) )))  
+val tree: Tree[Int] = Tree(1, Some(Tree(2, Some(Tree(3)))), Some(Tree(4, Some(Tree(5)), Some(Tree(6)) )))
   
 val encoded: String = toCsv(Foo("abc", tree))  
   
@@ -252,7 +255,7 @@ assert(o == List(Right(Foo(1, java.time.LocalDateTime.parse("2000-12-31T11:21:19
 Trasforming a CSV string to a class list; if the trasformations fails, resturns a Left with the cause of the error  
   
  ```  
- import com.github.gekomad.ittocsv.parser.IttoCSVFormat  
+import com.github.gekomad.ittocsv.parser.IttoCSVFormat
   
 import com.github.gekomad.ittocsv.core.FromCsv._  
   
@@ -264,12 +267,9 @@ import java.time.format.DateTimeFormatter
 implicit val csvFormat = IttoCSVFormat.default  
   
 implicit def localDateTimeToCsv: String => Either[ParseFailure, LocalDateTime] = {  
-  case s => try {  
+  case s => scala.util.Try {
     Right(LocalDateTime.parse(s, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.0")))  
-  }  
-  catch {  
-    case _: Throwable => Left(ParseFailure(s"Not a LocalDataTime $s"))  
-  }  
+  }.getOrElse(Left(ParseFailure(s"Not a LocalDataTime $s")))
 }  
   
 val o = fromCsv[Foo]("1,2000-12-31 11:21:19.0")  
@@ -327,8 +327,7 @@ See [Doobie Recepies project](https://github.com/gekomad/doobie-recipes/blob/mas
 For bugs, questions and discussions please use [Github Issues](https://github.com/gekomad/itto-csv/issues).  
   
 ## License  
-Copyright 2019 Giuseppe Cannella  
-  
+
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance  
 with the License. You may obtain a copy of the License at  
   

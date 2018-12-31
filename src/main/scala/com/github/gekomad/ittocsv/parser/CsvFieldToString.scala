@@ -41,31 +41,31 @@ object CsvFieldToString {
   def csvFieldToString(field: String)(implicit csvFormat: IttoCSVFormat): String = {
 
     /*
-      * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-      * @param field     the string to trasform
-      * {{{
-      *  "aaaa,bbbb" => aaaa,bbbb
-      *  "aaaa\nbbbb" => aaaa\nbbbb
-      *  "" => { }
-      *  "aaaabbbb " => {aaaabbbb }
-      *  "#aaaabbbb" => #aaaabbbb
-      * }}}
-      *
-      */
+     * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+     * @param field     the string to trasform
+     * {{{
+     *  "aaaa,bbbb" => aaaa,bbbb
+     *  "aaaa\nbbbb" => aaaa\nbbbb
+     *  "" => { }
+     *  "aaaabbbb " => {aaaabbbb }
+     *  "#aaaabbbb" => #aaaabbbb
+     * }}}
+     *
+     */
     def parseBorders(a: String)(implicit csvFormat: IttoCSVFormat): String = {
       val Q = csvFormat.quote.toString
       if (a.length > 1 && a.startsWith(Q) && a.endsWith(Q)) a.init.drop(1) else a
     }
 
     /*
-      * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-      * @param field     the string to trasform
-      * {{{
-      * "aaaa""bbbb" => aaaa"bbbb
-      * "aaaa""""bbbb" => aaaa""bbbb
-      * }}}
-      *
-      */
+     * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+     * @param field     the string to trasform
+     * {{{
+     * "aaaa""bbbb" => aaaa"bbbb
+     * "aaaa""""bbbb" => aaaa""bbbb
+     * }}}
+     *
+     */
     def parseQuote(a: String)(implicit csvFormat: IttoCSVFormat): String =
       a.replace(s"${csvFormat.quote}${csvFormat.quote}", s"${csvFormat.quote}")
 

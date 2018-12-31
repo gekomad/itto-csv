@@ -31,12 +31,22 @@ import Constants._
   * @param forceQuote      if true quotes all fields
   * @param printHeader     if true prints the header
   * @param trim            if true trims the fields
+  * @param ignoreEmptyLines if true skip empty lines
+  * @param quoteLowerChar   if true quotes lower chars
   * @see See test code for more information
   * @see See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information.
   */
-final case class IttoCSVFormat(delimeter: Char,
-                               quote: Char, recordSeparator: String, quoteEmpty: Boolean, forceQuote: Boolean,
-                               printHeader: Boolean, trim: Boolean, ignoreEmptyLines: Boolean) {
+final case class IttoCSVFormat(
+  delimeter: Char,
+  quote: Char,
+  recordSeparator: String,
+  quoteEmpty: Boolean,
+  forceQuote: Boolean,
+  printHeader: Boolean,
+  trim: Boolean,
+  ignoreEmptyLines: Boolean,
+  quoteLowerChar: Boolean
+) {
   def withDelimiter(c: Char): IttoCSVFormat = this.copy(delimeter = c)
 
   def withQuote(c: Char): IttoCSVFormat = this.copy(quote = c)
@@ -52,9 +62,12 @@ final case class IttoCSVFormat(delimeter: Char,
   def withRecordSeparator(c: String): IttoCSVFormat = this.copy(recordSeparator = c)
 
   def withIgnoreEmptyLines(c: Boolean): IttoCSVFormat = this.copy(ignoreEmptyLines = c)
+
+  def withQuoteLowerChar(c: Boolean): IttoCSVFormat = this.copy(quoteLowerChar = c)
 }
 
 object IttoCSVFormat {
+
   /**
     * | Method   |    Descrizione        |  default|
     * |----------|:-------------:|------:|
@@ -65,9 +78,21 @@ object IttoCSVFormat {
     * | withPrintHeader(c: Boolean)  | if true prints the header (method toCsvL) |    false |
     * | withTrim(c: Boolean)   | trims the field |    false |
     * | withRecordSeparator(c: String) | the rows separator|    \r\n |
+    * | withIgnoreEmptyLines(c: Boolean) | skips empty lines    false |
+    * | withQuoteLowerChar(c: Boolean) | quotes lower chars|    false |
     */
-  val default = IttoCSVFormat(quote = DOUBLE_QUOTE, delimeter = COMMA, recordSeparator = CRLF,
-    quoteEmpty = false, forceQuote = false, printHeader = true, trim = false, ignoreEmptyLines = false)
+  val default = IttoCSVFormat(
+    quote = DOUBLE_QUOTE,
+    delimeter = COMMA,
+    recordSeparator = CRLF,
+    quoteEmpty = false,
+    forceQuote = false,
+    printHeader = true,
+    trim = false,
+    ignoreEmptyLines = false,
+    quoteLowerChar = false
+  )
+
   /**
     * | Method   |    Descrizione        | default|
     * |----------|:-------------:|------:|-:|
@@ -78,7 +103,18 @@ object IttoCSVFormat {
     * | withPrintHeader(c: Boolean)  | if true prints the header (method toCsvL)  |false|
     * | withTrim(c: Boolean)   | trims the field | false|
     * | withRecordSeparator(c: String) | the rows separator |\r\n|
+    * | withIgnoreEmptyLines(c: Boolean) | skips empty lines  |  false |
+    * | withQuoteLowerChar(c: Boolean) | quotes lower chars|    false |
     */
-  val tab = IttoCSVFormat(quote = DOUBLE_QUOTE, delimeter = TAB, recordSeparator = CRLF,
-    quoteEmpty = false, forceQuote = false, printHeader = true, trim = false, ignoreEmptyLines = false)
+  val tab = IttoCSVFormat(
+    quote = DOUBLE_QUOTE,
+    delimeter = TAB,
+    recordSeparator = CRLF,
+    quoteEmpty = false,
+    forceQuote = false,
+    printHeader = true,
+    trim = false,
+    ignoreEmptyLines = false,
+    quoteLowerChar = false
+  )
 }

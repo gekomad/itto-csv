@@ -30,9 +30,15 @@ class CsvFieldTest extends FunSuite {
     assert(StringToCsvField.stringToCsvField("aa,\"b") == "\"aa,\"\"b\"")
   }
 
+  test("stringToCsvField 0") {
+    import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
+    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withQuoteLowerChar(true)
+    assert(StringToCsvField.stringToCsvField(" ") == "\" \"")
+  }
+
   test("stringToCsvField 1") {
     import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
+    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withQuoteLowerChar(true)
 
     assert(StringToCsvField.stringToCsvField("\"") == "\"\"\"\"")
     assert(StringToCsvField.stringToCsvField(",") == "\",\"")
@@ -49,10 +55,9 @@ class CsvFieldTest extends FunSuite {
     assert(StringToCsvField.stringToCsvField("aa,\"b") == "\"aa,\"\"b\"")
   }
 
-
   test("stringToCsvField 2") {
     import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withQuoteEmpty(true)
+    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withQuoteEmpty(true).withQuoteLowerChar(true)
 
     assert(StringToCsvField.stringToCsvField("\"") == "\"\"\"\"")
     assert(StringToCsvField.stringToCsvField(",") == "\",\"")
@@ -97,10 +102,9 @@ class CsvFieldTest extends FunSuite {
     import com.github.gekomad.ittocsv.parser.CsvFieldToString.csvFieldToString
     import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
     implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withDelimiter('A')
-    val orig = "aAc"
-    val csv = StringToCsvField.stringToCsvField(orig)
-    val string = csvFieldToString(csv)
+    val orig                              = "aAc"
+    val csv                               = StringToCsvField.stringToCsvField(orig)
+    val string                            = csvFieldToString(csv)
     assert(orig == string)
   }
 }
-
