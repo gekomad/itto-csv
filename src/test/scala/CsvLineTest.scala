@@ -27,4 +27,3 @@ class CsvLineTest extends FunSuite {
   }
 
 }
-

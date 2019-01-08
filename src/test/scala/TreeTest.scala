@@ -1,4 +1,4 @@
-
+import com.github.gekomad.ittocsv.core.ParseFailure
 import org.scalatest.FunSuite
 
 class TreeTest extends FunSuite {
@@ -10,15 +10,15 @@ class TreeTest extends FunSuite {
       case class Tree[A](value: A, left: Option[Tree[A]] = None, right: Option[Tree[A]] = None)
 
       object Serializer {
-        val pattern = """^(\d+)\((.*)\)$""".r
-        val treeOpen = '('
-        val treeClose = ')'
-        val separator = ','
+        val pattern         = """^(\d+)\((.*)\)$""".r
+        val treeOpen        = '('
+        val treeClose       = ')'
+        val separator       = ','
         val separatorLength = 1
 
         def serialize[A](nodeOption: Option[Tree[A]]): String = nodeOption match {
           case Some(Tree(value, left, right)) =>
-            val leftStr = serialize(left)
+            val leftStr  = serialize(left)
             val rightStr = serialize(right)
             s"$value$treeOpen$leftStr$separator$rightStr$treeClose"
 
@@ -35,10 +35,10 @@ class TreeTest extends FunSuite {
         def splitInner(inner: String): (String, String) = {
           var balance = 0
           val left = inner.takeWhile {
-            case `treeOpen` => balance += 1; true
-            case `treeClose` => balance -= 1; true
+            case `treeOpen`                  => balance += 1; true
+            case `treeClose`                 => balance -= 1; true
             case `separator` if balance == 0 => false
-            case _ => true
+            case _                           => true
           }
 
           val right = inner.drop(left.length + separatorLength)
@@ -60,16 +60,11 @@ class TreeTest extends FunSuite {
     //serialize
     import com.github.gekomad.ittocsv.core.ToCsv._
 
-    implicit def _f(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Tree[Int]] = createEncoder { node => csvConverter.stringToCsvField(serialize(Some(node))) }
+    implicit def _f(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Tree[Int]] = createEncoder { node =>
+      csvConverter.stringToCsvField(serialize(Some(node)))
+    }
 
-    val tree: Tree[Int] = Tree(
-      1,
-      Some(Tree(2, Some(Tree(3)))),
-      Some(Tree(4,
-        Some(Tree(5)),
-        Some(Tree(6))
-      ))
-    )
+    val tree: Tree[Int] = Tree(1, Some(Tree(2, Some(Tree(3)))), Some(Tree(4, Some(Tree(5)), Some(Tree(6)))))
 
     val serialized: String = toCsv(Foo("abc", tree))
 
@@ -78,13 +73,14 @@ class TreeTest extends FunSuite {
     //deserialize
     import com.github.gekomad.ittocsv.core.FromCsv._
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit def _l(implicit csvFormat: IttoCSVFormat): String => Either[ParseFailure, Tree[Int]] = (str: String) => deserialize(str, _.toInt) match {
-      case None => Left(ParseFailure(s"Not a Node[Short] $str"))
-      case Some(a) => Right(a)
-    }
+    implicit def _l(implicit csvFormat: IttoCSVFormat): String => Either[ParseFailure, Tree[Int]] =
+      (str: String) =>
+        deserialize(str, _.toInt) match {
+          case None    => Left(ParseFailure(s"Not a Node[Short] $str"))
+          case Some(a) => Right(a)
+      }
 
     assert(fromCsv[Foo](serialized) == List(Right(Foo("abc", tree))))
 
   }
 }
-

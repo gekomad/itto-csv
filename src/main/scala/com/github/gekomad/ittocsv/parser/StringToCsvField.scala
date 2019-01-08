@@ -8,10 +8,10 @@ import Constants._
   * @author Giuseppe Cannella
   * @since 0.0.1
   * @see See test code for more information
-  * @see See [[https://github.com/gekomad/itto-csb/blob/master/README.md]] for more information
+  * @see See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information
   */
 object StringToCsvField {
- 
+
   /**
     * @return trasforms a string to CSV field
     * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
@@ -34,7 +34,6 @@ object StringToCsvField {
     * }}}
     *
     */
-
   def stringToCsvField(field: String)(implicit csvFormat: IttoCSVFormat): String = {
 
     def trim(s: String): String = if (csvFormat.trim) s.trim else s
@@ -42,12 +41,13 @@ object StringToCsvField {
     def parseQuote(string: String)(implicit csvFormatter: IttoCSVFormat): String = {
 
       val q = csvFormat.quote
-      if (string == s"$q$q") s"$q$q$q$q$q$q" else if (string == s"$q") s"$q$q$q$q" else
+      if (string == s"$q$q") s"$q$q$q$q$q$q"
+      else if (string == s"$q") s"$q$q$q$q"
+      else
         string match {
           case "" => if (csvFormatter.quoteEmpty || csvFormatter.forceQuote) s"$q$q" else string
           case s =>
-
-            var c = 0
+            var c             = 0
             var containsQuote = false
 
             do {
@@ -57,12 +57,12 @@ object StringToCsvField {
 
             val p = if (containsQuote) s.replace(csvFormat.quote.toString, s"$q$q") else s
 
-            if (containsQuote || csvFormat.forceQuote || s(s.length - 1) <= SP || s(0) <= COMMENT)
-              csvFormat.quote + p + csvFormat.quote else p
+            if (containsQuote || csvFormat.forceQuote || csvFormat.quoteLowerChar && (s(s.length - 1) <= SP || s(0) <= COMMENT))
+              csvFormat.quote + p + csvFormat.quote
+            else p
         }
     }
 
     parseQuote(trim(field))
   }
-
 }

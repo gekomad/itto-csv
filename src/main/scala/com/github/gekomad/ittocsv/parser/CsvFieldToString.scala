@@ -6,7 +6,7 @@ package com.github.gekomad.ittocsv.parser
   * @author Giuseppe Cannella
   * @since 0.0.1
   * @see See test code for more information
-  * @see See [[https://github.com/gekomad/itto-csb/blob/master/README.md]] for more information.
+  * @see See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information.
   */
 object CsvFieldToString {
 
@@ -41,31 +41,31 @@ object CsvFieldToString {
   def csvFieldToString(field: String)(implicit csvFormat: IttoCSVFormat): String = {
 
     /*
-      * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-      * @param field     the string to trasform
-      * {{{
-      *  "aaaa,bbbb" => aaaa,bbbb
-      *  "aaaa\nbbbb" => aaaa\nbbbb
-      *  "" => { }
-      *  "aaaabbbb " => {aaaabbbb }
-      *  "#aaaabbbb" => #aaaabbbb
-      * }}}
-      *
-      */
+     * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+     * @param field     the string to trasform
+     * {{{
+     *  "aaaa,bbbb" => aaaa,bbbb
+     *  "aaaa\nbbbb" => aaaa\nbbbb
+     *  "" => { }
+     *  "aaaabbbb " => {aaaabbbb }
+     *  "#aaaabbbb" => #aaaabbbb
+     * }}}
+     *
+     */
     def parseBorders(a: String)(implicit csvFormat: IttoCSVFormat): String = {
       val Q = csvFormat.quote.toString
       if (a.length > 1 && a.startsWith(Q) && a.endsWith(Q)) a.init.drop(1) else a
     }
 
     /*
-      * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-      * @param field     the string to trasform
-      * {{{
-      * "aaaa""bbbb" => aaaa"bbbb
-      * "aaaa""""bbbb" => aaaa""bbbb
-      * }}}
-      *
-      */
+     * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+     * @param field     the string to trasform
+     * {{{
+     * "aaaa""bbbb" => aaaa"bbbb
+     * "aaaa""""bbbb" => aaaa""bbbb
+     * }}}
+     *
+     */
     def parseQuote(a: String)(implicit csvFormat: IttoCSVFormat): String =
       a.replace(s"${csvFormat.quote}${csvFormat.quote}", s"${csvFormat.quote}")
 
