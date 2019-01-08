@@ -26,7 +26,9 @@ case class IttoCSVFormat(
     quoteEmpty: Boolean,  
     forceQuote: Boolean,  
     printHeader: Boolean,  
-    trim: Boolean)  
+    trim: Boolean,
+    ignoreEmptyLines: Boolean,
+    quoteLowerChar: Boolean)
  ```  
 Two formatters are available:  
   
