@@ -338,9 +338,9 @@ See [Doobie Recepies project](https://github.com/gekomad/doobie-recipes/blob/mas
 
 ## Further examples
 
-[From CSV to Type](https://github.com/gekomad/itto-csv/blob/master/src/test/scala/scala/FromCsvTest.scala)
+[From CSV to Type](https://github.com/gekomad/itto-csv/blob/master/src/test/scala/FromCsvTest.scala)
 
-[From Type To CSV](https://github.com/gekomad/itto-csv/blob/master/src/test/scala/scala/ToCsvTest.scala)
+[From Type To CSV](https://github.com/gekomad/itto-csv/blob/master/src/test/scala/ToCsvTest.scala)
 
 <a id="defined_types"></a>
 ## Defined types
