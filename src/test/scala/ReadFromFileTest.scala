@@ -10,10 +10,9 @@ class ReadFromFileTest extends FunSuite {
 
   test("read from file") {
 
-    import com.github.gekomad.ittocsv.parser.files.FromFile.csvFromFile
+    import com.github.gekomad.ittocsv.parser.io.FromFile.csvFromFile
     implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.tab
 
-    import com.github.gekomad.ittocsv.core.Conversions.toUUIDS
     import com.github.gekomad.ittocsv.core.Conversions.fromStringToLocalDateTime
 
     case class Bar(id: UUID, name: String, date: LocalDateTime)
@@ -66,7 +65,7 @@ class ReadFromFileTest extends FunSuite {
       assert(res == Success(errList))
       //read from file - unsafe mode
       intercept[Exception] {
-        val l: Seq[Bar] = {
+        val _l: Seq[Bar] = {
           res match {
             case Failure(a) => throw new Exception(a)
             case Success(a) =>

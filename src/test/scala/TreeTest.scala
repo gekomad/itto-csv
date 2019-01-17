@@ -57,7 +57,7 @@ class TreeTest extends FunSuite {
 
     case class Foo(v: String, a: Tree[Int])
 
-    //serialize
+    //encode
     import com.github.gekomad.ittocsv.core.ToCsv._
 
     implicit def _f(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Tree[Int]] = createEncoder { node =>
@@ -70,7 +70,7 @@ class TreeTest extends FunSuite {
 
     assert(serialized == "abc,\"1(2(3(,),),4(5(,),6(,)))\"")
 
-    //deserialize
+    //decode
     import com.github.gekomad.ittocsv.core.FromCsv._
     import com.github.gekomad.ittocsv.core.FromCsv._
     implicit def _l(implicit csvFormat: IttoCSVFormat): String => Either[ParseFailure, Tree[Int]] =

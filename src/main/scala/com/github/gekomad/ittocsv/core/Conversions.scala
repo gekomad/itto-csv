@@ -1,13 +1,7 @@
 package com.github.gekomad.ittocsv.core
 
 import java.util.UUID
-import com.github.gekomad.ittocsv.core.Types.EmailOps._
-import com.github.gekomad.ittocsv.core.Types.IPOps.{IP, IP6}
-import com.github.gekomad.ittocsv.core.Types.MD5Ops.MD5
-import com.github.gekomad.ittocsv.core.Types.SHAOps.{SHA1, SHA256}
-import com.github.gekomad.ittocsv.core.Types.UrlOps.{URL, UrlValidator}
 import com.github.gekomad.ittocsv.util.TryCatch.tryCatch
-import com.github.gekomad.regexcollection.Validate._
 
 /**
   * Converts a string to type
@@ -63,65 +57,13 @@ object Conversions {
       tryCatch(a.toBoolean)(s"$a is not Boolean")
   }
 
-  implicit def toEmails(implicit emailValidator: EmailValidator): ConvertTo[Email] =
-    new ConvertTo[Email] {
-      def to(a: String): Either[ParseFailure, Email] =
-        emailValidator.validate(a)
-    }
-
-  implicit def toUrls(implicit urlValidator: UrlValidator): ConvertTo[URL] =
-    new ConvertTo[URL] {
-      def to(a: String): Either[ParseFailure, URL] = urlValidator.validate(a)
-    }
-
-  implicit val toMD5s: ConvertTo[MD5] = new ConvertTo[MD5] {
-    def to(a: String): Either[ParseFailure, MD5] =
-      tryCatch {
-        validate[com.github.gekomad.regexcollection.MD5](a).map(_ => MD5(a)) getOrElse (throw new Exception)
-      }(s"$a is not MD5")
-  }
-
-  implicit val toIPs: ConvertTo[IP] = new ConvertTo[IP] {
-    def to(a: String): Either[ParseFailure, IP] =
-      tryCatch {
-        validate[com.github.gekomad.regexcollection.IP](a).map(_ => IP(a)) getOrElse (throw new Exception)
-      }(s"$a is not IP")
-  }
-
-  implicit val toIP6s: ConvertTo[IP6] = new ConvertTo[IP6] {
-    def to(a: String): Either[ParseFailure, IP6] =
-      tryCatch {
-        validate[com.github.gekomad.regexcollection.IP_6](a).map(_ => IP6(a)) getOrElse (throw new Exception)
-      }(s"$a is not IP6")
-  }
-
-  implicit val toSHA1s: ConvertTo[SHA1] = new ConvertTo[SHA1] {
-    def to(a: String): Either[ParseFailure, SHA1] =
-      tryCatch {
-        validate[com.github.gekomad.regexcollection.SHA1](a).map(_ => SHA1(a)) getOrElse (throw new Exception)
-      }(s"$a is not SHA1")
-  }
-
-  implicit val toSHA256s: ConvertTo[SHA256] = new ConvertTo[SHA256] {
-    def to(a: String): Either[ParseFailure, SHA256] =
-      tryCatch {
-        validate[com.github.gekomad.regexcollection.SHA256](a).map(_ => SHA256(a)) getOrElse (throw new Exception)
-      }(s"$a is not SHA256")
-  }
-
   implicit val toUUIDS: ConvertTo[UUID] = new ConvertTo[UUID] {
     def to(a: String): Either[ParseFailure, UUID] =
       tryCatch(UUID.fromString(a))(s"$a is not UUID")
   }
 
-  import java.time.LocalDateTime
-  import java.time.LocalDate
-  import java.time.LocalTime
-  import java.time.OffsetDateTime
-  import java.time.OffsetTime
-  import java.time.ZonedDateTime
-
-  import java.time.format.DateTimeFormatter.{ISO_LOCAL_DATE, ISO_LOCAL_DATE_TIME, ISO_LOCAL_TIME, ISO_OFFSET_DATE_TIME, ISO_OFFSET_TIME, ISO_ZONED_DATE_TIME}
+  import java.time._
+  import java.time.format.DateTimeFormatter._
 
   implicit val fromStringToLocalDateTime: String => Either[ParseFailure, LocalDateTime] = { s =>
     tryCatch(LocalDateTime.parse(s, ISO_LOCAL_DATE_TIME))(s"Not a LocalDataTime $s")
