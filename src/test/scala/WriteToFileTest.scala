@@ -9,7 +9,7 @@ class WriteToFileTest extends FunSuite {
     import java.util.UUID
     case class Bar(id: UUID, name: String, date: LocalDateTime)
 
-    import com.github.gekomad.ittocsv.parser.files.ToFile.csvToFile
+    import com.github.gekomad.ittocsv.parser.io.ToFile.csvToFile
     implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.tab.withPrintHeader(true).withRecordSeparator("\n")
     import com.github.gekomad.ittocsv.core.ToCsv._
 

@@ -1,19 +1,11 @@
 package com.github.gekomad.ittocsv.core
 
-import java.util.UUID
-
+import cats.data.ValidatedNel
+import cats.implicits._
 import com.github.gekomad.ittocsv.core.Conversions.ConvertTo
-import com.github.gekomad.ittocsv.core.Types.EmailOps._
-import com.github.gekomad.ittocsv.core.Types.MD5Ops.MD5
-import com.github.gekomad.ittocsv.core.Types.SHAOps.{SHA1, SHA256}
+import com.github.gekomad.ittocsv.core.Types.Validate
 import com.github.gekomad.ittocsv.parser.IttoCSVFormat
-import cats._
-import com.github.gekomad.ittocsv.core.Types.IPOps.{IP, IP6}
-import com.github.gekomad.ittocsv.core.Types.UrlOps.{URL, UrlValidator}
 import com.github.gekomad.ittocsv.util.TryCatch.tryCatch
-import implicits._
-import data.ValidatedNel
-
 import scala.util.Try
 
 trait Convert[V] {
@@ -41,11 +33,11 @@ object Convert {
       }.toValidatedNel
     }
 
-  implicit def urls(implicit csvFormat: IttoCSVFormat, urlValidator: UrlValidator): Convert[URL] =
-    Convert.instance(urlValidator.validate(_).toValidatedNel)
+  implicit def genericValidator[A](implicit csvFormat: IttoCSVFormat, validator: Validate[A]): Convert[A] =
+    Convert.instance(validator.validate(_).toValidatedNel)
 
-  implicit def emails(implicit csvFormat: IttoCSVFormat, emailValidator: EmailValidator): Convert[Email] =
-    Convert.instance(emailValidator.validate(_).toValidatedNel)
+  implicit def generic[A](implicit f: String => Either[ParseFailure, A]): Convert[A] =
+    Convert.instance(f(_).toValidatedNel)
 
   implicit def lists[A: ConvertTo](implicit csvFormat: IttoCSVFormat): Convert[List[A]] =
     Convert.instance { s =>
@@ -60,28 +52,6 @@ object Convert {
       }.toValidatedNel
 
     }
-
-  implicit def md5s[A: ConvertTo](implicit csvFormat: IttoCSVFormat): Convert[MD5] =
-    Convert.instance(Conversions.toMD5s.to(_).toValidatedNel: ValidatedNel[ParseFailure, MD5])
-
-  implicit def ips[A: ConvertTo](implicit csvFormat: IttoCSVFormat): Convert[IP] =
-    Convert.instance(Conversions.toIPs.to(_).toValidatedNel: ValidatedNel[ParseFailure, IP])
-
-  implicit def ip6s[A: ConvertTo](implicit csvFormat: IttoCSVFormat): Convert[IP6] =
-    Convert.instance(Conversions.toIP6s.to(_).toValidatedNel: ValidatedNel[ParseFailure, IP6])
-
-  implicit def sha1s[A: ConvertTo](implicit csvFormat: IttoCSVFormat): Convert[SHA1] =
-    Convert.instance(s => Conversions.toSHA1s.to(s).toValidatedNel: ValidatedNel[ParseFailure, SHA1])
-
-  implicit def sha256s[A: ConvertTo](implicit csvFormat: IttoCSVFormat): Convert[SHA256] = {
-    Convert.instance(s => Conversions.toSHA256s.to(s).toValidatedNel: ValidatedNel[ParseFailure, SHA256])
-  }
-
-  implicit def uuids[A: ConvertTo](implicit csvFormat: IttoCSVFormat): Convert[UUID] =
-    Convert.instance(Conversions.toUUIDS.to(_).toValidatedNel: ValidatedNel[ParseFailure, UUID])
-
-  implicit def generic[A](implicit f: String => Either[ParseFailure, A]): Convert[A] =
-    Convert.instance(f(_).toValidatedNel)
 
   implicit val optionBoolean: Convert[Option[Boolean]] =
     Convert.instance {
@@ -123,17 +93,7 @@ object Convert {
     case s  => tryCatch(Some(s.toInt))(s"Not a Int for input string: $s").toValidatedNel
   }
 
-  implicit val booleans: Convert[Boolean] = Convert.instance(Conversions.toBooleans.to(_).toValidatedNel)
-
-  implicit val shorts: Convert[Short] = Convert.instance(Conversions.toShorts.to(_).toValidatedNel)
-
-  implicit val bytes: Convert[Byte] = Convert.instance(Conversions.toBytes.to(_).toValidatedNel)
-
-  implicit val double: Convert[Double] = Convert.instance(Conversions.toDoubles.to(_).toValidatedNel)
-
-  implicit val chars: Convert[Char] = Convert.instance(Conversions.toChars.to(_).toValidatedNel)
-
-  implicit val ints: Convert[Int] = Convert.instance(Conversions.toInts.to(_).toValidatedNel)
+  implicit def gen[A](implicit conv: ConvertTo[A]): Convert[A] = Convert.instance(conv.to(_).toValidatedNel)
 
   implicit val strings: Convert[String] = Convert.instance(_.validNel)
 }

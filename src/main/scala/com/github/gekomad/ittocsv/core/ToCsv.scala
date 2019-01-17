@@ -3,11 +3,9 @@ package com.github.gekomad.ittocsv.core
 import java.util.UUID
 
 import com.github.gekomad.ittocsv.core.Header._
-import com.github.gekomad.ittocsv.core.Types.EmailOps._
-import com.github.gekomad.ittocsv.core.Types.IPOps.{IP, IP6}
-import com.github.gekomad.ittocsv.core.Types.MD5Ops.MD5
-import com.github.gekomad.ittocsv.core.Types.SHAOps.{SHA1, SHA256}
-import com.github.gekomad.ittocsv.core.Types.UrlOps.URL
+
+import com.github.gekomad.ittocsv.core.Types.implicits._
+
 import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
 import shapeless.{::, Generic, HList, HNil, Lazy}
 
@@ -53,21 +51,6 @@ object ToCsv {
   implicit def uuidEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[UUID] =
     createEncoder(t => csvConverter.stringToCsvField(t.toString))
 
-  implicit def md5Encoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[MD5] =
-    createEncoder(t => csvConverter.stringToCsvField(t.code))
-
-  implicit def sha1Encoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[SHA1] =
-    createEncoder(t => csvConverter.stringToCsvField(t.code))
-
-  implicit def sha256Encoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[SHA256] =
-    createEncoder(t => csvConverter.stringToCsvField(t.code))
-
-  implicit def ipEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[IP] =
-    createEncoder(t => csvConverter.stringToCsvField(t.code))
-
-  implicit def ip6Encoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[IP6] =
-    createEncoder(t => csvConverter.stringToCsvField(t.code))
-
   implicit def shortEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Short] =
     createEncoder(t => csvConverter.stringToCsvField(t.toString))
 
@@ -76,12 +59,6 @@ object ToCsv {
 
   implicit def charEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Char] =
     createEncoder(t => csvConverter.stringToCsvField(t.toString))
-
-  implicit def emailEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Email] =
-    createEncoder(t => csvConverter.stringToCsvField(t.email))
-
-  implicit def urlEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[URL] =
-    createEncoder(t => csvConverter.stringToCsvField(t.url))
 
   import java.time.LocalDateTime
   import java.time.LocalDate

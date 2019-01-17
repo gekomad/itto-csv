@@ -1,4 +1,4 @@
-package com.github.gekomad.ittocsv.parser.files
+package com.github.gekomad.ittocsv.parser.io
 
 import com.github.gekomad.ittocsv.core.CsvStringEncoder
 import com.github.gekomad.ittocsv.util.ListUtils
