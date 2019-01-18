@@ -1,4 +1,7 @@
-[![Build Status](https://travis-ci.com/gekomad/itto-csv.svg?branch=master)](https://travis-ci.com/gekomad/itto-csv)  [![codecov.io](http://codecov.io/github/gekomad/itto-csv/coverage.svg?branch=master)](http://codecov.io/github/gekomad/itto-csv?branch=master)
+[![Build Status](https://travis-ci.com/gekomad/itto-csv.svg?branch=master)](https://travis-ci.com/gekomad/itto-csv)
+[![codecov.io](http://codecov.io/github/gekomad/itto-csv/coverage.svg?branch=master)](http://codecov.io/github/gekomad/itto-csv?branch=master)
+[![Javadocs](https://javadoc.io/badge/com.github.gekomad/itto-csv_2.12.svg)](https://javadoc.io/doc/com.github.gekomad/itto-csv_2.12)
+[![Cats Friendly Badge](https://typelevel.org/cats/img/cats-badge-tiny.png)](https://typelevel.org/cats/)
 
 Itto-CSV
 =====================
