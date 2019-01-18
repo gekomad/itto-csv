@@ -1,13 +1,11 @@
-[![Build Status](https://travis-ci.com/gekomad/itto-csv.svg?branch=master)](https://travis-ci.com/gekomad/itto-csv)
+Itto-CSV [![Build Status](https://travis-ci.com/gekomad/itto-csv.svg?branch=master)](https://travis-ci.com/gekomad/itto-csv)
 [![codecov.io](http://codecov.io/github/gekomad/itto-csv/coverage.svg?branch=master)](http://codecov.io/github/gekomad/itto-csv?branch=master)
 [![Javadocs](https://javadoc.io/badge/com.github.gekomad/itto-csv_2.12.svg)](https://javadoc.io/doc/com.github.gekomad/itto-csv_2.12)
-[![Cats Friendly Badge](https://typelevel.org/cats/img/cats-badge-tiny.png)](https://typelevel.org/cats/)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.gekomad/itto-csv_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.gekomad/itto-csv_2.12)
+<a href="https://typelevel.org/cats/"><img src="https://typelevel.org/cats/img/cats-badge.svg" height="40px" align="right" alt="Cats friendly" /></a>
+======
 
-Itto-CSV
-=====================
 
-侍
-=
 Itto-CSV is a pure scala library for working with the CSV format
 ## Add the library to your project
 `libraryDependencies += "com.github.gekomad" %% "itto-csv" % "0.1.0"`
