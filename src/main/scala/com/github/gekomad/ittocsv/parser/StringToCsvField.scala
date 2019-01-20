@@ -58,7 +58,7 @@ object StringToCsvField {
             val p = if (containsQuote) s.replace(csvFormat.quote.toString, s"$q$q") else s
 
             if (containsQuote || csvFormat.forceQuote || csvFormat.quoteLowerChar && (s(s.length - 1) <= SP || s(0) <= COMMENT))
-              csvFormat.quote + p + csvFormat.quote
+              s"${csvFormat.quote}$p${csvFormat.quote}"
             else p
         }
     }
