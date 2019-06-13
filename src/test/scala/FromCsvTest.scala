@@ -1,8 +1,8 @@
 import cats.data.NonEmptyList
 import com.github.gekomad.ittocsv.core.{ParseFailure, Schema}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class FromCsvTest extends FunSuite {
+class FromCsvTest extends AnyFunSuite {
 
   test("csv string to type - 1") {
 

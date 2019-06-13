@@ -2,11 +2,11 @@ import java.time.LocalDateTime
 import java.util.UUID
 import cats.data.NonEmptyList
 import com.github.gekomad.ittocsv.core.ParseFailure
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.{Failure, Success, Try}
 
-class ReadFromFileTest extends FunSuite {
+class ReadFromFileTest extends AnyFunSuite {
 
   test("read from file") {
 

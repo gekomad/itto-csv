@@ -1,6 +1,6 @@
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class ToCsvTest extends FunSuite {
+class ToCsvTest extends AnyFunSuite {
 
   test("email") {
     import com.github.gekomad.ittocsv.core.Types.implicits._

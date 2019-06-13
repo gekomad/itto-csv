@@ -1,6 +1,6 @@
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class StringUtilTest extends FunSuite {
+class StringUtilTest extends AnyFunSuite {
 
   test("split") {
     import com.github.gekomad.ittocsv.util.StringUtils._

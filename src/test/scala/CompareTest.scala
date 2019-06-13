@@ -1,10 +1,10 @@
 import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
 import org.apache.commons.csv.CSVFormat
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import com.github.gekomad.ittocsv.parser.Constants._
 
-class CompareTest extends FunSuite {
+class CompareTest extends AnyFunSuite {
 
   test("Compare with Apache commons-csv") {
 

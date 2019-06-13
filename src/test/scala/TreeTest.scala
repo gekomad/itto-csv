@@ -1,7 +1,7 @@
 import com.github.gekomad.ittocsv.core.ParseFailure
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class TreeTest extends FunSuite {
+class TreeTest extends AnyFunSuite {
 
   test("encode/decode Tree[Int]") {
     object OTree {

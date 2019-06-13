@@ -1,9 +1,10 @@
 import java.time.LocalDateTime
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
+
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
-class WriteToFileTest extends FunSuite {
+class WriteToFileTest extends AnyFunSuite {
 
   test("write to file") {
     import java.util.UUID

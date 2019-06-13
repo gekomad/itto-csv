@@ -1,7 +1,7 @@
 import com.github.gekomad.ittocsv.parser.IttoCSVFormat
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class CsvLineTest extends FunSuite {
+class CsvLineTest extends AnyFunSuite {
 
   test("csv string to list") {
 

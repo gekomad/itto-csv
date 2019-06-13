@@ -1,6 +1,6 @@
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class CsvFieldTest extends FunSuite {
+class CsvFieldTest extends AnyFunSuite {
   test("stringToCsvField trim") {
     import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
     implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withTrim(true)
