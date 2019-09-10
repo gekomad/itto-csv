@@ -30,13 +30,9 @@ object FromFile {
     import com.github.gekomad.ittocsv.core.FromCsv._
 
     Try {
-      val x = scala.io.Source
-        .fromFile(filePath)
-        .getLines
-        .map { line =>
-          fromCsv[A](line).head
-        }
-        .toList
+      val file = scala.io.Source.fromFile(filePath)
+      val x    = file.getLines.map(line => fromCsv[A](line).head).toList
+      file.close()
       if (skipHeader) x.drop(1) else x
     }
   }
