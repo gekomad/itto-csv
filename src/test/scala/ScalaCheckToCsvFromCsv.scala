@@ -35,6 +35,10 @@ object ScalaCheckToCsvFromCsv extends Properties("Scalacheck - from string to cs
     recordSeparator <- recordSeparators
     quote           <- quotes
     if quote != delimiter
-  } yield property("csvFieldToString") = doubleTrasformation(format1.withDelimiter(delimiter).withRecordSeparator(recordSeparator).withQuote(quote), generator)
+  } yield
+    property("csvFieldToString") = doubleTrasformation(
+      format1.withDelimiter(delimiter).withRecordSeparator(recordSeparator).withQuote(quote),
+      generator
+    )
 
 }

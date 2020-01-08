@@ -1,20 +1,22 @@
 import com.github.gekomad.ittocsv.core.ParseFailure
 import org.scalatest.funsuite.AnyFunSuite
 
+import scala.util.matching.Regex
+
 class TreeTest extends AnyFunSuite {
 
   test("encode/decode Tree[Int]") {
     object OTree {
 
       //thanks to amitayh https://gist.github.com/amitayh/373f512c50222e15550869e2ff539b25
-      case class Tree[A](value: A, left: Option[Tree[A]] = None, right: Option[Tree[A]] = None)
+      final case class Tree[A](value: A, left: Option[Tree[A]] = None, right: Option[Tree[A]] = None)
 
       object Serializer {
-        val pattern         = """^(\d+)\((.*)\)$""".r
-        val treeOpen        = '('
-        val treeClose       = ')'
-        val separator       = ','
-        val separatorLength = 1
+        val pattern: Regex       = """^(\d+)\((.*)\)$""".r
+        val treeOpen: Char       = '('
+        val treeClose: Char      = ')'
+        val separator: Char      = ','
+        val separatorLength: Int = 1
 
         def serialize[A](nodeOption: Option[Tree[A]]): String = nodeOption match {
           case Some(Tree(value, left, right)) =>
@@ -55,7 +57,7 @@ class TreeTest extends AnyFunSuite {
 
     implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
 
-    case class Foo(v: String, a: Tree[Int])
+    final case class Foo(v: String, a: Tree[Int])
 
     //encode
     import com.github.gekomad.ittocsv.core.ToCsv._
@@ -71,7 +73,6 @@ class TreeTest extends AnyFunSuite {
     assert(serialized == "abc,\"1(2(3(,),),4(5(,),6(,)))\"")
 
     //decode
-    import com.github.gekomad.ittocsv.core.FromCsv._
     import com.github.gekomad.ittocsv.core.FromCsv._
     implicit def _l(implicit csvFormat: IttoCSVFormat): String => Either[ParseFailure, Tree[Int]] =
       (str: String) =>

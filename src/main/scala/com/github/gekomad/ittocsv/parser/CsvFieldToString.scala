@@ -53,8 +53,8 @@ object CsvFieldToString {
      *
      */
     def parseBorders(a: String)(implicit csvFormat: IttoCSVFormat): String = {
-      val Q = csvFormat.quote.toString
-      if (a.length > 1 && a.startsWith(Q) && a.endsWith(Q)) a.init.drop(1) else a
+      val q = csvFormat.quote.toString
+      if (a.length > 1 && a.startsWith(q) && a.endsWith(q)) a.init.drop(1) else a
     }
 
     /*

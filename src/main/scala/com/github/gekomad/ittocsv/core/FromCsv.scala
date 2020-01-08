@@ -18,7 +18,7 @@ object FromCsv {
   /**
     * @param csv       is the string to parse. It might contain record separator
     * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-    * @return `Seq[Either[NonEmptyList[ParseFailure], A]]` based on the parsing of `csv`, any errors are reported
+    * @return `List[Either[NonEmptyList[ParseFailure], A]]` based on the parsing of `csv`, any errors are reported
     * {{{
     *  import com.github.gekomad.ittocsv.core.FromCsv._
     *  implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
@@ -32,7 +32,9 @@ object FromCsv {
     *  assert(fromCsv[Foo]("abc,\"1,2,3\"") == List(Right(Foo("abc", List(1, 2, 3)))))
     * }}}
     */
-  def fromCsv[A: FieldNames: Schema](csv: String)(implicit csvFormat: IttoCSVFormat): Seq[Either[NonEmptyList[ParseFailure], A]] =
+  def fromCsv[A: FieldNames: Schema](
+    csv: String
+  )(implicit csvFormat: IttoCSVFormat): List[Either[NonEmptyList[ParseFailure], A]] =
     fromCsv(csv.split(csvFormat.recordSeparator, -1).toList)
 
   import com.github.gekomad.ittocsv.core.Conversions._
@@ -41,7 +43,7 @@ object FromCsv {
     *
     * @param csv       is the string to parse. It might contain record separator
     * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-    * @return `Seq[Either[ParseFailure, A]]` based on the parsing of `csv`, any errors are reported
+    * @return `List[Either[ParseFailure, A]]` based on the parsing of `csv`, any errors are reported
     * {{{
     * import com.github.gekomad.ittocsv.core.FromCsv._
     *
@@ -51,15 +53,13 @@ object FromCsv {
     * assert(fromCsvL[Double]("1.1,abc,3.1") == List(Right(1.1), Left(com.github.gekomad.ittocsv.core.FromCsv.ParseFailure("Not a Double abc")), Right(3.1)))
     *}}}
     */
-  def fromCsvL[A: ConvertTo](csv: String)(implicit csvFormat: IttoCSVFormat): Seq[Either[ParseFailure, A]] = {
-    val x = csv.split(csvFormat.delimeter.toString, -1).toList
-    x.map(a => convert[A](a))
-  }
+  def fromCsvL[A: ConvertTo](csv: String)(implicit csvFormat: IttoCSVFormat): List[Either[ParseFailure, A]] =
+    csv.split(csvFormat.delimeter.toString, -1).toList.map(convert[A])
 
   /**
     * @param csvList   is the List[String] to parse
     * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-    * @return `Seq[Either[NonEmptyList[ParseFailure], A]]` based on the parsing of `csvList` any errors are reported
+    * @return `List[Either[NonEmptyList[ParseFailure], A]]` based on the parsing of `csvList` any errors are reported
     * {{{
     *  import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     *  import com.github.gekomad.ittocsv.core.FromCsv._
@@ -69,10 +69,12 @@ object FromCsv {
     *  assert(p1 == List(Right(Foo(1, 3.14, "foo", true)), Right(Foo(2, 3.14, "bar", false))))
     * }}}
     */
-  def fromCsv[A: FieldNames: Schema](csvList: List[String])(implicit csvFormat: IttoCSVFormat): Seq[Either[NonEmptyList[ParseFailure], A]] = {
-    if (csvList.isEmpty) Nil
-    else
-      csvList collect {
+  def fromCsv[A: FieldNames: Schema](
+    csvList: List[String]
+  )(implicit csvFormat: IttoCSVFormat): List[Either[NonEmptyList[ParseFailure], A]] = csvList match {
+    case Nil => Nil
+    case l =>
+      l collect {
         case row if !row.isEmpty || !csvFormat.ignoreEmptyLines =>
           tokenizeCsvLine(row) match {
             case None => Left(NonEmptyList(ParseFailure(s"$csvList is not a valid csv string"), Nil))

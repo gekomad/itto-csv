@@ -23,11 +23,9 @@ object StringUtils {
 
       case x0 :: x1 :: xs =>
         val a = s.substring(x0 + 1, x1)
-
         val b = sp(s, x1 :: xs)
         a :: b
-      case x0 :: _ =>
-        List(s.substring(x0 + 1, s.length))
+      case x0 :: _ => List(s.substring(x0 + 1, s.length))
     }
 
     sp(string, -1 :: separators)

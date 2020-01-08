@@ -10,8 +10,11 @@ object ScalaCheckCompare extends Properties("Scalacheck - Compare with apache co
   import org.scalacheck.Prop.forAll
   import com.github.gekomad.ittocsv.parser.Constants._
 
-  val generators       = List(Gen.asciiPrintableStr, Gen.asciiStr, Arbitrary.arbitrary[String])
-  val csvFormats       = List((IttoCSVFormat.default.withQuoteEmpty(true).withQuoteLowerChar(true), CSVFormat.DEFAULT), (IttoCSVFormat.tab.withQuoteEmpty(true).withQuoteLowerChar(true), CSVFormat.TDF))
+  val generators = List(Gen.asciiPrintableStr, Gen.asciiStr, Arbitrary.arbitrary[String])
+  val csvFormats = List(
+    (IttoCSVFormat.default.withQuoteEmpty(true).withQuoteLowerChar(true), CSVFormat.DEFAULT),
+    (IttoCSVFormat.tab.withQuoteEmpty(true).withQuoteLowerChar(true), CSVFormat.TDF)
+  )
   val delimiters       = List(COMMA, SEMICOLON, PIPE)
   val recordSeparators = List(LF, CRLF)
   val quotes           = List(PIPE, DOUBLE_QUOTE)

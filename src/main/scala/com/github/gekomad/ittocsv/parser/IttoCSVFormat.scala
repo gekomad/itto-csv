@@ -81,7 +81,7 @@ object IttoCSVFormat {
     * | withIgnoreEmptyLines(c: Boolean) | skips empty lines    false |
     * | withQuoteLowerChar(c: Boolean) | quotes lower chars|    false |
     */
-  val default = IttoCSVFormat(
+  val default: IttoCSVFormat = IttoCSVFormat(
     quote = DOUBLE_QUOTE,
     delimeter = COMMA,
     recordSeparator = CRLF,
@@ -93,20 +93,20 @@ object IttoCSVFormat {
     quoteLowerChar = false
   )
 
-  /**
-    * | Method   |    Descrizione        | default|
-    * |----------|:-------------:|------:|-:|
-    * | withDelimiter(c: Char)   |  the separator between fields  |\t|
-    * | withQuote(c: Char)        |    the quoteChar character    |"|
-    * | withQuoteEmpty(c: Boolean)  | quotes field if empty |false|
-    * | withForceQuote(c: Boolean) | quotes all fields  |false|
-    * | withPrintHeader(c: Boolean)  | if true prints the header (method toCsvL)  |false|
-    * | withTrim(c: Boolean)   | trims the field | false|
-    * | withRecordSeparator(c: String) | the rows separator |\r\n|
-    * | withIgnoreEmptyLines(c: Boolean) | skips empty lines  |  false |
-    * | withQuoteLowerChar(c: Boolean) | quotes lower chars|    false |
-    */
-  val tab = IttoCSVFormat(
+  /*
+   * | Method   |    Descrizione        | default|
+   * |----------|:-------------:|------:|-:|
+   * | withDelimiter(c: Char)   |  the separator between fields  |\t|
+   * | withQuote(c: Char)        |    the quoteChar character    |"|
+   * | withQuoteEmpty(c: Boolean)  | quotes field if empty |false|
+   * | withForceQuote(c: Boolean) | quotes all fields  |false|
+   * | withPrintHeader(c: Boolean)  | if true prints the header (method toCsvL)  |false|
+   * | withTrim(c: Boolean)   | trims the field | false|
+   * | withRecordSeparator(c: String) | the rows separator |\r\n|
+   * | withIgnoreEmptyLines(c: Boolean) | skips empty lines  |  false |
+   * | withQuoteLowerChar(c: Boolean) | quotes lower chars|    false |
+   */
+  val tab: IttoCSVFormat = IttoCSVFormat(
     quote = DOUBLE_QUOTE,
     delimeter = TAB,
     recordSeparator = CRLF,

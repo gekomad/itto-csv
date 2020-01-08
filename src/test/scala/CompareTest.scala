@@ -1,13 +1,11 @@
-import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
 import org.apache.commons.csv.CSVFormat
 import org.scalatest.funsuite.AnyFunSuite
-
 import com.github.gekomad.ittocsv.parser.Constants._
 
 class CompareTest extends AnyFunSuite {
 
   test("Compare with Apache commons-csv") {
-
+    import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
     def doTest(p: IttoCSVFormat, f: CSVFormat) = {
       def compare(s: String) = {
 
@@ -51,7 +49,10 @@ class CompareTest extends AnyFunSuite {
       compare("么ꄍ횊獎更ἆ쌀ᯞ腒䭗䘍뚞瘅鰅몐説ₒᤑ犫槅䪇꣫힆⏽蜁ᅚ竁퇈醮듑㧖\u0018")
     }
 
-    val csvFormats       = List((IttoCSVFormat.default.withQuoteEmpty(true).withQuoteLowerChar(true), CSVFormat.DEFAULT), (IttoCSVFormat.tab.withQuoteEmpty(true).withQuoteLowerChar(true), CSVFormat.TDF))
+    val csvFormats = List(
+      (IttoCSVFormat.default.withQuoteEmpty(true).withQuoteLowerChar(true), CSVFormat.DEFAULT),
+      (IttoCSVFormat.tab.withQuoteEmpty(true).withQuoteLowerChar(true), CSVFormat.TDF)
+    )
     val delimiters       = List(COMMA, SEMICOLON, PIPE)
     val recordSeparators = List(LF, CRLF)
     val quotes           = List(PIPE, DOUBLE_QUOTE)
@@ -64,7 +65,11 @@ class CompareTest extends AnyFunSuite {
       recordSeparator    <- recordSeparators
       quote              <- quotes
       if quote != delimiter
-    } yield doTest(format1.withDelimiter(delimiter).withRecordSeparator(recordSeparator).withQuote(quote), format2.withDelimiter(delimiter).withRecordSeparator(recordSeparator).withQuote(quote))
+    } yield
+      doTest(
+        format1.withDelimiter(delimiter).withRecordSeparator(recordSeparator).withQuote(quote),
+        format2.withDelimiter(delimiter).withRecordSeparator(recordSeparator).withQuote(quote)
+      )
 
   }
 }

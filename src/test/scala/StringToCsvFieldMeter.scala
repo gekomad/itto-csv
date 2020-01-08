@@ -10,7 +10,12 @@ class StringToCsvFieldMeter extends AnyFunSuite {
 
     implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
 
-    val standardConfig = config(Key.exec.minWarmupRuns -> 20, Key.exec.maxWarmupRuns -> 100000, Key.exec.benchRuns -> 200, Key.verbose -> false) withWarmer new Warmer.Default
+    val standardConfig = config(
+      Key.exec.minWarmupRuns -> 20,
+      Key.exec.maxWarmupRuns -> 100000,
+      Key.exec.benchRuns     -> 200,
+      Key.verbose            -> false
+    ) withWarmer new Warmer.Default
 
     val asciiStringGen = Gen.asciiPrintableStr.map(_.mkString.take(20))
     val l              = Gen.listOfN(100, asciiStringGen).sample.get

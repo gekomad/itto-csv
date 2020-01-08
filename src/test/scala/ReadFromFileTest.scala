@@ -1,6 +1,8 @@
 import java.time.LocalDateTime
 import java.util.UUID
+
 import cats.data.NonEmptyList
+import cats.effect.IO
 import com.github.gekomad.ittocsv.core.ParseFailure
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -10,15 +12,16 @@ class ReadFromFileTest extends AnyFunSuite {
 
   test("read from file") {
 
-    import com.github.gekomad.ittocsv.parser.io.FromFile.csvFromFile
+    import com.github.gekomad.ittocsv.parser.io.FromFile.csvFromFileUnsafe
     implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.tab
 
     import com.github.gekomad.ittocsv.core.Conversions.fromStringToLocalDateTime
 
-    case class Bar(id: UUID, name: String, date: LocalDateTime)
+    final case class Bar(id: UUID, name: String, date: LocalDateTime)
 
     val resList: List[Right[ParseFailure, Bar]] = {
-      def getDate(s: String): LocalDateTime = LocalDateTime.parse(s, java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+      def getDate(s: String): LocalDateTime =
+        LocalDateTime.parse(s, java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 
       List(
         Right(Bar(UUID.fromString("1cc3ccbb-c749-3078-e050-1aacbe064651"), "bob", getDate("2018-11-20T09:10:25"))),
@@ -29,27 +32,36 @@ class ReadFromFileTest extends AnyFunSuite {
     }
 
     {
-      val path                                                    = getClass.getResource("/csv_with_header.csv").getPath
-      val list: Try[Seq[Either[NonEmptyList[ParseFailure], Bar]]] = csvFromFile[Bar](path, skipHeader = true)
+      val path                                                     = getClass.getResource("/csv_with_header.csv").getPath
+      val list: Try[List[Either[NonEmptyList[ParseFailure], Bar]]] = csvFromFileUnsafe[Bar](path, skipHeader = true)
       assert(list.isSuccess && list.get == resList)
     }
 
     {
+      import com.github.gekomad.ittocsv.parser.io.FromFile.csvFromFileStream
+      val path = getClass.getResource("/csv_with_header.csv").getPath
+      val list = csvFromFileStream[Bar](path, skipHeader = true).compile.toList.unsafeRunSync()
+
+      assert(list == resList)
+    }
+
+    {
       val path = getClass.getResource("/csv_without_header.csv").getPath
-      val list = csvFromFile[Bar](path, skipHeader = false)
+      val list = csvFromFileUnsafe[Bar](path, skipHeader = false)
       assert(list.isSuccess && list.get == resList)
     }
 
     {
       val path = getClass.getResource("/empty_file.csv").getPath
-      val list = csvFromFile[Bar](path, skipHeader = true)
+      val list = csvFromFileUnsafe[Bar](path, skipHeader = true)
       assert(list.isSuccess && list.get == Nil)
     }
 
     {
 
       val errList: List[Either[NonEmptyList[ParseFailure], Bar]] = {
-        def getDate(s: String): LocalDateTime = LocalDateTime.parse(s, java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        def getDate(s: String): LocalDateTime =
+          LocalDateTime.parse(s, java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 
         List(
           Right(Bar(UUID.fromString("1cc3ccbb-c749-3078-e050-1aacbe064651"), "bob", getDate("2018-11-20T09:10:25"))),
@@ -60,7 +72,7 @@ class ReadFromFileTest extends AnyFunSuite {
       }
 
       val path = getClass.getResource("/csv_with_error.csv").getPath
-      val res  = csvFromFile[Bar](path, skipHeader = true)
+      val res  = csvFromFileUnsafe[Bar](path, skipHeader = true)
 
       assert(res == Success(errList))
       //read from file - unsafe mode

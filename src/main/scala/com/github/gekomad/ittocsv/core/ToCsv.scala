@@ -1,11 +1,10 @@
 package com.github.gekomad.ittocsv.core
 
+import java.time.Instant
 import java.util.UUID
 
 import com.github.gekomad.ittocsv.core.Header._
-
 import com.github.gekomad.ittocsv.core.Types.implicits._
-
 import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
 import shapeless.{::, Generic, HList, HNil, Lazy}
 
@@ -23,10 +22,7 @@ trait CsvStringEncoder[A] {
   */
 object ToCsv {
 
-  def createEncoder[A](func: A => String): CsvStringEncoder[A] =
-    new CsvStringEncoder[A] {
-      override def encode(value: A): String = func(value)
-    }
+  def createEncoder[A](func: A => String): CsvStringEncoder[A] = (value: A) => func(value)
 
   val csvConverter = StringToCsvField
 
@@ -85,17 +81,15 @@ object ToCsv {
   implicit def zonedDateTimeEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[ZonedDateTime] =
     createEncoder(t => csvConverter.stringToCsvField(t.toString))
 
-  ///////////////////////////
+  implicit def instantEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Instant] =
+    createEncoder(t => csvConverter.stringToCsvField(t.toString))
 
-  implicit val hnilEncoder: CsvStringEncoder[HNil] =
-    new CsvStringEncoder[HNil] {
-      override def encode(value: HNil): String = ""
-    }
+  implicit val hnilEncoder: CsvStringEncoder[HNil] = (_: HNil) => ""
 
-  implicit def genericEncoder[A, R](implicit gen: Generic.Aux[A, R], rEncoder: Lazy[CsvStringEncoder[R]]): CsvStringEncoder[A] =
-    createEncoder { value =>
-      rEncoder.value.encode(gen.to(value))
-    }
+  implicit def genericEncoder[A, R](
+    implicit gen: Generic.Aux[A, R],
+    rEncoder: Lazy[CsvStringEncoder[R]]
+  ): CsvStringEncoder[A] = createEncoder(value => rEncoder.value.encode(gen.to(value)))
 
   private def header[A: FieldNames](implicit enc: CsvStringEncoder[A], csvFormat: IttoCSVFormat): String =
     if (csvFormat.printHeader) csvHeader[A] + csvFormat.recordSeparator else ""
@@ -120,7 +114,10 @@ object ToCsv {
     * }}}
     *
     */
-  def toCsv[A](a: A, printRecordSeparator: Boolean = false)(implicit enc: CsvStringEncoder[A], csvFormat: IttoCSVFormat): String =
+  def toCsv[A](
+    a: A,
+    printRecordSeparator: Boolean = false
+  )(implicit enc: CsvStringEncoder[A], csvFormat: IttoCSVFormat): String =
     (if (printRecordSeparator) csvFormat.recordSeparator else "") + enc.encode(a)
 
   /**
@@ -136,7 +133,7 @@ object ToCsv {
     *
     */
   def toCsv[A](a: Seq[A])(implicit enc: CsvStringEncoder[A], csvFormat: IttoCSVFormat): String =
-    a.map(value => toCsv(value)).mkString(csvFormat.delimeter.toString)
+    a.map(toCsv(_)).mkString(csvFormat.delimeter.toString)
 
   /**
     * @param a         is the List of elements to convert
@@ -150,13 +147,16 @@ object ToCsv {
     *
     */
   def toCsvL[A: FieldNames](a: Seq[A])(implicit enc: CsvStringEncoder[A], csvFormat: IttoCSVFormat): String =
-    header + a.map(value => toCsv(value)).mkString(csvFormat.recordSeparator)
+    header + a.map(toCsv(_)).mkString(csvFormat.recordSeparator)
 
-  implicit def hlistEncoder[H, T <: HList](implicit hEncoder: CsvStringEncoder[H], tEncoder: CsvStringEncoder[T], csvFormat: IttoCSVFormat): CsvStringEncoder[H :: T] = createEncoder {
+  implicit def hlistEncoder[H, T <: HList](
+    implicit hEncoder: CsvStringEncoder[H],
+    tEncoder: CsvStringEncoder[T],
+    csvFormat: IttoCSVFormat
+  ): CsvStringEncoder[H :: T] = createEncoder {
     case h :: HNil        => hEncoder.encode(h)
     case h :: Nil :: HNil => hEncoder.encode(h)
-    case h :: t =>
-      hEncoder.encode(h) ++ csvFormat.delimeter.toString + tEncoder.encode(t)
+    case h :: t           => hEncoder.encode(h) ++ csvFormat.delimeter.toString + tEncoder.encode(t)
   }
 
   import shapeless.{:+:, CNil, Coproduct, Inl, Inr}

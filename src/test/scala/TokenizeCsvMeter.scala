@@ -9,7 +9,12 @@ class TokenizeCsvMeter extends AnyFunSuite {
 
     implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
     import com.github.gekomad.ittocsv.util.StringUtils._
-    val standardConfig = config(Key.exec.minWarmupRuns -> 20, Key.exec.maxWarmupRuns -> 100000, Key.exec.benchRuns -> 1000, Key.verbose -> false) withWarmer new Warmer.Default
+    val standardConfig = config(
+      Key.exec.minWarmupRuns -> 20,
+      Key.exec.maxWarmupRuns -> 100000,
+      Key.exec.benchRuns     -> 1000,
+      Key.verbose            -> false
+    ) withWarmer new Warmer.Default
 
     val asciiStringGen = Gen.asciiPrintableStr.map(_.mkString.take(40))
     val l              = Gen.listOfN(1000, asciiStringGen).sample.get
@@ -20,6 +25,5 @@ class TokenizeCsvMeter extends AnyFunSuite {
       }
     }
     printf(f"** tokenizeCsvMeter time: ${time.value}%1.2f **\n")
-
   }
 }
