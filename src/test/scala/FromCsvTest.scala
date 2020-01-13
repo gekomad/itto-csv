@@ -1073,6 +1073,25 @@ class FromCsvTest extends AnyFunSuite {
 
   }
 
+  test("decode Option[LocalDate]") {
+    import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
+    import java.time.LocalDate
+
+    import com.github.gekomad.ittocsv.parser.IttoCSVFormat
+    import com.github.gekomad.ittocsv.core.FromCsv._
+    import com.github.gekomad.ittocsv.core.Conversions._
+
+    final case class Foo(a: Int, b: Option[LocalDate])
+
+    implicit val csvFormat = IttoCSVFormat.default
+
+    {
+      val o = fromCsv[Foo]("1,2000-12-31")
+      assert(o == List(Right(Foo(1, Some(LocalDate.parse("2000-12-31", ISO_LOCAL_DATE))))))
+    }
+
+  }
+
   test("decode Option[LocalDateTime]") {
     import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
     import java.time.LocalDateTime
