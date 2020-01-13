@@ -1,5 +1,5 @@
 name := "itto-csv"
-version := "1.1.0"
+version := "1.1.1"
 organization := "com.github.gekomad"
 scalaVersion := "2.13.1"
 

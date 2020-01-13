@@ -41,31 +41,32 @@ object Conversions {
   import java.time._
   import java.time.format.DateTimeFormatter._
 
-  implicit val fromStringToLocalDateTime: String => Either[ParseFailure, LocalDateTime] = { s =>
-    tryToEither(LocalDateTime.parse(s, ISO_LOCAL_DATE_TIME))(ParseFailure(s"Not a LocalDataTime $s"))
-  }
-
   implicit def fromGenericOption[A](
     implicit f: String => Either[ParseFailure, A]
   ): String => Either[ParseFailure, Option[A]] =
     s => if (s == "") Right(None) else f(s).map(Some(_))
 
-  implicit val fromStringToLocalDate: ConvertTo[LocalDate] =
-    (s: String) => tryToEither(LocalDate.parse(s, ISO_LOCAL_DATE))(ParseFailure(s"Not a LocalDate $s"))
+  implicit val fromStringToLocalDateTime: String => Either[ParseFailure, LocalDateTime] = { s =>
+    tryToEither(LocalDateTime.parse(s, ISO_LOCAL_DATE_TIME))(ParseFailure(s"Not a LocalDataTime $s"))
+  }
 
-  implicit val fromStringToLocalTime: ConvertTo[LocalTime] =
+  implicit val fromStringToLocalDate: String => Either[ParseFailure, LocalDate] = { s =>
+    tryToEither(LocalDate.parse(s, ISO_LOCAL_DATE))(ParseFailure(s"Not a LocalDate $s"))
+  }
+
+  implicit val fromStringToLocalTime: String => Either[ParseFailure, LocalTime] =
     (s: String) => tryToEither(LocalTime.parse(s, ISO_LOCAL_TIME))(ParseFailure(s"Not a LocalTime $s"))
 
-  implicit val fromStringToOffsetDateTime: ConvertTo[OffsetDateTime] =
+  implicit val fromStringToOffsetDateTime: String => Either[ParseFailure, OffsetDateTime] =
     (s: String) => tryToEither(OffsetDateTime.parse(s, ISO_OFFSET_DATE_TIME))(ParseFailure(s"Not a OffsetDateTime $s"))
 
-  implicit val fromStringToOffsetTime: ConvertTo[OffsetTime] =
+  implicit val fromStringToOffsetTime: String => Either[ParseFailure, OffsetTime] =
     (s: String) => tryToEither(OffsetTime.parse(s, ISO_OFFSET_TIME))(ParseFailure(s"Not a OffsetTime $s"))
 
-  implicit val fromStringToZonedDateTime: ConvertTo[ZonedDateTime] =
+  implicit val fromStringToZonedDateTime: String => Either[ParseFailure, ZonedDateTime] =
     (s: String) => tryToEither(ZonedDateTime.parse(s, ISO_ZONED_DATE_TIME))(ParseFailure(s"Not a ZonedDateTime $s"))
 
-  implicit val fromStringInstant: ConvertTo[Instant] =
+  implicit val fromStringInstant: String => Either[ParseFailure, Instant] =
     (s: String) => tryToEither(Instant.parse(s))(ParseFailure(s"Not a Instant $s"))
 
   def convert[A](s: String)(implicit f: ConvertTo[A]): Either[ParseFailure, A] = f.to(s)
