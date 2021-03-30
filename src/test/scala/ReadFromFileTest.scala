@@ -7,6 +7,7 @@ import com.github.gekomad.ittocsv.core.ParseFailure
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.{Failure, Success, Try}
+import cats.effect.unsafe.implicits.global
 
 class ReadFromFileTest extends AnyFunSuite {
 

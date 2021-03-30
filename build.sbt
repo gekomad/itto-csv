@@ -1,11 +1,9 @@
 name := "itto-csv"
-version := "1.1.1"
+version := "1.2.0"
 organization := "com.github.gekomad"
-scalaVersion := "2.13.1"
+scalaVersion := "2.13.5"
 
-val catsVersion = "2.1.0"
-
-crossScalaVersions := Seq("2.12.9", "2.13.1")
+crossScalaVersions := Seq("2.12.9")
 
 val options = Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
@@ -20,7 +18,6 @@ val options = Seq(
   "-Ywarn-dead-code", // Warn when dead code is identified.
   "-Ywarn-extra-implicit", // Warn when more than one implicit parameter section is defined.
   "-Xlint:missing-interpolator", // A string literal appears to be missing an interpolator id.
-  "-Xlint:nullary-override", // Warn when non-nullary `def f()' overrides nullary `def f'.
   "-Xlint:nullary-unit", // Warn when nullary methods return Unit.
   "-Xlint:option-implicit", // Option.apply used implicit view.
   "-Xlint:package-object-classes", // Class or object defined in package object.
@@ -34,9 +31,7 @@ scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
 })
 
 //cats
-libraryDependencies += "org.typelevel"      %% "cats-core"              % catsVersion
-libraryDependencies += "co.fs2"             %% "fs2-core"               % catsVersion
-libraryDependencies += "co.fs2"             %% "fs2-io"                 % catsVersion
+libraryDependencies += "co.fs2"             %% "fs2-io"                 % "3.0.0"
 
 //shapeless
 libraryDependencies += "com.chuusai"        %% "shapeless"              % "2.3.3"
@@ -45,10 +40,10 @@ libraryDependencies += "com.chuusai"        %% "shapeless"              % "2.3.3
 libraryDependencies += "com.github.gekomad" %% "scala-regex-collection" % "1.0.1"
 
 //test
-libraryDependencies += "com.storm-enroute"  %% "scalameter"             % "0.19"      % Test
-libraryDependencies += "org.scalatest"      %% "scalatest"              % "3.2.0-M2"  % Test
-libraryDependencies += "org.apache.commons"  % "commons-csv"            % "1.7"       % Test
-libraryDependencies += "org.scalacheck"     %% "scalacheck"             % "1.14.3"    % Test
+libraryDependencies += "com.storm-enroute"  %% "scalameter"             % "0.19"        % Test
+libraryDependencies += "org.scalatest"      %% "scalatest"              % "3.3.0-SNAP3" % Test
+libraryDependencies += "org.apache.commons"  % "commons-csv"            % "1.8"         % Test
+libraryDependencies += "org.scalacheck"     %% "scalacheck"             % "1.15.3"      % Test
 
 testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-minSuccessfulTests", "1000")
 
