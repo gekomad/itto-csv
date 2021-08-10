@@ -4,7 +4,6 @@ import java.time.Instant
 import java.util.UUID
 
 import com.github.gekomad.ittocsv.core.Header._
-import com.github.gekomad.ittocsv.core.Types.implicits._
 import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
 import shapeless.{::, Generic, HList, HNil, Lazy}
 

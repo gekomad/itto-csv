@@ -1,7 +1,7 @@
 package com.github.gekomad.ittocsv.core
 
 import cats.{Applicative, Id}
-import cats.data.{NonEmptyList, Validated, ValidatedNel}
+import cats.data.{Validated, ValidatedNel}
 import com.github.gekomad.ittocsv.core.Conversions.ConvertTo
 import com.github.gekomad.ittocsv.core.Types.Validate
 import com.github.gekomad.ittocsv.parser.IttoCSVFormat

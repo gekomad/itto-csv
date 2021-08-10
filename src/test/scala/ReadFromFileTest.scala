@@ -5,7 +5,7 @@ import cats.data.NonEmptyList
 import cats.effect.IO
 import com.github.gekomad.ittocsv.core.ParseFailure
 import org.scalatest.funsuite.AnyFunSuite
-
+import cats.effect.unsafe.implicits.global
 import scala.util.{Failure, Success, Try}
 
 class ReadFromFileTest extends AnyFunSuite {

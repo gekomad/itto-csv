@@ -1,10 +1,9 @@
 import java.time.LocalDateTime
-
 import cats.effect.ExitCode
 import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 import fs2.Pure
 import org.scalatest.funsuite.AnyFunSuite
-
+import cats.effect.unsafe.implicits.global
 import scala.io.Source
 
 class WriteToFileTest extends AnyFunSuite {
@@ -33,13 +32,13 @@ class WriteToFileTest extends AnyFunSuite {
       )
 
       Util.deleteFile(filePath)
-      csvToFile(list, filePath).attempt.unsafeRunSync match {
+      csvToFile(list, filePath).attempt.unsafeRunSync() match {
         case Left(value)  => assert(false, value)
         case Right(value) => assert(value == ExitCode.Success)
       }
 
       val file  = Source.fromFile(filePath)
-      val lines = file.getLines.mkString
+      val lines = file.getLines().mkString
       file.close()
       assert(
         lines == "id\tname\tdate1cc3ccbb-c749-3078-e050-1aacbe064651\tbob\t2018-11-20T09:10:253cc3ccbb-c749-3078-e050-1aacbe064653\talice\t2018-11-20T10:12:244cc3ccbb-c749-3078-e050-1aacbe064654\tjim\t2018-11-20T11:18:175cc3ccbb-c749-3078-e050-1aacbe064655\ttom\t2018-11-20T11:36:04"
@@ -86,13 +85,13 @@ class WriteToFileTest extends AnyFunSuite {
 
     val filePath = "/tmp/out_stream.csv"
     Util.deleteFile(filePath)
-    csvToFileStream(stream, filePath).attempt.unsafeRunSync match {
+    csvToFileStream(stream, filePath).attempt.unsafeRunSync() match {
       case Left(value)  => assert(false, value)
       case Right(value) => assert(value == ExitCode.Success)
     }
 
     val file  = Source.fromFile(filePath)
-    val lines = file.getLines.mkString
+    val lines = file.getLines().mkString
     file.close()
     assert(
       lines == "id\tname\tdate1cc3ccbb-c749-3078-e050-1aacbe064651\tbob\t2018-11-20T09:10:253cc3ccbb-c749-3078-e050-1aacbe064653\talice\t2018-11-20T10:12:244cc3ccbb-c749-3078-e050-1aacbe064654\tjim\t2018-11-20T11:18:175cc3ccbb-c749-3078-e050-1aacbe064655\ttom\t2018-11-20T11:36:04"

@@ -2,7 +2,8 @@ package com.github.gekomad.ittocsv.parser.io
 
 import com.github.gekomad.ittocsv.core.FromCsv.fromCsv
 import com.github.gekomad.ittocsv.core.ParseFailure
-import scala.concurrent.ExecutionContext.Implicits.global
+import fs2.io.file.Files
+import cats.effect.unsafe.implicits.global
 import scala.util.{Failure, Success, Try}
 
 /**
@@ -36,22 +37,18 @@ object FromFile {
 
   import java.nio.file.Paths
 
-  import cats.effect.{Blocker, ContextShift, IO}
-  import fs2.{Stream, io, text}
-  implicit val contextShift: ContextShift[IO] = IO.contextShift(global)
+  import cats.effect.IO
+  import fs2.{Stream, text}
 
   def csvFromFileStream[A: FieldNames: Schema](filePath: String, skipHeader: Boolean)(
     implicit csvFormat: IttoCSVFormat
   ): Stream[IO, Either[NonEmptyList[ParseFailure], A]] = {
-    val x: Stream[IO, Either[NonEmptyList[ParseFailure], A]] = fs2.Stream
-      .resource(Blocker[IO])
-      .flatMap { blocker =>
-        io.file
-          .readAll[IO](Paths.get(filePath), blocker, 4096)
-          .through(text.utf8Decode)
-          .through(text.lines)
-          .map(line => fromCsv[A](line).head)
-      }
+    val x: Stream[IO, Either[NonEmptyList[ParseFailure], A]] =
+      Files[IO]
+        .readAll(fs2.io.file.Path(filePath))
+        .through(text.utf8.decode)
+        .through(text.lines)
+        .map(line => fromCsv[A](line).head)
 
     if (skipHeader) x.drop(1) else x
 
