@@ -1,0 +1,31 @@
+options:
+
+  - title: Formatters
+    url: docs/
+
+  - title: Type to CSV
+    url: docs/type-to-csv/
+
+  - title: CSV to list
+    url: docs/csv-to-list/
+
+  - title: List to CSV
+    url: docs/list-to-csv/
+
+  - title: Write/Read List to file
+    url: docs/write-list-to-file/
+
+  - title: FS2 stream
+    url: docs/fs2-stream/
+
+  - title: Get Header
+    url: docs/get-header/
+
+  - title: Regex
+    url: docs/regex/
+
+  - title: Spooling CSV file using FS2 Stream and Doobie
+    url: docs/spooling-csvfile-using-fs2-stream-and-doobie
+
+  - title: Further examples
+    url: docs/further-examples
