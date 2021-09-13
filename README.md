@@ -13,13 +13,13 @@ Scala 2
 -------
 `libraryDependencies += "com.github.gekomad" %% "itto-csv" % "1.2.0"`
 
-View [microsite](https://gekomad.github.io/itto-csv/scala2/docs/) for more information.
+View [microsite](https://gekomad.github.io/itto-csv/v1/docs/) for more information.
 
 Scala 3
 -------
 `libraryDependencies += "com.github.gekomad" %% "itto-csv" % "2.0.0-M1"`
 
-View [microsite](https://gekomad.github.io/itto-csv/scala3/docs/) for more information.
+View [microsite](https://gekomad.github.io/itto-csv/v2/docs/) for more information.
 
 
 ## Bugs and Feedback
