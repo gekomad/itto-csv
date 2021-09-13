@@ -1,173 +1,217 @@
 package com.github.gekomad.ittocsv.core
 
-import java.time.Instant
-import java.util.UUID
-
 import com.github.gekomad.ittocsv.core.Header._
+import com.github.gekomad.ittocsv.core.Types.implicits._
 import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
-import shapeless.{::, Generic, HList, HNil, Lazy}
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.OffsetTime
+import java.time.ZonedDateTime
+import java.util.UUID
+import scala.deriving.Mirror
 
-trait CsvStringEncoder[A] {
-  def encode(value: A): String
-}
-
-/**
-  * Converts the type A to CSV
-  *
-  * @author Giuseppe Cannella
-  * @since 0.0.1
-  * @see See test code for more information
-  * @see See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information.
-  */
 object ToCsv {
+  trait FieldEncoder[A]:
+    def encodeField(a: A)(using csvFormat: IttoCSVFormat): String
 
-  def createEncoder[A](func: A => String): CsvStringEncoder[A] = (value: A) => func(value)
+  trait RowEncoder[A] {
+    def encodeRow(a: A)(using csvFormat: IttoCSVFormat): List[String]
+  }
 
-  val csvConverter = StringToCsvField
+  def customFieldEncoder[A](f: A => String) = {
+    new FieldEncoder[A] {
+      def encodeField(x: A)(using csvFormat: IttoCSVFormat) =
+        StringToCsvField.stringToCsvField(f(x))
+    }
+  }
 
-  implicit def stringEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[String] =
-    createEncoder(t => csvConverter.stringToCsvField(t))
+  given FieldEncoder[Int] = customFieldEncoder[Int](_.toString)
+  given FieldEncoder[Boolean] = customFieldEncoder[Boolean](x => if x then "true" else "false")
+  given FieldEncoder[UUID] = customFieldEncoder[UUID](_.toString)
+  given FieldEncoder[String] = customFieldEncoder[String](identity)
+  given FieldEncoder[Long] = customFieldEncoder[Long](_.toString)
+  given FieldEncoder[Double] = customFieldEncoder[Double](_.toString)
+  given FieldEncoder[Byte] = customFieldEncoder[Byte](_.toString)
+  given FieldEncoder[Short] = customFieldEncoder[Short](_.toString)
+  given FieldEncoder[Float] = customFieldEncoder[Float](_.toString)
+  given FieldEncoder[Char] = customFieldEncoder[Char](_.toString)
+  given FieldEncoder[LocalDate] = customFieldEncoder[LocalDate](_.toString)
+  given FieldEncoder[LocalDateTime] = customFieldEncoder[LocalDateTime](_.toString)
+  given FieldEncoder[LocalTime] = customFieldEncoder[LocalTime](_.toString)
+  given FieldEncoder[OffsetDateTime] = customFieldEncoder[OffsetDateTime](_.toString)
+  given FieldEncoder[OffsetTime] = customFieldEncoder[OffsetTime](_.toString)
+  given FieldEncoder[ZonedDateTime] = customFieldEncoder[ZonedDateTime](_.toString)
+  given FieldEncoder[Instant] = customFieldEncoder[Instant](_.toString)
+  given FieldEncoder[SHA1] = customFieldEncoder[SHA1](_.value.toString)
+  given FieldEncoder[SHA256] = customFieldEncoder[SHA256](_.value.toString)
+  given FieldEncoder[IP] = customFieldEncoder[IP](_.value.toString)
+  given FieldEncoder[IP6] = customFieldEncoder[IP6](_.value.toString)
+  given FieldEncoder[BitcoinAdd] = customFieldEncoder[BitcoinAdd](_.value.toString)
+  given FieldEncoder[USphoneNumber] = customFieldEncoder[USphoneNumber](_.value.toString)
+  given FieldEncoder[ItalianMobilePhone] = customFieldEncoder[ItalianMobilePhone](_.value.toString)
+  given FieldEncoder[ItalianPhone] = customFieldEncoder[ItalianPhone](_.value.toString)
+  given FieldEncoder[Time24] = customFieldEncoder[Time24](_.value.toString)
+  given FieldEncoder[MDY] = customFieldEncoder[MDY](_.value.toString)
+  given FieldEncoder[MDY2] = customFieldEncoder[MDY2](_.value.toString)
+  given FieldEncoder[MDY3] = customFieldEncoder[MDY3](_.value.toString)
+  given FieldEncoder[MDY4] = customFieldEncoder[MDY4](_.value.toString)
+  given FieldEncoder[DMY] = customFieldEncoder[DMY](_.value.toString)
+  given FieldEncoder[DMY2] = customFieldEncoder[DMY2](_.value.toString)
+  given FieldEncoder[DMY3] = customFieldEncoder[DMY3](_.value.toString)
+  given FieldEncoder[DMY4] = customFieldEncoder[DMY4](_.value.toString)
+  given FieldEncoder[Time] = customFieldEncoder[Time](_.value.toString)
+  given FieldEncoder[Cron] = customFieldEncoder[Cron](_.value.toString)
+  given FieldEncoder[ItalianFiscalCode] = customFieldEncoder[ItalianFiscalCode](_.value.toString)
+  given FieldEncoder[ItalianVAT] = customFieldEncoder[ItalianVAT](_.value.toString)
+  given FieldEncoder[ItalianIban] = customFieldEncoder[ItalianIban](_.value.toString)
+  given FieldEncoder[USstates] = customFieldEncoder[USstates](_.value.toString)
+  given FieldEncoder[USstates1] = customFieldEncoder[USstates1](_.value.toString)
+  given FieldEncoder[USZipCode] = customFieldEncoder[USZipCode](_.value.toString)
+  given FieldEncoder[ItalianZipCode] = customFieldEncoder[ItalianZipCode](_.value.toString)
+  given FieldEncoder[USstreets] = customFieldEncoder[USstreets](_.value.toString)
+  given FieldEncoder[USstreetNumber] = customFieldEncoder[USstreetNumber](_.value.toString)
+  given FieldEncoder[GermanStreet] = customFieldEncoder[GermanStreet](_.value.toString)
+  given FieldEncoder[UsdCurrency] = customFieldEncoder[UsdCurrency](_.value.toString)
+  given FieldEncoder[EurCurrency] = customFieldEncoder[EurCurrency](_.value.toString)
+  given FieldEncoder[YenCurrency] = customFieldEncoder[YenCurrency](_.value.toString)
+  given FieldEncoder[NotASCII] = customFieldEncoder[NotASCII](_.value.toString)
+  given FieldEncoder[SingleChar] = customFieldEncoder[SingleChar](_.value.toString)
+  given FieldEncoder[AZString] = customFieldEncoder[AZString](_.value.toString)
+  given FieldEncoder[AsciiString] = customFieldEncoder[AsciiString](_.value.toString)
+  given FieldEncoder[StringAndNumber] = customFieldEncoder[StringAndNumber](_.value.toString)
+  given FieldEncoder[ApacheError] = customFieldEncoder[ApacheError](_.value.toString)
+  given FieldEncoder[Number1] = customFieldEncoder[Number1](_.value.toString)
+  given FieldEncoder[Unsigned32] = customFieldEncoder[Unsigned32](_.value.toString)
+  given FieldEncoder[Signed] = customFieldEncoder[Signed](_.value.toString)
+  given FieldEncoder[Percentage] = customFieldEncoder[Percentage](_.value.toString)
+  given FieldEncoder[Scientific] = customFieldEncoder[Scientific](_.value.toString)
+  given FieldEncoder[SingleNumber] = customFieldEncoder[SingleNumber](_.value.toString)
+  given FieldEncoder[Celsius] = customFieldEncoder[Celsius](_.value.toString)
+  given FieldEncoder[Fahrenheit] = customFieldEncoder[Fahrenheit](_.value.toString)
+  given FieldEncoder[Coordinate] = customFieldEncoder[Coordinate](_.value.toString)
+  given FieldEncoder[Coordinate1] = customFieldEncoder[Coordinate1](_.value.toString)
+  given FieldEncoder[Coordinate2] = customFieldEncoder[Coordinate2](_.value.toString)
+  given FieldEncoder[Youtube] = customFieldEncoder[Youtube](_.value.toString)
+  given FieldEncoder[Facebook] = customFieldEncoder[Facebook](_.value.toString)
+  given FieldEncoder[Twitter] = customFieldEncoder[Twitter](_.value.toString)
+  given FieldEncoder[MACAddress] = customFieldEncoder[MACAddress](_.value.toString)
+  given FieldEncoder[Email1] = customFieldEncoder[Email1](_.value.toString)
+  given FieldEncoder[Email] = customFieldEncoder[Email](_.value.toString)
+  given FieldEncoder[EmailSimple] = customFieldEncoder[EmailSimple](_.value.toString)
+  given FieldEncoder[HEX] = customFieldEncoder[HEX](_.value.toString)
+  given FieldEncoder[HEX1] = customFieldEncoder[HEX1](_.value.toString)
+  given FieldEncoder[HEX2] = customFieldEncoder[HEX2](_.value.toString)
+  given FieldEncoder[HEX3] = customFieldEncoder[HEX3](_.value.toString)
+  given FieldEncoder[URL] = customFieldEncoder[URL](_.value.toString)
+  given FieldEncoder[URL1] = customFieldEncoder[URL1](_.value.toString)
+  given FieldEncoder[URL2] = customFieldEncoder[URL2](_.value.toString)
+  given FieldEncoder[URL3] = customFieldEncoder[URL3](_.value.toString)
+  given FieldEncoder[FTP] = customFieldEncoder[FTP](_.value.toString)
+  given FieldEncoder[FTP1] = customFieldEncoder[FTP1](_.value.toString)
+  given FieldEncoder[FTP2] = customFieldEncoder[FTP2](_.value.toString)
+  given FieldEncoder[Domain] = customFieldEncoder[Domain](_.value.toString)
+  given FieldEncoder[MD5] = customFieldEncoder[MD5](_.value.toString)
 
-  implicit def intEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Int] =
-    createEncoder(t => csvConverter.stringToCsvField(t.toString))
+  given [A](using enc: FieldEncoder[A]): FieldEncoder[Option[A]] =
+    new FieldEncoder[Option[A]] {
+      def encodeField(x: Option[A])(using csvFormat: IttoCSVFormat) =
+        x match {
+          case Some(xx) => enc.encodeField(xx)
+          case _        => StringToCsvField.stringToCsvField("")
+        }
+    }
 
-  implicit def longEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Long] =
-    createEncoder(t => csvConverter.stringToCsvField(t.toString))
+  given [A](using enc: FieldEncoder[A]): FieldEncoder[List[A]] =
+    new FieldEncoder[List[A]] {
+      def encodeField(x: List[A])(using csvFormat: IttoCSVFormat) =
+        x match {
+          case x :: Nil => enc.encodeField(x)
+          case x :: xs  => enc.encodeField(x) + csvFormat.recordSeparator + encodeField(xs)
+          case _        => StringToCsvField.stringToCsvField("")
+        }
+    }
 
-  implicit def doubleEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Double] =
-    createEncoder(t => csvConverter.stringToCsvField(t.toString))
+  given RowEncoder[EmptyTuple] with
+    def encodeRow(empty: EmptyTuple)(using csvFormat: IttoCSVFormat) = List.empty
 
-  implicit def booleanEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Boolean] =
-    createEncoder(t => csvConverter.stringToCsvField(t.toString))
+  given [H: FieldEncoder, T <: Tuple: RowEncoder]: RowEncoder[H *: T] with
+    def encodeRow(tuple: H *: T)(using csvFormat: IttoCSVFormat) =
+      summon[FieldEncoder[H]].encodeField(tuple.head) :: summon[RowEncoder[T]].encodeRow(tuple.tail)
 
-  implicit def byteEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Byte] =
-    createEncoder(t => csvConverter.stringToCsvField(t.toString))
+  private def tupleToCsv[A <: Tuple: RowEncoder](tuple: A)(using csvFormat: IttoCSVFormat): List[String] =
+    summon[RowEncoder[A]].encodeRow(tuple)
 
-  implicit def uuidEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[UUID] =
-    createEncoder(t => csvConverter.stringToCsvField(t.toString))
-
-  implicit def shortEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Short] =
-    createEncoder(t => csvConverter.stringToCsvField(t.toString))
-
-  implicit def floatEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Float] =
-    createEncoder(t => csvConverter.stringToCsvField(t.toString))
-
-  implicit def charEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Char] =
-    createEncoder(t => csvConverter.stringToCsvField(t.toString))
-
-  import java.time.LocalDateTime
-  import java.time.LocalDate
-  import java.time.LocalTime
-  import java.time.OffsetDateTime
-  import java.time.OffsetTime
-  import java.time.ZonedDateTime
-
-  implicit def localDateEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[LocalDate] =
-    createEncoder(t => csvConverter.stringToCsvField(t.toString))
-
-  implicit def localDateTimeEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[LocalDateTime] =
-    createEncoder(t => csvConverter.stringToCsvField(t.toString))
-
-  implicit def localTimeEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[LocalTime] =
-    createEncoder(t => csvConverter.stringToCsvField(t.toString))
-
-  implicit def offsetDateTimeEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[OffsetDateTime] =
-    createEncoder(t => csvConverter.stringToCsvField(t.toString))
-
-  implicit def offsetTimeEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[OffsetTime] =
-    createEncoder(t => csvConverter.stringToCsvField(t.toString))
-
-  implicit def zonedDateTimeEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[ZonedDateTime] =
-    createEncoder(t => csvConverter.stringToCsvField(t.toString))
-
-  implicit def instantEncoder(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Instant] =
-    createEncoder(t => csvConverter.stringToCsvField(t.toString))
-
-  implicit val hnilEncoder: CsvStringEncoder[HNil] = (_: HNil) => ""
-
-  implicit def genericEncoder[A, R](
-    implicit gen: Generic.Aux[A, R],
-    rEncoder: Lazy[CsvStringEncoder[R]]
-  ): CsvStringEncoder[A] = createEncoder(value => rEncoder.value.encode(gen.to(value)))
-
-  private def header[A: FieldNames](implicit enc: CsvStringEncoder[A], csvFormat: IttoCSVFormat): String =
+  inline def header[A](using mirror: Mirror.Of[A], csvFormat: IttoCSVFormat): String =
     if (csvFormat.printHeader) csvHeader[A] + csvFormat.recordSeparator else ""
 
   /**
-    * @param a                    is the element to convert
-    * @param printRecordSeparator if true, appends the record separator to end of string
-    * @param enc                  the [[com.github.gekomad.ittocsv.core.CsvStringEncoder]] encoder
-    * @param csvFormat            the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-    * @return the CSV string encoded
-    * {{{
-    * import com.github.gekomad.ittocsv.core.ToCsv._
-    * implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
-    *
-    * case class Bar(a: String, b: Int)
-    * assert(toCsv(Bar("侍", 42)) == "侍,42")
-    * case class Baz(x: String)
-    * case class Foo(a: Int, c: Baz)
-    * case class Xyz(a: String, b: Int, c: Foo)
-    *
-    * assert(toCsv(Xyz("hello", 3, Foo(1, Baz("hi, dude")))) == "hello,3,1,\"hi, dude\"")
-    * }}}
-    *
-    */
-  def toCsv[A](
+   * @param a
+   *   is the element to convert
+   * @param printRecordSeparator
+   *   if true, appends the record separator to end of string
+   * @param enc
+   *   the [[com.github.gekomad.ittocsv.core.CsvStringEncoder]] encoder
+   * @param csvFormat
+   *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+   * @return
+   *   the CSV string encoded
+   * {{{
+   * import com.github.gekomad.ittocsv.core.ToCsv._
+   * given IttoCSVFormat = IttoCSVFormat.default
+   *
+   * case class Bar(a: String, b: Int)
+   * assert(toCsv(Bar("侍", 42)) == "侍,42")
+   * case class Baz(x: String)
+   * case class Foo(a: Int, c: Baz)
+   * case class Xyz(a: String, b: Int, c: Foo)
+   *
+   * assert(toCsv(Xyz("hello", 3, Foo(1, Baz("hi, dude")))) == "hello,3,1,\"hi, dude\"")
+   * }}}
+   */
+  def toCsv[A <: Product](
     a: A,
     printRecordSeparator: Boolean = false
-  )(implicit enc: CsvStringEncoder[A], csvFormat: IttoCSVFormat): String =
-    (if (printRecordSeparator) csvFormat.recordSeparator else "") + enc.encode(a)
+  )(using m: scala.deriving.Mirror.ProductOf[A], e: RowEncoder[m.MirroredElemTypes], csvFormat: IttoCSVFormat): String =
+    (if (printRecordSeparator) csvFormat.recordSeparator else "") + toCsv(a)
 
-  /**
-    * @param a         is the List of elements to convert
-    * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-    * @return the CSV string encoded
-    * {{{
-    * import com.github.gekomad.ittocsv.core.ToCsv._
-    * implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
-    * case class Bar(a: String, b: Int)
-    * assert(toCsv(List(Bar("abc", 42), Bar("def", 24))) == "abc,42,def,24")
-    * }}}
-    *
-    */
-  def toCsv[A](a: Seq[A])(implicit enc: CsvStringEncoder[A], csvFormat: IttoCSVFormat): String =
-    a.map(toCsv(_)).mkString(csvFormat.delimeter.toString)
-
-  /**
-    * @param a         is the List of elements to convert
-    * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-    * {{{
-    * import com.github.gekomad.ittocsv.core.ToCsv._
-    * implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
-    * case class Bar(a: String, b: Int)
-    * assert(toCsvL(List(Bar("abc", 42), Bar("def", 24))) == "a,b\r\nabc,42\r\ndef,24")
-    * }}}
-    *
-    */
-  def toCsvL[A: FieldNames](a: Seq[A])(implicit enc: CsvStringEncoder[A], csvFormat: IttoCSVFormat): String =
-    header + a.map(toCsv(_)).mkString(csvFormat.recordSeparator)
-
-  implicit def hlistEncoder[H, T <: HList](
-    implicit hEncoder: CsvStringEncoder[H],
-    tEncoder: CsvStringEncoder[T],
+  inline def toCsvL[A <: Product](a: Seq[A])(using
+    m: scala.deriving.Mirror.ProductOf[A],
+    e: RowEncoder[m.MirroredElemTypes],
     csvFormat: IttoCSVFormat
-  ): CsvStringEncoder[H :: T] = createEncoder {
-    case h :: HNil        => hEncoder.encode(h)
-    case h :: Nil :: HNil => hEncoder.encode(h)
-    case h :: t           => hEncoder.encode(h) ++ csvFormat.delimeter.toString + tEncoder.encode(t)
-  }
+  ): String = header + a.map(toCsv(_)).mkString(csvFormat.recordSeparator)
 
-  import shapeless.{:+:, CNil, Coproduct, Inl, Inr}
+  def toCsv[A <: Product](a: Seq[A])(using
+    m: scala.deriving.Mirror.ProductOf[A],
+    e: RowEncoder[m.MirroredElemTypes],
+    csvFormat: IttoCSVFormat
+  ): String = a.map(toCsv(_)).mkString(csvFormat.delimeter.toString)
 
-  implicit val cnilEncoder: CsvStringEncoder[CNil] = createEncoder(_ => throw new Exception("Inconceivable!"))
+  def toCsv[A](a: Seq[A])(using
+    enc: FieldEncoder[A],
+    csvFormat: IttoCSVFormat
+  ): String = a.map(toCsv(_)).mkString(csvFormat.delimeter.toString)
 
-  implicit def coproductEncoder[H, T <: Coproduct](
-    implicit
-    hEncoder: Lazy[CsvStringEncoder[H]],
-    tEncoder: CsvStringEncoder[T]
-  ): CsvStringEncoder[H :+: T] = createEncoder {
-    case Inl(h) => hEncoder.value.encode(h)
-    case Inr(t) => tEncoder.encode(t)
+  def toCsv[A <: Product](t: A)(using
+    m: scala.deriving.Mirror.ProductOf[A],
+    e: RowEncoder[m.MirroredElemTypes],
+    csvFormat: IttoCSVFormat
+  ): String = e.encodeRow(Tuple.fromProductTyped(t)).mkString(csvFormat.delimeter.toString)
+
+  def toCsv[A](t: A)(using
+    enc: FieldEncoder[A],
+    csvFormat: IttoCSVFormat
+  ): String = enc.encodeField(t)
+
+  def toCsvFlat[A <: Product](a: A)(using m: scala.deriving.Mirror.ProductOf[A], csvFormat: IttoCSVFormat) = {
+
+    def flatTuple(any: Any): Tuple = any match
+      case p: Product => p.productIterator.map(flatTuple).foldLeft(EmptyTuple: Tuple)(_ ++ _)
+      case a          => Tuple1(a)
+
+    val tuple = flatTuple(Tuple.fromProductTyped(a)).toList
+    tuple.map(a => StringToCsvField.stringToCsvField(a.toString)).mkString(csvFormat.delimeter.toString)
   }
 }

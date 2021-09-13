@@ -1,26 +1,31 @@
-import com.github.gekomad.ittocsv.core.ParseFailure
-import org.scalatest.funsuite.AnyFunSuite
-
+import com.github.gekomad.ittocsv.parser.StringToCsvField
+import org.junit.Test
+import com.github.gekomad.ittocsv.core.ToCsv
+import com.github.gekomad.ittocsv.core.ToCsv.*
+import com.github.gekomad.ittocsv.core.Types.RegexValidator
+import com.github.gekomad.ittocsv.core.FromCsv.Decoder
 import scala.util.matching.Regex
+import com.github.gekomad.ittocsv.core.ToCsv.given
+import com.github.gekomad.ittocsv.core.FromCsv.*
 
-class TreeTest extends AnyFunSuite {
+class TreeTest {
+  @Test def encode_decodeTree_Int(): Unit = {
 
-  test("encode/decode Tree[Int]") {
     object OTree {
 
       //thanks to amitayh https://gist.github.com/amitayh/373f512c50222e15550869e2ff539b25
       final case class Tree[A](value: A, left: Option[Tree[A]] = None, right: Option[Tree[A]] = None)
 
       object Serializer {
-        val pattern: Regex       = """^(\d+)\((.*)\)$""".r
-        val treeOpen: Char       = '('
-        val treeClose: Char      = ')'
-        val separator: Char      = ','
+        val pattern: Regex = """^(\d+)\((.*)\)$""".r
+        val treeOpen: Char = '('
+        val treeClose: Char = ')'
+        val separator: Char = ','
         val separatorLength: Int = 1
 
         def serialize[A](nodeOption: Option[Tree[A]]): String = nodeOption match {
           case Some(Tree(value, left, right)) =>
-            val leftStr  = serialize(left)
+            val leftStr = serialize(left)
             val rightStr = serialize(right)
             s"$value$treeOpen$leftStr$separator$rightStr$treeClose"
 
@@ -50,21 +55,18 @@ class TreeTest extends AnyFunSuite {
       }
 
     }
-    import com.github.gekomad.ittocsv.core.CsvStringEncoder
-    import OTree.Serializer._
-    import OTree._
+    import OTree.*
+    import OTree.Serializer.*
+
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class Foo(v: String, a: Tree[Int])
 
     //encode
-    import com.github.gekomad.ittocsv.core.ToCsv._
-
-    implicit def _f(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Tree[Int]] = createEncoder { node =>
-      csvConverter.stringToCsvField(serialize(Some(node)))
-    }
+    import com.github.gekomad.ittocsv.core.ToCsv.*
+    given FieldEncoder[Tree[Int]] = customFieldEncoder[Tree[Int]](x => serialize(Some(x)))
 
     val tree: Tree[Int] = Tree(1, Some(Tree(2, Some(Tree(3)))), Some(Tree(4, Some(Tree(5)), Some(Tree(6)))))
 
@@ -73,15 +75,13 @@ class TreeTest extends AnyFunSuite {
     assert(serialized == "abc,\"1(2(3(,),),4(5(,),6(,)))\"")
 
     //decode
-    import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit def _l(implicit csvFormat: IttoCSVFormat): String => Either[ParseFailure, Tree[Int]] =
-      (str: String) =>
-        deserialize(str, _.toInt) match {
-          case None    => Left(ParseFailure(s"Not a Node[Short] $str"))
-          case Some(a) => Right(a)
+    given Decoder[String, Tree[Int]] = str => {
+      deserialize(str, _.toInt) match {
+        case None    => Left(List(s"Not a Node[Short] $str"))
+        case Some(a) => Right(a)
       }
+    }
 
     assert(fromCsv[Foo](serialized) == List(Right(Foo("abc", tree))))
-
   }
 }

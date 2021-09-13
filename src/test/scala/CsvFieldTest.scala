@@ -1,18 +1,19 @@
-import org.scalatest.funsuite.AnyFunSuite
+import org.junit.Test
 
-class CsvFieldTest extends AnyFunSuite {
-  test("stringToCsvField trim") {
+class CsvFieldTest {
+
+  @Test def stringToCsvFieldTrim(): Unit = {
     import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withTrim(true)
+    given IttoCSVFormat = IttoCSVFormat.default.withTrim(true)
 
     assert(StringToCsvField.stringToCsvField("a ") == "a")
     assert(StringToCsvField.stringToCsvField(" a ") == "a")
     assert(StringToCsvField.stringToCsvField("  ") == "")
   }
 
-  test("stringToCsvField force quote") {
+  @Test def stringToCsvFieldForceQuote(): Unit = {
     import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withForceQuote(true)
+    given IttoCSVFormat = IttoCSVFormat.default.withForceQuote(true)
 
     assert(StringToCsvField.stringToCsvField("\"") == "\"\"\"\"")
     assert(StringToCsvField.stringToCsvField(",") == "\",\"")
@@ -30,15 +31,15 @@ class CsvFieldTest extends AnyFunSuite {
     assert(StringToCsvField.stringToCsvField("aa,\"b") == "\"aa,\"\"b\"")
   }
 
-  test("stringToCsvField 0") {
+  @Test def stringToCsvField0(): Unit = {
     import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withQuoteLowerChar(true)
+    given IttoCSVFormat = IttoCSVFormat.default.withQuoteLowerChar(true)
     assert(StringToCsvField.stringToCsvField(" ") == "\" \"")
   }
 
-  test("stringToCsvField 1") {
+  @Test def stringToCsvField1(): Unit = {
     import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withQuoteLowerChar(true)
+    given IttoCSVFormat = IttoCSVFormat.default.withQuoteLowerChar(true)
 
     assert(StringToCsvField.stringToCsvField("\"") == "\"\"\"\"")
     assert(StringToCsvField.stringToCsvField(",") == "\",\"")
@@ -55,9 +56,9 @@ class CsvFieldTest extends AnyFunSuite {
     assert(StringToCsvField.stringToCsvField("aa,\"b") == "\"aa,\"\"b\"")
   }
 
-  test("stringToCsvField 2") {
+  @Test def stringToCsvField2(): Unit = {
     import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withQuoteEmpty(true).withQuoteLowerChar(true)
+    given IttoCSVFormat = IttoCSVFormat.default.withQuoteEmpty(true).withQuoteLowerChar(true)
 
     assert(StringToCsvField.stringToCsvField("\"") == "\"\"\"\"")
     assert(StringToCsvField.stringToCsvField(",") == "\",\"")
@@ -74,10 +75,10 @@ class CsvFieldTest extends AnyFunSuite {
     assert(StringToCsvField.stringToCsvField("aa,\"b") == "\"aa,\"\"b\"")
   }
 
-  test("csvFieldToString") {
+  @Test def csvFieldToStringTest(): Unit = {
     import com.github.gekomad.ittocsv.parser.CsvFieldToString.csvFieldToString
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withQuoteEmpty(true)
+    given IttoCSVFormat = IttoCSVFormat.default.withQuoteEmpty(true)
 
     assert(csvFieldToString("\"\"\",\"\"\"") == "\",\"")
     assert(csvFieldToString("\"aa\na\"") == "aa\na")
@@ -98,13 +99,13 @@ class CsvFieldTest extends AnyFunSuite {
     assert(csvFieldToString("\"aa,\"\"b\"") == "aa,\"b")
   }
 
-  test("both 1") {
+  @Test def both1(): Unit = {
     import com.github.gekomad.ittocsv.parser.CsvFieldToString.csvFieldToString
     import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withDelimiter('A')
-    val orig                              = "aAc"
-    val csv                               = StringToCsvField.stringToCsvField(orig)
-    val string                            = csvFieldToString(csv)
+    given IttoCSVFormat = IttoCSVFormat.default.withDelimiter('A')
+    val orig = "aAc"
+    val csv = StringToCsvField.stringToCsvField(orig)
+    val string = csvFieldToString(csv)
     assert(orig == string)
   }
 }

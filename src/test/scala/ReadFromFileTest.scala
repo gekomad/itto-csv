@@ -1,25 +1,21 @@
+import cats.effect.IO
+import cats.effect.unsafe.implicits.global
+import com.github.gekomad.ittocsv.parser.IttoCSVFormat
+import org.junit.Test
+
 import java.time.LocalDateTime
 import java.util.UUID
-
-import cats.data.NonEmptyList
-import cats.effect.IO
-import com.github.gekomad.ittocsv.core.ParseFailure
-import org.scalatest.funsuite.AnyFunSuite
-import cats.effect.unsafe.implicits.global
 import scala.util.{Failure, Success, Try}
 
-class ReadFromFileTest extends AnyFunSuite {
+class ReadFromFileTest {
 
-  test("read from file") {
-
+  @Test def readFromFile(): Unit = {
     import com.github.gekomad.ittocsv.parser.io.FromFile.csvFromFileUnsafe
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.tab
-
-    import com.github.gekomad.ittocsv.core.Conversions.fromStringToLocalDateTime
-
+    
+    given IttoCSVFormat = IttoCSVFormat.tab
     final case class Bar(id: UUID, name: String, date: LocalDateTime)
 
-    val resList: List[Right[ParseFailure, Bar]] = {
+    val resList: List[Right[String, Bar]] = {
       def getDate(s: String): LocalDateTime =
         LocalDateTime.parse(s, java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 
@@ -32,8 +28,8 @@ class ReadFromFileTest extends AnyFunSuite {
     }
 
     {
-      val path                                                     = getClass.getResource("/csv_with_header.csv").getPath
-      val list: Try[List[Either[NonEmptyList[ParseFailure], Bar]]] = csvFromFileUnsafe[Bar](path, skipHeader = true)
+      val path = getClass.getResource("/csv_with_header.csv").getPath
+      val list: Try[List[Either[List[String], Bar]]] = csvFromFileUnsafe[Bar](path, skipHeader = true)
       assert(list.isSuccess && list.get == resList)
     }
 
@@ -59,35 +55,41 @@ class ReadFromFileTest extends AnyFunSuite {
 
     {
 
-      val errList: List[Either[NonEmptyList[ParseFailure], Bar]] = {
+      val errList: List[Either[List[String], Bar]] = {
         def getDate(s: String): LocalDateTime =
           LocalDateTime.parse(s, java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 
         List(
           Right(Bar(UUID.fromString("1cc3ccbb-c749-3078-e050-1aacbe064651"), "bob", getDate("2018-11-20T09:10:25"))),
           Right(Bar(UUID.fromString("3cc3ccbb-c749-3078-e050-1aacbe064653"), "alice", getDate("2018-11-20T10:12:24"))),
-          Left(NonEmptyList(ParseFailure("xxx is not UUID"), Nil)),
+          Left(List("xxx value is not valid UUID")),
           Right(Bar(UUID.fromString("5cc3ccbb-c749-3078-e050-1aacbe064655"), "tom", getDate("2018-11-20T11:36:04")))
         )
       }
 
       val path = getClass.getResource("/csv_with_error.csv").getPath
-      val res  = csvFromFileUnsafe[Bar](path, skipHeader = true)
+      val res = csvFromFileUnsafe[Bar](path, skipHeader = true)
 
       assert(res == Success(errList))
       //read from file - unsafe mode
-      intercept[Exception] {
+//      intercept[Exception]
+      val a = Try {
         val _l: Seq[Bar] = {
           res match {
             case Failure(a) => throw new Exception(a)
             case Success(a) =>
               a.map {
                 case Right(rr) => rr
-                case Left(rr)  => throw new Exception(rr.toString())
+                case Left(rr)  => throw new Exception(rr.mkString)
               }
           }
         }
       }
+      a match {
+        case Failure(a) => assert(a.getMessage == "xxx value is not valid UUID")
+        case _          => assert(false)
+      }
+
     }
   }
 

@@ -16,3 +16,4 @@ dist
 ojdbc6.jar
 .pid
 .attach_pid*
+.bsp

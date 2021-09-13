@@ -36,5 +36,5 @@ Two formatters are available:
 
 It's possible to create custom formatters editing the default ones, example:
 ```scala
-implicit val newFormatter = default.withForceQuote(true).withRecordSeparator("\n").with.....
+given csvFormat: IttoCSVFormat = IttoCSVFormat.default.withForceQuote(true).withRecordSeparator("\n").with.....
 ```

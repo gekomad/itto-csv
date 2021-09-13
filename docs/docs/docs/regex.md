@@ -9,7 +9,7 @@ permalink: docs/regex/
 ```scala
 import java.util.UUID
 import com.github.gekomad.ittocsv.core.Types.implicits._
-implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+given IttoCSVFormat = IttoCSVFormat.default
 
 case class Bar(a: String, b: SHA1, c: SHA256, d: MD5, e: UUID, f: Email, g: IP6, h: BitcoinAdd, i: URL)
 
@@ -42,13 +42,12 @@ assert(fromCsv[Bar](csvString) == List(Right(bar)))
 Using **encode** for MyType:
 
 ```scala
-implicit def _e(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[MyType] = ???
+given Decoder[String, MyType] = (s: String) => RegexValidator[MyType](regexString).validate(s)
 ```
 
-Example encoding N:Int to "[N]"
+Example encoding N:Int to "[N]"  spostarlo TODO
 
 ```scala
-import com.github.gekomad.ittocsv.core.CsvStringEncoder
 import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
 
@@ -56,15 +55,12 @@ case class MyType(a: Int)
 case class Foo(a: MyType, b: Int)
 
 import com.github.gekomad.ittocsv.core.ToCsv._
+given FieldEncoder[MyType] = customFieldEncoder[MyType](node => s"[${node.a}]")
 
-implicit def _e(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[MyType] = createEncoder { node =>
-  csvConverter.stringToCsvField(s"[${node.a}]")
-}
-
-assert(toCsv(Foo(MyType(42),99)) == "[42],99")
+assert(toCsv(Foo(MyType(42), 99)) == "[42],99")
 ```
 
-Using **decode** for MyType:
+Using **decode** for MyType: spostarlo TODO
 
 ```scala
 implicit def _d(implicit csvFormat: IttoCSVFormat): String => Either[ParseFailure, MyType] = (str: String) => ???
@@ -76,7 +72,6 @@ Example decoding "[N]" to N:Int
 import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 import scala.util.Try
 implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
-import com.github.gekomad.ittocsv.core.ParseFailure
 import cats.data.NonEmptyList
 
 case class MyType(a: Int)
@@ -84,27 +79,26 @@ case class Foo(a: MyType, b: Int)
 
 import com.github.gekomad.ittocsv.core.FromCsv._
 
-implicit def _d(implicit csvFormat: IttoCSVFormat): String => Either[ParseFailure, MyType] = { str: String =>
+given Decoder[String, MyType] = str => {
   if (str.startsWith("[") && str.endsWith("]"))
     Try(str.substring(1, str.length - 1).toInt)
       .map(f => Right(MyType(f)))
-      .getOrElse(Left(ParseFailure(s"Not a MyType $str")))
-  else Left(ParseFailure(s"Wrong format $str"))
-
+      .getOrElse(Left(List(s"Not a MyType $str")))
+  else Left(List(s"Wrong format $str"))
 }
 
-assert(fromCsv[Foo]("[42],99") == List(Right(Foo(MyType(42),99))))
-assert(fromCsv[Foo]("[x],99") == List(Left(NonEmptyList(ParseFailure("Not a MyType [x]"), Nil))))
-assert(fromCsv[Foo]("42,99") == List(Left(NonEmptyList(ParseFailure("Wrong format 42"), Nil))))
+assert(fromCsv[Foo]("[42],99") == List(Right(Foo(MyType(42), 99))))
+assert(fromCsv[Foo]("[x],99") == List(Left(List("Not a MyType [x]"))))
+assert(fromCsv[Foo]("42,99") == List(Left(List("Wrong format 42"))))
 
 ```
 
 The [TreeTest.scala](https://github.com/gekomad/itto-csv/blob/master/src/test/scala/TreeTest.scala) shows how to encode/decode a `Tree[Int]`
 
 
-
 ### Defined regex
 
+(full list [scala-regex-collection](https://github.com/gekomad/scala-regex-collection))
 
 Email
 

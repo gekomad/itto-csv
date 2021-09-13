@@ -1,44 +1,51 @@
 package com.github.gekomad.ittocsv.parser
 
 /**
-  * Trasforms a single CSV field to string
-  *
-  * @author Giuseppe Cannella
-  * @since 0.0.1
-  * @see See test code for more information
-  * @see See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information.
-  */
+ * Trasforms a single CSV field to string
+ *
+ * @author
+ *   Giuseppe Cannella
+ * @since 0.0.1
+ * @see
+ *   See test code for more information
+ * @see
+ *   See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information.
+ */
 object CsvFieldToString {
 
   /**
-    * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-    * @return trims the string according to csvFormat
-    */
-  def trim(field: String)(implicit csvFormat: IttoCSVFormat): String = if (csvFormat.trim) field.trim else field
+   * @param csvFormat
+   *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+   * @return
+   *   trims the string according to csvFormat
+   */
+  private def trim(field: String)(using csvFormat: IttoCSVFormat): String = if (csvFormat.trim) field.trim else field
 
   /**
-    * @return trasforms a CSV field to string
-    * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-    * @param field     the string to trasform
-    * {{{
-    * csvFieldToString("\"\"\",\"\"\"")   //  "\",\""
-    * csvFieldToString("\"aa\na\"")       //  "aa\na"
-    * csvFieldToString("\"\"\"\"\"\"")    //  "\"\""
-    * csvFieldToString("\"\"\"\"")        //  "\""
-    * csvFieldToString("\",\"")           //  ","
-    * csvFieldToString("\"\"")            //  ""
-    * csvFieldToString("\"\"\"a\"\"\"")   //  "\"a\""
-    * csvFieldToString("\" \"")           //  " "
-    * csvFieldToString("aaa")             //  "aaa"
-    * csvFieldToString("\"aa\"\"b\"")     //  "aa\"b"
-    * csvFieldToString("\"aa\"\"\"\"b\"") //  "aa\"\"b"
-    * csvFieldToString("\"aa,a\"")        //  "aa,a"
-    * csvFieldToString("\"aa,\"\"b\"")    //  "aa,\"b"
-    * csvFieldToString("\"aa,\"\"b\"")    //  "aa,\"b"
-    * }}}
-    *
-    */
-  def csvFieldToString(field: String)(implicit csvFormat: IttoCSVFormat): String = {
+   * @return
+   *   trasforms a CSV field to string
+   * @param csvFormat
+   *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+   * @param field
+   *   the string to trasform
+   * {{{
+   * csvFieldToString("\"\"\",\"\"\"")   //  "\",\""
+   * csvFieldToString("\"aa\na\"")       //  "aa\na"
+   * csvFieldToString("\"\"\"\"\"\"")    //  "\"\""
+   * csvFieldToString("\"\"\"\"")        //  "\""
+   * csvFieldToString("\",\"")           //  ","
+   * csvFieldToString("\"\"")            //  ""
+   * csvFieldToString("\"\"\"a\"\"\"")   //  "\"a\""
+   * csvFieldToString("\" \"")           //  " "
+   * csvFieldToString("aaa")             //  "aaa"
+   * csvFieldToString("\"aa\"\"b\"")     //  "aa\"b"
+   * csvFieldToString("\"aa\"\"\"\"b\"") //  "aa\"\"b"
+   * csvFieldToString("\"aa,a\"")        //  "aa,a"
+   * csvFieldToString("\"aa,\"\"b\"")    //  "aa,\"b"
+   * csvFieldToString("\"aa,\"\"b\"")    //  "aa,\"b"
+   * }}}
+   */
+  def csvFieldToString(field: String)(using csvFormat: IttoCSVFormat): String = {
 
     /*
      * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
@@ -52,7 +59,7 @@ object CsvFieldToString {
      * }}}
      *
      */
-    def parseBorders(a: String)(implicit csvFormat: IttoCSVFormat): String = {
+    def parseBorders(a: String)(using csvFormat: IttoCSVFormat): String = {
       val q = csvFormat.quote.toString
       if (a.length > 1 && a.startsWith(q) && a.endsWith(q)) a.init.drop(1) else a
     }
@@ -66,7 +73,7 @@ object CsvFieldToString {
      * }}}
      *
      */
-    def parseQuote(a: String)(implicit csvFormat: IttoCSVFormat): String =
+    def parseQuote(a: String)(using csvFormat: IttoCSVFormat): String =
       a.replace(s"${csvFormat.quote}${csvFormat.quote}", s"${csvFormat.quote}")
 
     parseQuote(parseBorders(trim(field)))

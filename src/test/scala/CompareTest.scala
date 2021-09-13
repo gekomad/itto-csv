@@ -1,16 +1,26 @@
-import org.apache.commons.csv.CSVFormat
-import org.scalatest.funsuite.AnyFunSuite
-import com.github.gekomad.ittocsv.parser.Constants._
+import com.github.gekomad.ittocsv.parser.Constants.*
+import com.github.gekomad.ittocsv.parser.IttoCSVFormat
+import org.apache.commons.csv.{CSVFormat, CSVPrinter}
+import org.junit.{Assert, Test}
 
-class CompareTest extends AnyFunSuite {
+import java.io.StringWriter
 
-  test("Compare with Apache commons-csv") {
+class CompareTest {
+
+  @Test def CompareWithApacheXommons_csv(): Unit = {
     import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
-    def doTest(p: IttoCSVFormat, f: CSVFormat) = {
-      def compare(s: String) = {
 
-        val ittoScala = StringToCsvField.stringToCsvField(s)(p)
-        val apache    = ApacheCommonCsvHelper.fildParser(s)(f)
+    def fildParser(field: String, csvFormat: CSVFormat): String = {
+      val csvPrinter = new CSVPrinter(new StringWriter, csvFormat)
+      csvPrinter.print(field)
+      csvPrinter.getOut.toString
+    }
+
+    def doTest(p: IttoCSVFormat, fmt: CSVFormat) = {
+      def compare(s: String) = {
+        given IttoCSVFormat = p
+        val ittoScala = StringToCsvField.stringToCsvField(s)
+        val apache = fildParser(s, fmt)
         assert(ittoScala == apache, s"            csvScala: $ittoScala apache: $apache")
       }
 
@@ -53,23 +63,22 @@ class CompareTest extends AnyFunSuite {
       (IttoCSVFormat.default.withQuoteEmpty(true).withQuoteLowerChar(true), CSVFormat.DEFAULT),
       (IttoCSVFormat.tab.withQuoteEmpty(true).withQuoteLowerChar(true), CSVFormat.TDF)
     )
-    val delimiters       = List(COMMA, SEMICOLON, PIPE)
+    val delimiters = List(COMMA, SEMICOLON, PIPE)
     val recordSeparators = List(LF, CRLF)
-    val quotes           = List(PIPE, DOUBLE_QUOTE)
+    val quotes = List(PIPE, DOUBLE_QUOTE)
 
     csvFormats.foreach(f => doTest(f._1, f._2))
 
     for {
       (format1, format2) <- csvFormats
-      delimiter          <- delimiters
-      recordSeparator    <- recordSeparators
-      quote              <- quotes
+      delimiter <- delimiters
+      recordSeparator <- recordSeparators
+      quote <- quotes
       if quote != delimiter
-    } yield
-      doTest(
-        format1.withDelimiter(delimiter).withRecordSeparator(recordSeparator).withQuote(quote),
-        format2.withDelimiter(delimiter).withRecordSeparator(recordSeparator).withQuote(quote)
-      )
+    } yield doTest(
+      format1.withDelimiter(delimiter).withRecordSeparator(recordSeparator).withQuote(quote),
+      format2.withDelimiter(delimiter).withRecordSeparator(recordSeparator).withQuote(quote)
+    )
 
   }
 }

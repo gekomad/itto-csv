@@ -1,5 +1,7 @@
 [![codecov.io](http://codecov.io/github/gekomad/itto-csv/coverage.svg?branch=master)](http://codecov.io/github/gekomad/itto-csv?branch=master)
+[![Javadocs](https://javadoc.io/badge/com.github.gekomad/itto-csv_3.0.svg)](https://javadoc.io/doc/com.github.gekomad/itto-csv_3.0)
 [![Javadocs](https://javadoc.io/badge/com.github.gekomad/itto-csv_2.13.svg)](https://javadoc.io/doc/com.github.gekomad/itto-csv_2.13)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.gekomad/itto-csv_3.0/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.gekomad/itto-csv_3.0)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.gekomad/itto-csv_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.gekomad/itto-csv_2.13)
 <a href="https://typelevel.org/cats/"><img src="https://typelevel.org/cats/img/cats-badge.svg" height="40px" align="right" alt="Cats friendly" /></a>
 ======
@@ -7,15 +9,18 @@
 
 Itto-CSV is a pure scala library for working with the CSV format
 
-## Add the library to your project
-
+Scala 2
+-------
 `libraryDependencies += "com.github.gekomad" %% "itto-csv" % "1.2.0"`
 
+View [microsite](https://gekomad.github.io/itto-csv/scala2/docs/) for more information.
 
-View [microsite](https://gekomad.github.io/itto-csv/docs/) for more information.
+Scala 3
+-------
+`libraryDependencies += "com.github.gekomad" %% "itto-csv" % "2.0.0-M1"`
 
-## Scaladoc API
-[Scala doc](https://javadoc.io/doc/com.github.gekomad/itto-csv_2.13)
+View [microsite](https://gekomad.github.io/itto-csv/scala3/docs/) for more information.
+
 
 ## Bugs and Feedback
 For bugs, questions and discussions please use [Github Issues](https://github.com/gekomad/itto-csv/issues).

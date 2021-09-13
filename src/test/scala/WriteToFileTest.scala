@@ -1,25 +1,23 @@
-import java.time.LocalDateTime
 import cats.effect.ExitCode
+import cats.effect.unsafe.implicits.global
 import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 import fs2.Pure
-import org.scalatest.funsuite.AnyFunSuite
-import cats.effect.unsafe.implicits.global
+import org.junit.{Assert, Test}
+import java.time.LocalDateTime
 import scala.io.Source
 
-class WriteToFileTest extends AnyFunSuite {
+class WriteToFileTest {
 
-  test("write List to file") {
+  @Test def writeListToFile(): Unit = {
     import java.util.UUID
 
     final case class Bar(id: UUID, name: String, date: LocalDateTime)
     val filePath = "/tmp/out_list.csv"
-    implicit val csvFormat: IttoCSVFormat =
-      com.github.gekomad.ittocsv.parser.IttoCSVFormat.tab.withPrintHeader(true).withRecordSeparator("\n")
+    given IttoCSVFormat = IttoCSVFormat.tab.withPrintHeader(true).withRecordSeparator("\n")
 
     {
-      import com.github.gekomad.ittocsv.parser.io.ToFile.csvToFile
-
       import com.github.gekomad.ittocsv.core.ToCsv._
+      import com.github.gekomad.ittocsv.parser.io.ToFile.csvToFile
 
       def toLocalDateTime(s: String): LocalDateTime =
         LocalDateTime.parse(s, java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
@@ -31,13 +29,16 @@ class WriteToFileTest extends AnyFunSuite {
         Bar(UUID.fromString("5CC3CCBB-C749-3078-E050-1AACBE064655"), "tom", toLocalDateTime("2018-11-20T11:36:04"))
       )
 
+      import com.github.gekomad.ittocsv.core.Header._
       Util.deleteFile(filePath)
-      csvToFile(list, filePath).attempt.unsafeRunSync() match {
+      val lt = list.map(a => Tuple.fromProductTyped(a))
+      val c = csvToFile(lt, filePath, Some(csvHeader[Bar]))
+      c.attempt.unsafeRunSync() match {
         case Left(value)  => assert(false, value)
         case Right(value) => assert(value == ExitCode.Success)
       }
 
-      val file  = Source.fromFile(filePath)
+      val file = Source.fromFile(filePath)
       val lines = file.getLines().mkString
       file.close()
       assert(
@@ -46,10 +47,13 @@ class WriteToFileTest extends AnyFunSuite {
     }
     //read file through stream
     {
-      import com.github.gekomad.ittocsv.core.Conversions.fromStringToLocalDateTime
-      import com.github.gekomad.ittocsv.parser.io.FromFile.csvFromFileStream
 
-      val r = csvFromFileStream[Bar](filePath, skipHeader = true)
+      import com.github.gekomad.ittocsv.parser.io.FromFile.csvFromFileStream
+      import com.github.gekomad.ittocsv.core.Types.implicits._
+      import com.github.gekomad.ittocsv.core.FromCsv._
+
+      val rr = csvFromFileStream[Bar](filePath, skipHeader = true)
+      val r = rr
         .map(csvEither => println(csvEither))
         .compile
         .drain
@@ -64,13 +68,13 @@ class WriteToFileTest extends AnyFunSuite {
     }
   }
 
-  test("write Stream to file") {
+  @Test def writeStreamToFile(): Unit = {
+
     import java.util.UUID
     final case class Bar(id: UUID, name: String, date: LocalDateTime)
 
     import com.github.gekomad.ittocsv.parser.io.ToFile.csvToFileStream
-    implicit val csvFormat =
-      com.github.gekomad.ittocsv.parser.IttoCSVFormat.tab.withPrintHeader(true).withRecordSeparator("\n")
+    given IttoCSVFormat = IttoCSVFormat.tab.withPrintHeader(true).withRecordSeparator("\n")
     import com.github.gekomad.ittocsv.core.ToCsv._
 
     def getDate(s: String): LocalDateTime =
@@ -85,12 +89,14 @@ class WriteToFileTest extends AnyFunSuite {
 
     val filePath = "/tmp/out_stream.csv"
     Util.deleteFile(filePath)
-    csvToFileStream(stream, filePath).attempt.unsafeRunSync() match {
+
+    val k = csvToFileStream(stream, filePath)
+    k.attempt.unsafeRunSync() match {
       case Left(value)  => assert(false, value)
       case Right(value) => assert(value == ExitCode.Success)
     }
 
-    val file  = Source.fromFile(filePath)
+    val file = Source.fromFile(filePath)
     val lines = file.getLines().mkString
     file.close()
     assert(

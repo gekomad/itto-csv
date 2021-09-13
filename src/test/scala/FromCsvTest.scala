@@ -1,45 +1,44 @@
-import cats.Id
-import cats.data.Validated.{Invalid, Valid}
-import cats.data.{NonEmptyList, ValidatedNel}
+import cats.effect.{ExitCode, IO}
+import org.junit.{Assert, Test}
+import com.github.gekomad.ittocsv.core.FromCsv.fromCsvL
+import com.github.gekomad.ittocsv.core.FromCsv.Decoder
+import com.github.gekomad.ittocsv.core.FromCsv.list2Product
 
-import com.github.gekomad.ittocsv.core.{Convert, ParseFailure, Schema}
-import org.scalatest.funsuite.AnyFunSuite
+import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 
-class FromCsvTest extends AnyFunSuite {
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.UUID
+import scala.util.Try
 
-  test("csv string to type - 1") {
+class FromCsvTest {
 
-    import cats.data.Validated.{Invalid, Valid}
-    import cats.data.NonEmptyList
+  @Test def csv_string_to_type_1(): Unit = {
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
-    import com.github.gekomad.ittocsv.core.FromCsv._
-    import com.github.gekomad.ittocsv.core.Header._
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
 
-    final case class Foo(a: Int, b: Double, c: String, d: Option[Boolean])
+    given IttoCSVFormat = IttoCSVFormat.default
 
-    val schema                 = Schema.of[Foo]
-    val fields: List[String]   = fieldNames[Foo]
-    val csv: List[String]      = List("1", "3.14", "foo", "true")
-    val p: Map[String, String] = fields.zip(csv).toMap
-    assert(schema.readFrom(p) == Valid(Foo(1, 3.14, "foo", Some(true))))
+    {
+      final case class Foo(a: Int, b: Double, c: String, d: Option[Boolean])
+      val csv: List[String] = List("1", "3.14", "foo", "true")
+      val a = list2Product[Foo](csv)
+      assert(a == Right(Foo(1, 3.14, "foo", Some(true))))
+    }
 
-    def e: Map[String, String] = Map("c" -> "true", "b" -> "xx", "d" -> "true")
-
-    assert(
-      schema.readFrom(e) == Invalid(NonEmptyList(ParseFailure("a is missing"), List(ParseFailure("xx is not Double"))))
-    )
+    {
+      final case class Foo(a: Int, b: Double, c: String, d: Boolean)
+      val csv: List[String] = List("1", "3.14", "foo", "False")
+      val a = list2Product[Foo](csv)
+      assert(a == Right(Foo(1, 3.14, "foo", false)))
+    }
 
   }
 
-  test("csv string to type - 2") {
+  @Test def csv_string_to_type_2(): Unit = {
 
-    import cats.data.Validated.{Invalid, Valid}
-    import cats.data.NonEmptyList
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
-    import com.github.gekomad.ittocsv.core.FromCsv._
-    import com.github.gekomad.ittocsv.core.Header._
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
+
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class Foo(
       a: Int,
@@ -54,108 +53,94 @@ class FromCsvTest extends AnyFunSuite {
       f2: Option[Int]
     )
 
-    val schema                 = Schema.of[Foo]
-    val fields: List[String]   = fieldNames[Foo]
-    val csv: List[String]      = List("1", "3.14", "foo", "", "", "hi", "", "3.3", "", "100")
-    val p: Map[String, String] = fields.zip(csv).toMap
-    assert(schema.readFrom(p) == Valid(Foo(1, 3.14, "foo", None, None, Some("hi"), None, Some(3.3), None, Some(100))))
-
+    val csv: List[String] = List("1", "3.14", "foo", "", "", "hi", "", "3.3", "", "100")
+    val a = list2Product[Foo](csv)
+    assert(a == Right(Foo(1, 3.14, "foo", None, None, Some("hi"), None, Some(3.3), None, Some(100))))
   }
 
-  test("csv string to types 3") {
+  @Test def csv_string_to_type_3(): Unit = {
 
-    import cats.data.Validated.{Invalid, Valid}
-    import cats.data.NonEmptyList
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
-    import com.github.gekomad.ittocsv.core.FromCsv._
-    import com.github.gekomad.ittocsv.core.Header._
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
+
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class Foo(a: Int, b: Char, c: String, d: Option[Boolean])
 
-    val schema                 = Schema.of[Foo]
-    val fields: List[String]   = fieldNames[Foo]
-    val csv: List[String]      = List("1", "λ", "foo", "baz")
-    val p: Map[String, String] = fields.zip(csv).toMap
-    assert(schema.readFrom(p) == Invalid(NonEmptyList(ParseFailure("Not a Boolean for input string: baz"), List())))
+    {
+      val csv: List[String] = List("1", "λ", "foo", "true")
+      assert(list2Product[Foo](csv) == Right(Foo(1, 'λ', "foo", Some(true))))
+    }
+
+    {
+      val csv: List[String] = List("1", "λ", "foo", "baz")
+      assert(list2Product[Foo](csv) == Left(List("baz value is not valid Boolean")))
+    }
 
   }
 
-  test("tokenizeCsvLine to types ok") {
-    import cats.data.NonEmptyList
+  @Test def tokenizeCsvLine_to_types_ok(): Unit = {
+
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
-    import com.github.gekomad.ittocsv.core.FromCsv._
-    import com.github.gekomad.ittocsv.core.Header._
-    import cats.data.Validated.Valid
     import com.github.gekomad.ittocsv.util.StringUtils._
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
+
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class Foo(a: Int, b: Double, c: String, d: Boolean)
 
-    val fields: List[String]      = fieldNames[Foo]
     val csv: Option[List[String]] = tokenizeCsvLine("1,3.14,foo,true")
     csv match {
       case None => assert(false)
       case Some(g) =>
         assert(g == List("1", "3.14", "foo", "true"))
-        val schema                 = Schema.of[Foo]
-        val p: Map[String, String] = fields.zip(g).toMap
-        assert(schema.readFrom(p) == Valid(Foo(1, 3.14, "foo", true)))
+        val a = list2Product[Foo](g)
+        assert(a == Right(Foo(1, 3.14, "foo", true)))
     }
   }
 
-  test("tokenizeCsvLine to types boolean ko") {
-    import cats.data.NonEmptyList
+  @Test def tokenizeCsvLine_to_types_boolean_ko(): Unit = {
+
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
-    import com.github.gekomad.ittocsv.core.FromCsv._
-    import com.github.gekomad.ittocsv.core.Header._
+
     import cats.data.Validated.Invalid
     import com.github.gekomad.ittocsv.util.StringUtils._
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class Foo(a: Int, b: Double, c: String, d: Boolean)
 
-    val fields: List[String]      = fieldNames[Foo]
     val csv: Option[List[String]] = tokenizeCsvLine("1,3.14,foo,bar")
     csv match {
       case None => assert(false)
       case Some(g) =>
         assert(g == List("1", "3.14", "foo", "bar"))
-        val schema                 = Schema.of[Foo]
-        val p: Map[String, String] = fields.zip(g).toMap
-        assert(schema.readFrom(p) == Invalid(NonEmptyList(ParseFailure("bar is not Boolean"), Nil)))
+        val a = list2Product[Foo](g)
+        assert(a == Left(List("bar value is not valid Boolean")))
     }
   }
 
-  test("tokenizeCsvLine to types Option[Double] ko") {
-    import cats.data.NonEmptyList
+  @Test def tokenizeCsvLine_to_types_Option_Double__ko(): Unit = {
+
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
-    import com.github.gekomad.ittocsv.core.FromCsv._
-    import com.github.gekomad.ittocsv.core.Header._
-    import cats.data.Validated.Invalid
+
     import com.github.gekomad.ittocsv.util.StringUtils._
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class Foo(a: Int, b: Double, c: String, d: Option[Double])
 
-    val fields: List[String]      = fieldNames[Foo]
     val csv: Option[List[String]] = tokenizeCsvLine("1,3.14,foo,bar")
     csv match {
       case None => assert(false)
       case Some(g) =>
         assert(g == List("1", "3.14", "foo", "bar"))
-        val schema                 = Schema.of[Foo]
-        val p: Map[String, String] = fields.zip(g).toMap
-        assert(schema.readFrom(p) == Invalid(NonEmptyList(ParseFailure("""Not a Double for input string: bar"""), Nil)))
+        val a = list2Product[Foo](g)
+        assert(a == Left(List("bar value is not valid Double")))
     }
   }
 
-  test("from csv SHA1") {
-    import cats.data.NonEmptyList
+  @Test def fromCsvSha1(): Unit = {
+
     import com.github.gekomad.ittocsv.core.Types.implicits.SHA1
     import com.github.gekomad.ittocsv.core.FromCsv._
-    import com.github.gekomad.ittocsv.core.ParseFailure
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class Bar(a: String, b: SHA1)
     assert(
@@ -164,28 +149,40 @@ class FromCsvTest extends AnyFunSuite {
       )
     )
 
-    assert(fromCsv[Bar]("abc,hi") == List(Left(NonEmptyList(ParseFailure("Not a SHA1 hi"), Nil))))
+    assert(fromCsv[Bar]("abc,hi") == List(Left(List("hi value is not valid SHA1"))))
   }
 
-  test("List[Int] ok") {
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+  @Test def fromCsvShaKO(): Unit = {
 
-    val a: ValidatedNel[ParseFailure, Id[List[Int]]] = Convert.f[Int, Id].parse("1,2,3")
-    assert(a == Valid(List(1, 2, 3)))
+    import com.github.gekomad.ittocsv.core.Types.implicits.SHA1
+    import com.github.gekomad.ittocsv.core.FromCsv._
+    given IttoCSVFormat = IttoCSVFormat.default
+
+    final case class Bar(a: SHA1, b: SHA1)
+    val x = fromCsv[Bar]("abc,hi")
+    assert(x == List(Left(List("abc value is not valid SHA1", "hi value is not valid SHA1"))))
+
   }
 
-  test("List[Int] ko") {
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
-
-    val a: ValidatedNel[ParseFailure, Id[List[Int]]] = Convert.f[Int, Id].parse("foo,bar,3")
-    assert(a == Invalid(NonEmptyList(ParseFailure("Bad type on foo"), List(ParseFailure("Bad type on bar")))))
+  @Test def List_Int_ok(): Unit = {
+    given IttoCSVFormat = IttoCSVFormat.default
+    import com.github.gekomad.ittocsv.core.FromCsv.fromCsvL
+    val a = fromCsvL[Int]("1,2,3")
+    assert(a == List(Right(1), Right(2), Right(3)))
   }
 
-  test("from csv SHA256") {
+  @Test def List_Int_ko(): Unit = {
+    given IttoCSVFormat = IttoCSVFormat.default
+    import com.github.gekomad.ittocsv.core.FromCsv.fromCsvL
+    val a = fromCsvL[Int]("foo,bar,3")
+    assert(a == List(Left("foo value is not valid Int"), Left("bar value is not valid Int"), Right(3)))
+  }
+
+  @Test def from_csv_SHA256(): Unit = {
     import com.github.gekomad.ittocsv.core.Types.implicits.SHA256
     import com.github.gekomad.ittocsv.core.FromCsv._
 
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class Bar(a: String, b: SHA256)
     assert(
@@ -194,38 +191,38 @@ class FromCsvTest extends AnyFunSuite {
       )
     )
 
-    assert(fromCsv[Bar]("abc,hi") == List(Left(NonEmptyList(ParseFailure("Not a SHA256 hi"), Nil))))
+    assert(fromCsv[Bar]("abc,hi") == List(Left(List("hi value is not valid SHA256"))))
 
   }
 
-  test("from csv IP") {
+  @Test def from_csv_IP(): Unit = {
     import com.github.gekomad.ittocsv.core.Types.implicits.IP
     import com.github.gekomad.ittocsv.core.FromCsv._
 
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class Bar(a: String, b: IP)
     assert(fromCsv[Bar]("abc,10.192.168.1") == List(Right(Bar("abc", IP("10.192.168.1")))))
 
-    assert(fromCsv[Bar]("abc,hi") == List(Left(NonEmptyList(ParseFailure("Not a IP hi"), Nil))))
+    assert(fromCsv[Bar]("abc,hi") == List(Left(List("hi value is not valid IP"))))
   }
 
-  test("from csv IP6") {
+  @Test def from_csv_IP6() = {
     import com.github.gekomad.ittocsv.core.Types.implicits.IP6
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class Bar(a: String, b: IP6)
     assert(fromCsv[Bar]("abc,2001:db8:a0b:12f0::1") == List(Right(Bar("abc", IP6("2001:db8:a0b:12f0::1")))))
 
-    assert(fromCsv[Bar]("abc,hi") == List(Left(NonEmptyList(ParseFailure("Not a IP6 hi"), Nil))))
+    assert(fromCsv[Bar]("abc,hi") == List(Left(List("hi value is not valid IP6"))))
   }
 
-  test("from csv MD5") {
+  @Test def from_csv_MD5(): Unit = {
     import com.github.gekomad.ittocsv.core.Types.implicits.MD5
     import com.github.gekomad.ittocsv.core.FromCsv._
 
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class Bar(a: String, b: MD5)
     assert(
@@ -233,16 +230,14 @@ class FromCsvTest extends AnyFunSuite {
         Right(Bar("abc", MD5("23f8e84c1f4e7c8814634267bd456194")))
       )
     )
-
-    assert(fromCsv[Bar]("abc,hi") == List(Left(NonEmptyList(ParseFailure("Not a MD5 hi"), Nil))))
+    assert(fromCsv[Bar]("abc,hi") == List(Left(List("hi value is not valid MD5"))))
   }
 
-  test("from csv uuid") {
+  @Test def from_csv_UUID(): Unit = {
     import java.util.UUID
     import com.github.gekomad.ittocsv.core.FromCsv._
 
-    import com.github.gekomad.ittocsv.core.Conversions.toUUIDS
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class Bar(a: String, b: UUID)
 
@@ -254,22 +249,24 @@ class FromCsvTest extends AnyFunSuite {
 
     assert(
       fromCsv[Bar]("abc,xxc586e2-7cc3-4d39-a449-") == List(
-        Left(NonEmptyList(ParseFailure("xxc586e2-7cc3-4d39-a449- is not UUID"), Nil))
+        Left(List("xxc586e2-7cc3-4d39-a449- value is not valid UUID"))
       )
     )
 
   }
 
-  test("from csv url") {
+  @Test def from_csv_URL(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
     final case class Bar(a: String, b: URL, c: URL1, d: URL2, e: URL3)
 
     assert(
-      fromCsv[Bar]("abc,http://abc.def.com,http://www.aaa.com,http://www.aaa.com,https://www.google.com:8080/url?") == List(
+      fromCsv[Bar](
+        "abc,http://abc.def.com,http://www.aaa.com,http://www.aaa.com,https://www.google.com:8080/url?"
+      ) == List(
         Right(
           Bar(
             "abc",
@@ -285,22 +282,20 @@ class FromCsvTest extends AnyFunSuite {
     assert(
       fromCsv[Bar]("abc,www.aaa.com,abc.def.com,abc.def.com,abc.def.com") == List(
         Left(
-          NonEmptyList(
-            ParseFailure("Not a URL www.aaa.com"),
-            List(
-              ParseFailure("Not a URL1 abc.def.com"),
-              ParseFailure("Not a URL2 abc.def.com"),
-              ParseFailure("Not a URL3 abc.def.com")
-            )
+          List(
+            "www.aaa.com value is not valid URL",
+            "abc.def.com value is not valid URL1",
+            "abc.def.com value is not valid URL2",
+            "abc.def.com value is not valid URL3"
           )
         )
       )
     )
   }
 
-  test("from csv ftp domain") {
+  @Test def from_csv_domain(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -317,22 +312,20 @@ class FromCsvTest extends AnyFunSuite {
     assert(
       fromCsv[Bar]("abc,www.aaa.com,abc.def.com,abc.def.com,abc") == List(
         Left(
-          NonEmptyList(
-            ParseFailure("Not a FTP www.aaa.com"),
-            List(
-              ParseFailure("Not a FTP1 abc.def.com"),
-              ParseFailure("Not a FTP2 abc.def.com"),
-              ParseFailure("Not a Domain abc")
-            )
+          List(
+            "www.aaa.com value is not valid FTP",
+            "abc.def.com value is not valid FTP1",
+            "abc.def.com value is not valid FTP2",
+            "abc value is not valid Domain"
           )
         )
       )
     )
   }
 
-  test("HEX") {
+  @Test def hex(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -346,18 +339,19 @@ class FromCsvTest extends AnyFunSuite {
     assert(
       fromCsv[Bar]("aa,bb,cc,dd") == List(
         Left(
-          NonEmptyList(
-            ParseFailure("Not a HEX aa"),
-            List(ParseFailure("Not a HEX1 bb"), ParseFailure("Not a HEX2 cc"), ParseFailure("Not a HEX3 dd"))
+          List("aa value is not valid HEX",
+               "bb value is not valid HEX1",
+               "cc value is not valid HEX2",
+               "dd value is not valid HEX3"
           )
         )
       )
     )
   }
 
-  test("GermanStreet") {
+  @Test def germanStreet(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -365,62 +359,62 @@ class FromCsvTest extends AnyFunSuite {
 
     assert(fromCsv[Bar]("Mühlenstr. 33") == List(Right(Bar(GermanStreet("Mühlenstr. 33")))))
 
-    assert(fromCsv[Bar]("aa") == List(Left(NonEmptyList(ParseFailure("Not a GermanStreet aa"), Nil))))
+    assert(fromCsv[Bar]("aa") == List(Left(List("aa value is not valid GermanStreet"))))
   }
 
-  test("SingleChar") {
+  @Test def singleChar(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
     import com.github.gekomad.ittocsv.core.Types.implicits._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class Bar(b: SingleChar)
     assert(fromCsv[Bar]("a") == List(Right(Bar(SingleChar("a")))))
-    assert(fromCsv[Bar]("aa") == List(Left(NonEmptyList(ParseFailure("Not a SingleChar aa"), Nil))))
+    assert(fromCsv[Bar]("aa") == List(Left(List("aa value is not valid SingleChar"))))
   }
 
-  test("AZString") {
+  @Test def azString(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
     import com.github.gekomad.ittocsv.core.Types.implicits._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class Bar(b: AZString)
     assert(fromCsv[Bar]("aA") == List(Right(Bar(AZString("aA")))))
-    assert(fromCsv[Bar]("1") == List(Left(NonEmptyList(ParseFailure("Not a AZString 1"), Nil))))
+    assert(fromCsv[Bar]("1") == List(Left(List("1 value is not valid AZString"))))
   }
 
-  test("StringAndNumber") {
+  @Test def stringAndNumber(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
     import com.github.gekomad.ittocsv.core.Types.implicits._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class Bar(b: StringAndNumber)
     assert(fromCsv[Bar]("aA1") == List(Right(Bar(StringAndNumber("aA1")))))
-    assert(fromCsv[Bar]("$") == List(Left(NonEmptyList(ParseFailure("Not a StringAndNumber $"), Nil))))
+    assert(fromCsv[Bar]("$") == List(Left(List("$ value is not valid StringAndNumber"))))
   }
 
-  test("AsciiString") {
+  @Test def asciiString(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
     import com.github.gekomad.ittocsv.core.Types.implicits._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class Bar(b: AsciiString)
     assert(fromCsv[Bar]("aA1%") == List(Right(Bar(AsciiString("aA1%")))))
-    assert(fromCsv[Bar]("テ") == List(Left(NonEmptyList(ParseFailure("Not a AsciiString テ"), Nil))))
+    assert(fromCsv[Bar]("テ") == List(Left(List("テ value is not valid AsciiString"))))
   }
 
-  test("SingleNumber") {
+  @Test def singleNumber(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
     import com.github.gekomad.ittocsv.core.Types.implicits._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class Bar(b: SingleNumber)
     assert(fromCsv[Bar]("1") == List(Right(Bar(SingleNumber("1")))))
-    assert(fromCsv[Bar]("11") == List(Left(NonEmptyList(ParseFailure("Not a SingleNumber 11"), Nil))))
+    assert(fromCsv[Bar]("11") == List(Left(List("11 value is not valid SingleNumber"))))
   }
 
-  test("MACAddress") {
+  @Test def macAddress(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -428,12 +422,12 @@ class FromCsvTest extends AnyFunSuite {
 
     assert(fromCsv[Bar]("fE:dC:bA:98:76:54") == List(Right(Bar(MACAddress("fE:dC:bA:98:76:54")))))
 
-    assert(fromCsv[Bar]("aa") == List(Left(NonEmptyList(ParseFailure("Not a MACAddress aa"), Nil))))
+    assert(fromCsv[Bar]("aa") == List(Left(List("aa value is not valid MACAddress"))))
   }
 
-  test("Phones") {
+  @Test def phines(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -448,9 +442,10 @@ class FromCsvTest extends AnyFunSuite {
     assert(
       fromCsv[Bar]("aa,bb,cc") == List(
         Left(
-          NonEmptyList(
-            ParseFailure("Not a USphoneNumber aa"),
-            List(ParseFailure("Not a ItalianMobilePhone bb"), ParseFailure("Not a ItalianPhone cc"))
+          List(
+            "aa value is not valid USphoneNumber",
+            "bb value is not valid ItalianMobilePhone",
+            "cc value is not valid ItalianPhone"
           )
         )
       )
@@ -458,9 +453,9 @@ class FromCsvTest extends AnyFunSuite {
 
   }
 
-  test("Time") {
+  @Test def time(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -478,7 +473,9 @@ class FromCsvTest extends AnyFunSuite {
     )
 
     assert(
-      fromCsv[Bar]("1/12/1902,1-12-1902,01/01/1900,01-12-1902,1/12/1902,1-12-1902,01/12/1902,01-12-1902,8am,23:50:00") == List(
+      fromCsv[Bar](
+        "1/12/1902,1-12-1902,01/01/1900,01-12-1902,1/12/1902,1-12-1902,01/12/1902,01-12-1902,8am,23:50:00"
+      ) == List(
         Right(
           Bar(
             MDY("1/12/1902"),
@@ -499,19 +496,17 @@ class FromCsvTest extends AnyFunSuite {
     assert(
       fromCsv[Bar]("1,2,3,4,5,6,7,8,9,10") == List(
         Left(
-          NonEmptyList(
-            ParseFailure("Not a MDY 1"),
-            List(
-              ParseFailure("Not a MDY2 2"),
-              ParseFailure("Not a MDY3 3"),
-              ParseFailure("Not a MDY4 4"),
-              ParseFailure("Not a DMY 5"),
-              ParseFailure("Not a DMY2 6"),
-              ParseFailure("Not a DMY3 7"),
-              ParseFailure("Not a DMY4 8"),
-              ParseFailure("Not a Time 9"),
-              ParseFailure("Not a Time24 10")
-            )
+          List(
+            "1 value is not valid MDY",
+            "2 value is not valid MDY2",
+            "3 value is not valid MDY3",
+            "4 value is not valid MDY4",
+            "5 value is not valid DMY",
+            "6 value is not valid DMY2",
+            "7 value is not valid DMY3",
+            "8 value is not valid DMY4",
+            "9 value is not valid Time",
+            "10 value is not valid Time24"
           )
         )
       )
@@ -519,9 +514,9 @@ class FromCsvTest extends AnyFunSuite {
 
   }
 
-  test("Coordinates") {
+  @Test def coordinates(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default.withQuote('|')
+    given IttoCSVFormat = IttoCSVFormat.default.withQuote('|')
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -543,18 +538,18 @@ class FromCsvTest extends AnyFunSuite {
     assert(
       fromCsv[Bar]("a,b,c") == List(
         Left(
-          NonEmptyList(
-            ParseFailure("Not a Coordinate a"),
-            List(ParseFailure("Not a Coordinate1 b"), ParseFailure("Not a Coordinate2 c"))
+          List("a value is not valid Coordinate",
+               "b value is not valid Coordinate1",
+               "c value is not valid Coordinate2"
           )
         )
       )
     )
   }
 
-  test("Zip code") {
+  @Test def zipCode(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -566,15 +561,13 @@ class FromCsvTest extends AnyFunSuite {
     )
 
     assert(
-      fromCsv[Bar]("a,b") == List(
-        Left(NonEmptyList(ParseFailure("Not a USZipCode a"), List(ParseFailure("Not a ItalianZipCode b"))))
-      )
+      fromCsv[Bar]("a,b") == List(Left(List("a value is not valid USZipCode", "b value is not valid ItalianZipCode")))
     )
   }
 
-  test("Numbers") {
+  @Test def numbers(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -592,23 +585,21 @@ class FromCsvTest extends AnyFunSuite {
     assert(
       fromCsv[Bar]("a,b,c,d,e") == List(
         Left(
-          NonEmptyList(
-            ParseFailure("Not a Number1 a"),
-            List(
-              ParseFailure("Not a Signed b"),
-              ParseFailure("Not a Unsigned32 c"),
-              ParseFailure("Not a Percentage d"),
-              ParseFailure("Not a Scientific e")
-            )
+          List(
+            "a value is not valid Number1",
+            "b value is not valid Signed",
+            "c value is not valid Unsigned32",
+            "d value is not valid Percentage",
+            "e value is not valid Scientific"
           )
         )
       )
     )
   }
 
-  test("Codes") {
+  @Test def codes(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -644,25 +635,23 @@ class FromCsvTest extends AnyFunSuite {
     assert(
       fromCsv[Bar]("a,b,c,d,e,f,g") == List(
         Left(
-          NonEmptyList(
-            ParseFailure("Not a ItalianFiscalCode a"),
-            List(
-              ParseFailure("Not a ItalianVAT b"),
-              ParseFailure("Not a ItalianIban c"),
-              ParseFailure("Not a USstates d"),
-              ParseFailure("Not a USstates1 e"),
-              ParseFailure("Not a USstreets f"),
-              ParseFailure("Not a USstreetNumber g")
-            )
+          List(
+            "a value is not valid ItalianFiscalCode",
+            "b value is not valid ItalianVAT",
+            "c value is not valid ItalianIban",
+            "d value is not valid USstates",
+            "e value is not valid USstates1",
+            "f value is not valid USstreets",
+            "g value is not valid USstreetNumber"
           )
         )
       )
     )
   }
 
-  test("BitcoinAdd") {
+  @Test def bitcoinAdd(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -674,12 +663,12 @@ class FromCsvTest extends AnyFunSuite {
       )
     )
 
-    assert(fromCsv[Bar]("aa") == List(Left(NonEmptyList(ParseFailure("Not a BitcoinAdd aa"), Nil))))
+    assert(fromCsv[Bar]("aa") == List(Left(List("aa value is not valid BitcoinAdd"))))
   }
 
-  test("Celsius") {
+  @Test def celsius(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -687,12 +676,12 @@ class FromCsvTest extends AnyFunSuite {
 
     assert(fromCsv[Bar]("+2 °C") == List(Right(Bar(Celsius("+2 °C")))))
 
-    assert(fromCsv[Bar]("aa") == List(Left(NonEmptyList(ParseFailure("Not a Celsius aa"), Nil))))
+    assert(fromCsv[Bar]("aa") == List(Left(List("aa value is not valid Celsius"))))
   }
 
-  test("Fahrenheit") {
+  @Test def fahrenheit(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -700,12 +689,12 @@ class FromCsvTest extends AnyFunSuite {
 
     assert(fromCsv[Bar]("+2 °F") == List(Right(Bar(Fahrenheit("+2 °F")))))
 
-    assert(fromCsv[Bar]("aa") == List(Left(NonEmptyList(ParseFailure("Not a Fahrenheit aa"), Nil))))
+    assert(fromCsv[Bar]("aa") == List(Left(List("aa value is not valid Fahrenheit"))))
   }
 
-  test("ApacheError") {
+  @Test def apacheError(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -717,12 +706,12 @@ class FromCsvTest extends AnyFunSuite {
       )
     )
 
-    assert(fromCsv[Bar]("aa") == List(Left(NonEmptyList(ParseFailure("Not a ApacheError aa"), Nil))))
+    assert(fromCsv[Bar]("aa") == List(Left(List("aa value is not valid ApacheError"))))
   }
 
-  test("Concurrency") {
+  @Test def concurrency(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -737,18 +726,19 @@ class FromCsvTest extends AnyFunSuite {
     assert(
       fromCsv[Bar]("a,b,c") == List(
         Left(
-          NonEmptyList(
-            ParseFailure("Not a UsdCurrency a"),
-            List(ParseFailure("Not a EurCurrency b"), ParseFailure("Not a YenCurrency c"))
+          List(
+            "a value is not valid UsdCurrency",
+            "b value is not valid EurCurrency",
+            "c value is not valid YenCurrency"
           )
         )
       )
     )
   }
 
-  test("NotASCII") {
+  @Test def notAscii(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -756,12 +746,12 @@ class FromCsvTest extends AnyFunSuite {
 
     assert(fromCsv[Bar]("テスト。") == List(Right(Bar(NotASCII("テスト。")))))
 
-    assert(fromCsv[Bar]("aa") == List(Left(NonEmptyList(ParseFailure("Not a NotASCII aa"), Nil))))
+    assert(fromCsv[Bar]("aa") == List(Left(List("aa value is not valid NotASCII"))))
   }
 
-  test("Crontab") {
+  @Test def crontab(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -769,12 +759,12 @@ class FromCsvTest extends AnyFunSuite {
 
     assert(fromCsv[Bar]("5 4 * * *") == List(Right(Bar(Cron("5 4 * * *")))))
 
-    assert(fromCsv[Bar]("aa") == List(Left(NonEmptyList(ParseFailure("Not a Cron aa"), Nil))))
+    assert(fromCsv[Bar]("aa") == List(Left(List("aa value is not valid Cron"))))
   }
 
-  test("from csv social") {
+  @Test def fromCsvSocial(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits._
 
@@ -797,67 +787,84 @@ class FromCsvTest extends AnyFunSuite {
     assert(
       fromCsv[Bar]("aa,bb,cc") == List(
         Left(
-          NonEmptyList(
-            ParseFailure("Not a Youtube aa"),
-            List(ParseFailure("Not a Facebook bb"), ParseFailure("Not a Twitter cc"))
+          List(
+            "aa value is not valid Youtube",
+            "bb value is not valid Facebook",
+            "cc value is not valid Twitter"
           )
         )
       )
     )
   }
 
-  test("decode custom type") {
+  @Test def decodeCustomType(): Unit = { //TODO add in microsite
 
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     import scala.util.Try
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     final case class MyType(a: Int)
     final case class Foo(a: MyType, b: Int)
 
     import com.github.gekomad.ittocsv.core.FromCsv._
 
-    implicit def _l(implicit csvFormat: IttoCSVFormat): String => Either[ParseFailure, MyType] = { str: String =>
-      if (str.startsWith("[") && str.endsWith("]"))
-        Try(str.substring(1, str.length - 1).toInt)
-          .map(f => Right(MyType(f)))
-          .getOrElse(Left(ParseFailure(s"Not a MyType $str")))
-      else Left(ParseFailure(s"Wrong format $str"))
-
-    }
+    given Decoder[String, MyType] = a =>
+      (if (a.startsWith("[") && a.endsWith("]"))
+         Try(a.substring(1, a.length - 1).toInt)
+           .map(f => Some(MyType(f)))
+           .getOrElse(None)
+       else None).toRight(List(s"$a value is not valid MyType"))
 
     assert(fromCsv[Foo]("[42],99") == List(Right(Foo(MyType(42), 99))))
-    assert(fromCsv[Foo]("[x],99") == List(Left(NonEmptyList(ParseFailure("Not a MyType [x]"), Nil))))
-    assert(fromCsv[Foo]("42,99") == List(Left(NonEmptyList(ParseFailure("Wrong format 42"), Nil))))
+    assert(fromCsv[Foo]("[x],99") == List(Left(List("[x] value is not valid MyType"))))
+    assert(fromCsv[Foo]("42,99") == List(Left(List("42 value is not valid MyType"))))
 
   }
 
-  test("from csv url with custom parser") {
+  @Test def from_csv_email_with_custom_parser(): Unit = {
 
+    import com.github.gekomad.ittocsv.core.Types.implicits.Email
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
+    import com.github.gekomad.regexcollection.Collection.Validator
+    import com.github.gekomad.ittocsv.core.Types.RegexValidator
+
+    final case class Bar(a: String, b: Email)
+
+    assert(fromCsv[Bar]("abc,a@%.d") == List(Left(List("a@%.d value is not valid Email"))))
+
+    {
+      given Decoder[String, Email] = (a: String) => RegexValidator[Email](""".+@.+\..+""").validate(a)
+      assert(fromCsv[Bar]("abc,a@%.d") == List(Right(Bar("abc", Email("a@%.d")))))
+    }
+  }
+
+  @Test def from_csv_url_with_custom_parser(): Unit = {
+    import com.github.gekomad.ittocsv.core.FromCsv._
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits.URL
 
     final case class Bar(a: String, b: URL)
-
     assert(fromCsv[Bar]("abc,http://abc.def.com") == List(Right(Bar("abc", URL("http://abc.def.com")))))
     assert(fromCsv[Bar]("abc,https://abc.def.com") == List(Right(Bar("abc", URL("https://abc.def.com")))))
-    assert(fromCsv[Bar]("abc,www.aaa.com") == List(Left(NonEmptyList(ParseFailure("Not a URL www.aaa.com"), Nil))))
+    assert(fromCsv[Bar]("abc,www.aaa.com") == List(Left(List("www.aaa.com value is not valid URL"))))
 
     {
-      import com.github.gekomad.ittocsv.core.Types.Validator
-      implicit val _l: Validator[URL] =
-        com.github.gekomad.ittocsv.core.Types.implicits.validatorURL
-          .copy(regex = """[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?""")
+      import com.github.gekomad.regexcollection.Collection.Validator
+      import com.github.gekomad.ittocsv.core.Types.RegexValidator
+
+      given Decoder[String, URL] = (a: String) =>
+        RegexValidator[URL]("""[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?""")
+          .validate(a)
 
       assert(fromCsv[Bar]("abc,www.aaa.com") == List(Right(Bar("abc", URL("www.aaa.com")))))
     }
   }
 
-  test("from csv email") {
+  @Test def from_csv_email(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits.Email
 
@@ -866,21 +873,21 @@ class FromCsvTest extends AnyFunSuite {
     assert(fromCsv[Bar]("abc,aaa@aai.sss") == List(Right(Bar("abc", Email("aaa@aai.sss")))))
     assert(fromCsv[Bar]("abc,$aaa@aai.sss") == List(Right(Bar("abc", Email("$aaa@aai.sss")))))
     assert(fromCsv[Bar]("abc,a@i.d") == List(Right(Bar("abc", Email("a@i.d")))))
-    assert(fromCsv[Bar]("abc,a@%.d") == List(Left(NonEmptyList(ParseFailure("Not a Email a@%.d"), Nil))))
-    assert(fromCsv[Bar]("abc,a @i.d") == List(Left(NonEmptyList(ParseFailure("Not a Email a @i.d"), Nil))))
-    assert(fromCsv[Bar]("abc,hi") == List(Left(NonEmptyList(ParseFailure("Not a Email hi"), Nil))))
-    assert(fromCsv[Bar]("abc,hi@") == List(Left(NonEmptyList(ParseFailure("Not a Email hi@"), Nil))))
-    assert(fromCsv[Bar]("abc,@") == List(Left(NonEmptyList(ParseFailure("Not a Email @"), Nil))))
-    assert(fromCsv[Bar]("abc,@.com") == List(Left(NonEmptyList(ParseFailure("Not a Email @.com"), Nil))))
-    assert(fromCsv[Bar]("abc,hi@g.") == List(Left(NonEmptyList(ParseFailure("Not a Email hi@g."), Nil))))
-    assert(fromCsv[Bar]("abc,hi@.d") == List(Left(NonEmptyList(ParseFailure("Not a Email hi@.d"), Nil))))
-    assert(fromCsv[Bar]("abc,") == List(Left(NonEmptyList(ParseFailure("Not a Email "), Nil))))
-    assert(fromCsv[Bar]("abc, ") == List(Left(NonEmptyList(ParseFailure("Not a Email  "), Nil))))
+    assert(fromCsv[Bar]("abc,a@%.d") == List(Left(List("a@%.d value is not valid Email"))))
+    assert(fromCsv[Bar]("abc,a @i.d") == List(Left(List("a @i.d value is not valid Email"))))
+    assert(fromCsv[Bar]("abc,hi") == List(Left(List("hi value is not valid Email"))))
+    assert(fromCsv[Bar]("abc,hi@") == List(Left(List("hi@ value is not valid Email"))))
+    assert(fromCsv[Bar]("abc,@") == List(Left(List("@ value is not valid Email"))))
+    assert(fromCsv[Bar]("abc,@.com") == List(Left(List("@.com value is not valid Email"))))
+    assert(fromCsv[Bar]("abc,hi@g.") == List(Left(List("hi@g. value is not valid Email"))))
+    assert(fromCsv[Bar]("abc,hi@.d") == List(Left(List("hi@.d value is not valid Email"))))
+    assert(fromCsv[Bar]("abc,") == List(Left(List(" value is not valid Email"))))
+    assert(fromCsv[Bar]("abc, ") == List(Left(List("  value is not valid Email"))))
   }
 
-  test("from csv emailSimple") {
+  @Test def from_csv_email_simple(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits.EmailSimple
 
@@ -892,9 +899,9 @@ class FromCsvTest extends AnyFunSuite {
 
   }
 
-  test("from csv email1") {
+  @Test def from_csv_email1(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     import com.github.gekomad.ittocsv.core.Types.implicits.Email1
 
@@ -902,47 +909,33 @@ class FromCsvTest extends AnyFunSuite {
 
     assert(fromCsv[Bar]("abc,aaa@ai.sss") == List(Right(Bar("abc", Email1("aaa@ai.sss")))))
     assert(fromCsv[Bar]("abc,a@i.da") == List(Right(Bar("abc", Email1("a@i.da")))))
-    assert(fromCsv[Bar]("abc,a@%.da") == List(Left(NonEmptyList(ParseFailure("Not a Email1 a@%.da"), Nil))))
+    assert(fromCsv[Bar]("abc,a@%.da") == List(Left(List("a@%.da value is not valid Email1"))))
 
   }
 
-  test("from csv email with custom parser") {
-
+  @Test def from_csv_to_type(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
-    import com.github.gekomad.ittocsv.core.Types.implicits.Email
-
-    final case class Bar(a: String, b: Email)
-    import com.github.gekomad.ittocsv.core.Types.Validator
-    implicit val _l: Validator[Email] =
-      com.github.gekomad.ittocsv.core.Types.implicits.validatorEmail.copy(regex = """.+@.+\..+""")
-
-    assert(fromCsv[Bar]("abc,a@%.d") == List(Right(Bar("abc", Email("a@%.d")))))
-  }
-
-  test("from csv to type") {
-    import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
     final case class Bar(a: String, b: Int)
     assert(fromCsv[Bar]("abc,42") == List(Right(Bar("abc", 42))))
-    assert(fromCsv[Bar]("abc,hi") == List(Left(NonEmptyList(ParseFailure("hi is not Int"), Nil))))
+    assert(fromCsv[Bar]("abc,hi") == List(Left(List("hi value is not valid Int"))))
   }
 
-  test("from csv to List of type") {
+  @Test def from_csv_to_list_of_type(): Unit = {
     import com.github.gekomad.ittocsv.core.FromCsv._
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
     final case class Bar(a: String, b: Int)
     assert(fromCsv[Bar]("abc,42\r\nfoo,24") == List(Right(Bar("abc", 42)), Right(Bar("foo", 24))))
   }
 
-  test("tokenizeCsvLine to types complete") {
+  @Test def tokenizeCsvLine_to_types_complete: Unit = {
 
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     import com.github.gekomad.ittocsv.core.FromCsv._
 
     final case class Foo(a: Int, b: Double, c: Option[String], d: Boolean)
 
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     val o = fromCsv[Foo]("1,3.14,foo,true")
 
@@ -950,49 +943,35 @@ class FromCsvTest extends AnyFunSuite {
 
   }
 
-  test("list of csv string to list of type") {
+  @Test def list_of_csv_string_to_list_of_type(): Unit = {
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     import com.github.gekomad.ittocsv.core.FromCsv._
     final case class Foo(a: Int, b: Double, c: String, d: Boolean)
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
-    val o                                 = fromCsv[Foo](List("1,3.14,foo,true", "2,3.14,bar,false")) // List[Either[NonEmptyList[ParseFailure], Foo]]
+    given IttoCSVFormat = IttoCSVFormat.default
+    val o = fromCsv[Foo](List("1,3.14,foo,true", "2,3.14,bar,false")) // List[Either[List[ParseFailure], Foo]]
     assert(o == List(Right(Foo(1, 3.14, "foo", true)), Right(Foo(2, 3.14, "bar", false))))
   }
 
-  test("list of csv string to list of type with empty string and ignoreEmptyLines false") {
+  @Test def list_of_csv_string_to_list_of_type_with_empty_string_and_ignoreEmptyLines_false(): Unit = {
+
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     import com.github.gekomad.ittocsv.core.FromCsv._
     final case class Foo(a: Int)
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
-    val o                                 = fromCsv[Foo](List("1", "")) // List[Either[NonEmptyList[ParseFailure], Foo]]
-    assert(o == List(Right(Foo(1)), Left(NonEmptyList(ParseFailure(" is not Int"), Nil))))
+    given IttoCSVFormat = IttoCSVFormat.default
+    val o = fromCsv[Foo](List("1", "")) // List[Either[List[ParseFailure], Foo]]
+    assert(o == List(Right(Foo(1)), Left(List(" value is not valid Int"))))
   }
 
-  test("list of csv string to list of type with empty string and ignoreEmptyLines true") {
+  @Test def list_of_csv_string_to_list_of_type_with_empty_string_and_ignoreEmptyLines_true(): Unit = {
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     import com.github.gekomad.ittocsv.core.FromCsv._
     final case class Foo(a: Int)
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withIgnoreEmptyLines(true)
-    val o                                 = fromCsv[Foo](List("1", "", "2")) // List[Either[NonEmptyList[ParseFailure], Foo]]
+    given IttoCSVFormat = IttoCSVFormat.default.withIgnoreEmptyLines(true)
+    val o = fromCsv[Foo](List("1", "", "2"))
     assert(o == List(Right(Foo(1)), Right(Foo(2))))
   }
 
-  test("decode Option[List[Int]]") {
-    import com.github.gekomad.ittocsv.parser.IttoCSVFormat
-    import com.github.gekomad.ittocsv.core.FromCsv._
-
-    import com.github.gekomad.ittocsv.core.FromCsv._
-
-    final case class Foo(v: String, a: Option[List[Int]])
-
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
-
-    assert(fromCsv[Foo]("abc,\"1,2,3\"") == List(Right(Foo("abc", Some(List(1, 2, 3))))))
-    assert(fromCsv[Foo]("abc,\"1,xy,3\"") == List(Left(cats.data.NonEmptyList(ParseFailure("Bad type on xy"), Nil))))
-
-  }
-
-  test("decode List[Char]") {
+  @Test def decode_List_char(): Unit = {
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     import com.github.gekomad.ittocsv.core.FromCsv._
 
@@ -1000,14 +979,26 @@ class FromCsvTest extends AnyFunSuite {
 
     final case class Foo(v: String, a: List[Char])
 
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     assert(fromCsv[Foo]("abc,\"a,b,c\"") == List(Right(Foo("abc", List('a', 'b', 'c')))))
-    assert(fromCsv[Foo]("abc,\"1,xy,3\"") == List(Left(cats.data.NonEmptyList(ParseFailure("Bad type on xy"), Nil))))
-
+    assert(fromCsv[Foo]("abc,\"a,λ,c\"") == List(Right(Foo("abc", List('a', 'λ', 'c')))))
+    assert(fromCsv[Foo]("abc,\"1,xy,3\"") == List(Left(List("xy value is not valid Char"))))
   }
 
-  test("decode List[Boolean]") {
+  @Test def decodeOption_List_int(): Unit = {
+    import com.github.gekomad.ittocsv.parser.IttoCSVFormat
+    import com.github.gekomad.ittocsv.core.FromCsv._
+
+    final case class Foo(v: String, a: Option[List[Int]])
+
+    given IttoCSVFormat = IttoCSVFormat.default
+
+    assert(fromCsv[Foo]("abc,\"1,2,3\"") == List(Right(Foo("abc", Some(List(1, 2, 3))))))
+    assert(fromCsv[Foo]("abc,\"1,xy,3\"") == List(Left(List("xy value is not valid Int"))))
+  }
+
+  @Test def decode_List_bool(): Unit = {
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     import com.github.gekomad.ittocsv.core.FromCsv._
 
@@ -1015,94 +1006,92 @@ class FromCsvTest extends AnyFunSuite {
 
     final case class Foo(a: List[Boolean])
 
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     assert(fromCsv[Foo]("\"true,false\"") == List(Right(Foo(List(true, false)))))
-    assert(fromCsv[Foo]("\"abc,false\"") == List(Left(cats.data.NonEmptyList(ParseFailure("Bad type on abc"), Nil))))
+    assert(fromCsv[Foo]("\"abc,false\"") == List(Left(List("abc value is not valid Boolean"))))
 
   }
 
-  test("decode List[Int]") {
+  @Test def decode_List_int(): Unit = {
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 
     import com.github.gekomad.ittocsv.core.FromCsv._
 
     final case class Foo(v: String, a: List[Int])
 
-    implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
-
+    given IttoCSVFormat = IttoCSVFormat.default
+    val a = fromCsv[Foo]("abc,\"1,2,3\"")
     assert(fromCsv[Foo]("abc,\"1,2,3\"") == List(Right(Foo("abc", List(1, 2, 3)))))
-    assert(fromCsv[Foo]("abc,\"1,xy,3\"") == List(Left(cats.data.NonEmptyList(ParseFailure("Bad type on xy"), Nil))))
+    assert(fromCsv[Foo]("abc,\"1,xy,y\"") == List(Left(List("xy value is not valid Int", "y value is not valid Int"))))
 
   }
 
-  test("decode List[Double]") {
+  @Test def decode_List_double(): Unit = {
+    import com.github.gekomad.ittocsv.core.FromCsv.fromCsvL
 
-    import com.github.gekomad.ittocsv.core.FromCsv._
-
-    implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     assert(fromCsvL[Double]("1.1,2.1,3.1") == List(Right(1.1), Right(2.1), Right(3.1)))
-    assert(fromCsvL[Double]("1.1,abc,3.1") == List(Right(1.1), Left(ParseFailure("abc is not Double")), Right(3.1)))
-    assert(fromCsvL[Double]("") == List(Left(ParseFailure(" is not Double"))))
+    assert(fromCsvL[Double]("1.1,abc,3.1") == List(Right(1.1), Left("abc value is not valid Double"), Right(3.1)))
+    assert(
+      fromCsvL[Double]("1.1,abc,foo") == List(
+        Right(1.1),
+        Left("abc value is not valid Double"),
+        Left("foo value is not valid Double")
+      )
+    )
+    assert(fromCsvL[Double]("") == List(Left(" value is not valid Double")))
 
   }
 
-  test("decode LocalDateTime") {
-
+  @Test def decode_LocalDateTime(): Unit = {
     import java.time.LocalDateTime
 
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     import com.github.gekomad.ittocsv.core.FromCsv._
-    import com.github.gekomad.ittocsv.core.Conversions._
 
     final case class Foo(a: Int, b: LocalDateTime)
 
-    implicit val csvFormat = IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
-    {
-      val o = fromCsv[Foo]("1,2000-12-31T11:21:19")
-      assert(
-        o == List(
-          Right(
-            Foo(1, LocalDateTime.parse("2000-12-31T11:21:19", java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-          )
+    val o = fromCsv[Foo]("1,2000-12-31T11:21:19")
+    assert(
+      o == List(
+        Right(
+          Foo(1, LocalDateTime.parse("2000-12-31T11:21:19", java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME))
         )
       )
-    }
+    )
 
   }
 
-  test("decode Option[LocalDate]") {
+  @Test def decode_Option_LocalDate(): Unit = {
     import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
     import java.time.LocalDate
 
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     import com.github.gekomad.ittocsv.core.FromCsv._
-    import com.github.gekomad.ittocsv.core.Conversions._
 
     final case class Foo(a: Int, b: Option[LocalDate])
 
-    implicit val csvFormat = IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
-    {
-      val o = fromCsv[Foo]("1,2000-12-31")
-      assert(o == List(Right(Foo(1, Some(LocalDate.parse("2000-12-31", ISO_LOCAL_DATE))))))
-    }
+    val o = fromCsv[Foo]("1,2000-12-31")
+    assert(o == List(Right(Foo(1, Some(LocalDate.parse("2000-12-31", ISO_LOCAL_DATE))))))
 
   }
 
-  test("decode Option[LocalDateTime]") {
+  @Test def decode_LocalDateTime2(): Unit = {
     import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
     import java.time.LocalDateTime
 
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     import com.github.gekomad.ittocsv.core.FromCsv._
-    import com.github.gekomad.ittocsv.core.Conversions._
 
     final case class Foo(a: Int, b: Option[LocalDateTime])
 
-    implicit val csvFormat = IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     {
       val o = fromCsv[Foo]("1,2000-12-31T11:21:19")
@@ -1110,13 +1099,12 @@ class FromCsvTest extends AnyFunSuite {
     }
 
   }
+  @Test def decode_date_and_time(): Unit = {
 
-  test("decode date and time") {
     import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
     import java.time.LocalDateTime
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     import com.github.gekomad.ittocsv.core.FromCsv._
-    import com.github.gekomad.ittocsv.core.Conversions._
     import java.time.{LocalDate, LocalTime, OffsetDateTime}
     import java.time.format.DateTimeFormatter
     import java.time.ZonedDateTime
@@ -1131,7 +1119,7 @@ class FromCsvTest extends AnyFunSuite {
       ldt: LocalDateTime
     )
 
-    implicit val csvFormat = IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
     {
       val o = fromCsv[Foo](
@@ -1152,11 +1140,34 @@ class FromCsvTest extends AnyFunSuite {
         )
       )
     }
-
   }
 
-  test("decode custom Option[LocalDateTime]") {
+  @Test def CSVtoListOftTypeWithCustomLocalDateTime(): Unit = {
+    import com.github.gekomad.ittocsv.core.FromCsv._
 
+    given IttoCSVFormat = IttoCSVFormat.default
+
+    case class Foo(a: Int, b: java.time.LocalDateTime)
+
+    given Decoder[String, LocalDateTime] = { case s =>
+      scala.util
+        .Try {
+          Right(LocalDateTime.parse(s, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.0")))
+        }
+        .getOrElse(Left(List(s"Not a LocalDataTime $s")))
+    }
+
+    val l = fromCsv[Foo]("1,2000-12-31 11:21:19.0")
+    assert(
+      l == List(
+        Right(
+          Foo(1, LocalDateTime.parse("2000-12-31 11:21:19.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.0")))
+        )
+      )
+    )
+  }
+
+  @Test def decode_custom_option_LocalDateTime(): Unit = {
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 
     import com.github.gekomad.ittocsv.core.FromCsv._
@@ -1167,27 +1178,36 @@ class FromCsvTest extends AnyFunSuite {
     import java.time.LocalDateTime
     import java.time.format.DateTimeFormatter
 
-    implicit val csvFormat = IttoCSVFormat.default
+    given IttoCSVFormat = IttoCSVFormat.default
 
-    implicit def localDateTimeToCsv: String => Either[ParseFailure, Option[LocalDateTime]] = {
+    val pattern = "yyyy-MM-dd HH:mm:ss.0"
+    given Decoder[String, Option[LocalDateTime]] = {
       case "" => Right(None)
       case s =>
         Try {
-          val x = LocalDateTime.parse(s, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.0"))
+          val x = LocalDateTime.parse(s, DateTimeFormatter.ofPattern(pattern))
           Right(Some(x))
-        }.getOrElse(Left(ParseFailure(s"Not a LocalDataTime $s")))
+        }.getOrElse(Left(List(s"Not a LocalDataTime $s")))
+    }
 
+    given (String => Either[String, Option[LocalDateTime]]) = {
+      case "" => Right(None)
+      case s =>
+        Try {
+          val x = LocalDateTime.parse(s, DateTimeFormatter.ofPattern(pattern))
+          Right(Some(x))
+        }.getOrElse(Left(s"Not a LocalDataTime $s"))
     }
 
     {
-      val l = LocalDateTime.parse("2000-11-11 11:11:11.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.0"))
+      val l = LocalDateTime.parse("2000-11-11 11:11:11.0", DateTimeFormatter.ofPattern(pattern))
       val o = fromCsv[Foo]("1,2000-11-11 11:11:11.0")
       assert(o == List(Right(Foo(1, Some(l)))))
     }
 
     {
       val o = fromCsv[Foo]("1,daigoro-xx-11 11:11:11.0")
-      assert(o == List(Left(cats.data.NonEmptyList(ParseFailure("Not a LocalDataTime daigoro-xx-11 11:11:11.0"), Nil))))
+      assert(o == List(Left(List("Not a LocalDataTime daigoro-xx-11 11:11:11.0"))))
     }
   }
 

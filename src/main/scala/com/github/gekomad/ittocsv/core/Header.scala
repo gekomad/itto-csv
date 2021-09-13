@@ -2,29 +2,29 @@ package com.github.gekomad.ittocsv.core
 
 import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
 
-object Header {
+object Header:
 
-  import shapeless._
-  import shapeless.ops.record._
-  import shapeless.ops.hlist.ToTraversable
+  import scala.compiletime.{constValue, erasedValue}
+  import scala.deriving._
 
-  trait FieldNames[_] {
-    def apply(): List[String]
-  }
+  private inline def toNames[T <: Tuple]: List[String] =
+    inline erasedValue[T] match {
+      case _: (head *: tail) =>
+        (inline constValue[head] match {
+          case str: String => str
+        }) :: toNames[tail]
+      case _ => Nil
+    }
 
-  implicit def toNames[T, Repr <: HList, KeysRepr <: HList](
-    implicit gen: LabelledGeneric.Aux[T, Repr],
-    keys: Keys.Aux[Repr, KeysRepr],
-    traversable: ToTraversable.Aux[KeysRepr, List, Symbol]
-  ): FieldNames[T] = () => keys().toList.map(_.name)
+  inline def fieldNames[P](using mirror: Mirror.Of[P]): List[String] = toNames[mirror.MirroredElemLabels]
 
   /**
-    * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-    * @return the string with class's fields name encoded according with csvFormat
-    */
-  def csvHeader[T](implicit h: FieldNames[T], csvFormat: IttoCSVFormat): String =
-    h().map(StringToCsvField.stringToCsvField).mkString(csvFormat.delimeter.toString)
+   * @param csvFormat
+   *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+   * @return
+   *   the string with class's fields name encoded according with csvFormat
+   */
+  inline def csvHeader[T](using mirror: Mirror.Of[T], csvFormat: IttoCSVFormat): String =
+    fieldNames[T].map(StringToCsvField.stringToCsvField).mkString(csvFormat.delimeter.toString)
 
-  def fieldNames[T](implicit h: FieldNames[T]): List[String] = h()
-
-}
+end Header
