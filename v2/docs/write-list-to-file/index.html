@@ -13,7 +13,7 @@
 
 <h3 id="read-list-from-file">Read List from file</h3>
 
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">import</span> <span class="nn">com.github.gekomad.ittocsv.parser.io.FromFile.csvFromFileUnsafe</span>
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">com.github.gekomad.ittocsv.parser.io.FromFile.csvFromFileUnsafe</span>
 <span class="n">given</span> <span class="nc">IttoCSVFormat</span> <span class="k">=</span> <span class="nv">IttoCSVFormat</span><span class="o">.</span><span class="py">tab</span>
 <span class="k">case</span> <span class="k">class</span> <span class="nc">Bar</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">date</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
 <span class="k">val</span> <span class="nv">filePath</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="s">"/tmp/out.csv"</span>
