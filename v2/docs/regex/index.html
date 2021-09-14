@@ -35,10 +35,11 @@
 <div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">given</span> <span class="nc">Decoder</span><span class="o">[</span><span class="kt">String</span>, <span class="kt">MyType</span><span class="o">]</span> <span class="k">=</span> <span class="o">(</span><span class="n">s</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">RegexValidator</span><span class="o">[</span><span class="kt">MyType</span><span class="o">](</span><span class="n">regexString</span><span class="o">).</span><span class="py">validate</span><span class="o">(</span><span class="n">s</span><span class="o">)</span>
 </code></pre></div></div>
 
-<p>Example encoding N:Int to “[N]”  spostarlo TODO</p>
+<p>Example encoding N:Int to “[N]”</p>
 
 <div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">com.github.gekomad.ittocsv.parser.IttoCSVFormat</span>
-<span class="k">implicit</span> <span class="k">val</span> <span class="nv">csvFormat</span><span class="k">:</span> <span class="kt">IttoCSVFormat</span> <span class="o">=</span> <span class="nv">IttoCSVFormat</span><span class="o">.</span><span class="py">default</span>
+
+<span class="n">given</span> <span class="nc">IttoCSVFormat</span> <span class="k">=</span> <span class="nv">IttoCSVFormat</span><span class="o">.</span><span class="py">default</span>
 
 <span class="k">case</span> <span class="k">class</span> <span class="nc">MyType</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span>
 <span class="k">case</span> <span class="k">class</span> <span class="nc">Foo</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">MyType</span><span class="o">,</span> <span class="n">b</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span>
@@ -49,7 +50,7 @@
 <span class="nf">assert</span><span class="o">(</span><span class="nf">toCsv</span><span class="o">(</span><span class="nc">Foo</span><span class="o">(</span><span class="nc">MyType</span><span class="o">(</span><span class="mi">42</span><span class="o">),</span> <span class="mi">99</span><span class="o">))</span> <span class="o">==</span> <span class="s">"[42],99"</span><span class="o">)</span>
 </code></pre></div></div>
 
-<p>Using <strong>decode</strong> for MyType: spostarlo TODO</p>
+<p>Using <strong>decode</strong></p>
 
 <div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">implicit</span> <span class="k">def</span> <span class="nf">_d</span><span class="o">(</span><span class="k">implicit</span> <span class="n">csvFormat</span><span class="k">:</span> <span class="kt">IttoCSVFormat</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=&gt;</span> <span class="nc">Either</span><span class="o">[</span><span class="kt">ParseFailure</span>, <span class="kt">MyType</span><span class="o">]</span> <span class="k">=</span> <span class="o">(</span><span class="n">str</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">???</span>
 </code></pre></div></div>
@@ -58,7 +59,8 @@
 
 <div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">com.github.gekomad.ittocsv.parser.IttoCSVFormat</span>
 <span class="k">import</span> <span class="nn">scala.util.Try</span>
-<span class="k">implicit</span> <span class="k">val</span> <span class="nv">csvFormat</span><span class="k">:</span> <span class="kt">IttoCSVFormat</span> <span class="o">=</span> <span class="nv">IttoCSVFormat</span><span class="o">.</span><span class="py">default</span>
+<span class="n">given</span> <span class="nc">IttoCSVFormat</span> <span class="k">=</span> <span class="nv">IttoCSVFormat</span><span class="o">.</span><span class="py">default</span>
+
 <span class="k">import</span> <span class="nn">cats.data.NonEmptyList</span>
 
 <span class="k">case</span> <span class="k">class</span> <span class="nc">MyType</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span>
