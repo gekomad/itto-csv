@@ -10,7 +10,7 @@ import java.time.*
 import java.time.format.DateTimeFormatter.*
 import scala.util.Try
 
-object FromCsv {
+object FromCsv:
 
   import scala.deriving.Mirror
 
@@ -35,12 +35,10 @@ object FromCsv {
     Try(ZonedDateTime.parse(a, ISO_ZONED_DATE_TIME)).toOption.toRight(List(s"$a value is not valid ZonedDateTime"))
   given Decoder[String, Instant] = a => Try(Instant.parse(a)).toOption.toRight(List(s"$a value is not valid Instant"))
 
-  given Decoder[String, Boolean] = a => {
+  given Decoder[String, Boolean] = a =>
     if (a.toLowerCase == "true") Right(true)
     else if (a.toLowerCase == "false") Right(false)
-    else
-      Left(List(s"$a value is not valid Boolean"))
-  }
+    else Left(List(s"$a value is not valid Boolean"))
 
   given Decoder[String, Int] = a => a.toIntOption.toRight(List(s"$a value is not valid Int"))
 
@@ -195,40 +193,34 @@ object FromCsv {
 
   given Decoder[String, MD5] = a => RegexValidator[MD5](validatorMD5.regexp).validate(a)
 
-  given [A](using f: Decoder[String, A]): Decoder[String, Option[A]] = { s =>
+  given [A](using f: Decoder[String, A]): Decoder[String, Option[A]] = s =>
     if (s == "") Right(None) else f(s).map(Some(_))
-  }
 
-  given [A](using f: Decoder[String, A], csvFormat: IttoCSVFormat): Decoder[String, List[A]] =
-    s =>
-      val a = s.split(csvFormat.delimeter.toString, -1).toList.map(f(_))
-      val (l, rights) = a.partitionMap(identity)
-      val lefts = l.flatten
-      if (lefts.isEmpty) Right(rights) else Left(lefts)
+  given [A](using f: Decoder[String, A], csvFormat: IttoCSVFormat): Decoder[String, List[A]] = s =>
+    val a = s.split(csvFormat.delimeter.toString, -1).toList.map(f(_))
+    val (l, rights) = a.partitionMap(identity)
+    val lefts = l.flatten
+    if (lefts.isEmpty) Right(rights) else Left(lefts)
 
-  given Decoder[List[String], EmptyTuple] = {
+  given Decoder[List[String], EmptyTuple] =
     case Nil => Right(EmptyTuple)
     case s   => Left(List(s"$s empty list"))
-  }
 
-  given [H, T <: Tuple](using dh: Decoder[String, H], dt: Decoder[List[String], T]): Decoder[List[String], H *: T] = {
+  given [H, T <: Tuple](using dh: Decoder[String, H], dt: Decoder[List[String], T]): Decoder[List[String], H *: T] =
     case h :: t =>
-      (dh(h), dt(t)) match {
+      (dh(h), dt(t)) match
         case (Right(a), Right(b)) => Right(a *: b)
         case (Left(e), Left(e2))  => Left(e ::: e2)
         case (Left(e), _)         => Left(e)
         case (_, Left(e))         => Left(e)
-      }
     case Nil => Left(List("empty list"))
-  }
 
   def list2Product[A](
     xs: List[String]
   )(using m: Mirror.ProductOf[A], d: Decoder[List[String], m.MirroredElemTypes]): Either[List[String], A] =
-    d(xs) match {
+    d(xs) match
       case Right(r) => Right(m.fromProduct(r))
       case Left(l)  => Left(l)
-    }
 
   /**
    * @param csvList
@@ -236,15 +228,7 @@ object FromCsv {
    * @param csvFormat
    *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
    * @return
-   *   `List[Either[NonEmptyList[ParseFailure], A]]` based on the parsing of `csvList` any errors are reported
-   * {{{
-   * import com.github.gekomad.ittocsv.parser.IttoCSVFormat
-   * import com.github.gekomad.ittocsv.core.FromCsv._
-   * case class Foo(a: Int, b: Double, c: String, d: Boolean)
-   * given IttoCSVFormat = IttoCSVFormat.default
-   * val p1 = fromCsv[Foo](List("1,3.14,foo,true", "2,3.14,bar,false"))
-   * assert(p1 == List(Right(Foo(1, 3.14, "foo", true)), Right(Foo(2, 3.14, "bar", false))))
-   * }}}
+   *   `List[Either[List[String], A]]` based on the parsing of `csvList` any errors are reported
    */
   def fromCsv[A](
     csvList: List[String]
@@ -252,23 +236,18 @@ object FromCsv {
     m: Mirror.ProductOf[A],
     d: Decoder[List[String], m.MirroredElemTypes],
     csvFormat: IttoCSVFormat
-  ): List[Either[List[String], A]] = {
-    csvList match {
-      case Nil => Nil
-      case l =>
-        l.collect {
-          case row if !row.isEmpty || !csvFormat.ignoreEmptyLines =>
-            tokenizeCsvLine(row) match {
-              case None => Left(List(s"$csvList is not a valid csv string"))
-              case Some(t) =>
-                list2Product[A](t).match {
-                  case Right(a) => Right(a)
-                  case Left(a)  => Left(a.toList)
-                }
-            }
-        }
-    }
-  }
+  ): List[Either[List[String], A]] = csvList match
+    case Nil => Nil
+    case l =>
+      l.collect {
+        case row if !row.isEmpty || !csvFormat.ignoreEmptyLines =>
+          tokenizeCsvLine(row) match
+            case None => Left(List(s"$csvList is not a valid csv string"))
+            case Some(t) =>
+              list2Product[A](t).match
+                case Right(a) => Right(a)
+                case Left(a)  => Left(a.toList)
+      }
 
   def fromCsv[A](csv: String)(using
     m: Mirror.ProductOf[A],
@@ -280,10 +259,9 @@ object FromCsv {
     x: String
   )(using dec: Decoder[String, A], csvFormat: IttoCSVFormat): List[Either[String, A]] =
     x.split(csvFormat.delimeter.toString, -1).toList.map(dec(_)).map {
-      _ match {
+      _ match
         case Left(a)  => Left(a.head)
         case Right(a) => Right(a)
-      }
     }
 
-}
+end FromCsv

@@ -8,36 +8,34 @@ import scala.util.matching.Regex
 import com.github.gekomad.ittocsv.core.ToCsv.given
 import com.github.gekomad.ittocsv.core.FromCsv.*
 
-class TreeTest {
+class TreeTest :
   @Test def encode_decodeTree_Int(): Unit = {
 
-    object OTree {
+    object OTree:
 
       //thanks to amitayh https://gist.github.com/amitayh/373f512c50222e15550869e2ff539b25
       final case class Tree[A](value: A, left: Option[Tree[A]] = None, right: Option[Tree[A]] = None)
 
-      object Serializer {
+      object Serializer:
         val pattern: Regex = """^(\d+)\((.*)\)$""".r
         val treeOpen: Char = '('
         val treeClose: Char = ')'
         val separator: Char = ','
         val separatorLength: Int = 1
 
-        def serialize[A](nodeOption: Option[Tree[A]]): String = nodeOption match {
+        def serialize[A](nodeOption: Option[Tree[A]]): String = nodeOption match
           case Some(Tree(value, left, right)) =>
             val leftStr = serialize(left)
             val rightStr = serialize(right)
             s"$value$treeOpen$leftStr$separator$rightStr$treeClose"
 
           case None => ""
-        }
 
-        def deserialize[A](str: String, f: String => A): Option[Tree[A]] = str match {
+        def deserialize[A](str: String, f: String => A): Option[Tree[A]] = str match
           case pattern(value, inner) =>
             val (left, right) = splitInner(inner)
             Some(Tree(f(value), deserialize(left, f), deserialize(right, f)))
           case _ => None
-        }
 
         def splitInner(inner: String): (String, String) = {
           var balance = 0
@@ -52,9 +50,9 @@ class TreeTest {
 
           (left, right)
         }
-      }
+      end Serializer
 
-    }
+    end OTree
     import OTree.*
     import OTree.Serializer.*
 
@@ -76,12 +74,11 @@ class TreeTest {
 
     //decode
     given Decoder[String, Tree[Int]] = str => {
-      deserialize(str, _.toInt) match {
+      deserialize(str, _.toInt) match
         case None    => Left(List(s"Not a Node[Short] $str"))
         case Some(a) => Right(a)
-      }
     }
 
     assert(fromCsv[Foo](serialized) == List(Right(Foo("abc", tree))))
   }
-}
+end TreeTest

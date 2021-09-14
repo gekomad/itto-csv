@@ -10,7 +10,7 @@ import scala.annotation.tailrec
  *   Giuseppe Cannella
  * @since 0.0.1
  */
-object StringUtils {
+object StringUtils:
 
   /**
    * @return
@@ -20,15 +20,13 @@ object StringUtils {
    */
   def split(string: String, separators: List[Int]): List[String] = {
 
-    def sp(s: String, sep: List[Int]): List[String] = sep match {
+    def sp(s: String, sep: List[Int]): List[String] = sep match
       case Nil => List(s)
-
       case x0 :: x1 :: xs =>
         val a = s.substring(x0 + 1, x1)
         val b = sp(s, x1 :: xs)
         a :: b
       case x0 :: _ => List(s.substring(x0 + 1, s.length))
-    }
 
     sp(string, -1 :: separators)
   }
@@ -47,13 +45,8 @@ object StringUtils {
    *   the CSV formatter
    * @param csv
    *   the string to trasform
-   * {{{
-   * tokenizeCsvLine("""1,"foo,bar",y,"2,e,","2ne","a""bc""z"""") // List("1", "foo,bar", "y", "2,e,", "2ne", "a\"bc\"z"))
-   * tokenizeCsvLine("1,foo") //   Some(List("1", "foo"))
-   * tokenizeCsvLine("1,\"foo") //  None
-   * }}}
    */
-  def tokenizeCsvLine(csv: String)(using csvFormat: IttoCSVFormat): Option[List[String]] = csv match {
+  def tokenizeCsvLine(csv: String)(using csvFormat: IttoCSVFormat): Option[List[String]] = csv match
     case _ if !csv.contains(csvFormat.quote)           => Some(csv.split(csvFormat.delimeter.toString, -1).toList)
     case _ if csv.count(_ == csvFormat.quote) % 2 != 0 => None
     case _ =>
@@ -74,6 +67,5 @@ object StringUtils {
       val l: List[String] = split(arr.mkString, commas.toList)
       val p: List[String] = l.map(_.replace(s"${csvFormat.quote}", "").replace(delimiter, csvFormat.quote))
       Some(p)
-  }
 
-}
+end StringUtils

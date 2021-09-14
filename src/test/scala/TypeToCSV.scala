@@ -8,7 +8,7 @@ import com.github.gekomad.ittocsv.core.ToCsv
 import com.github.gekomad.ittocsv.core.ToCsv.*
 import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 
-class TypeToCSV {
+class TypeToCSV :
   given IttoCSVFormat = IttoCSVFormat.default
   @Test def CSVtoList1(): Unit = {
 
@@ -26,4 +26,4 @@ class TypeToCSV {
 
     assert(a == "侍,889bd28a-00b6-45ab-9481-92060ba1ce7b")
   }
-}
+end TypeToCSV

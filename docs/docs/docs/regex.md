@@ -49,7 +49,7 @@ Example encoding N:Int to "[N]"  spostarlo TODO
 
 ```scala
 import com.github.gekomad.ittocsv.parser.IttoCSVFormat
-implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
+given IttoCSVFormat = IttoCSVFormat.default
 
 case class MyType(a: Int)
 case class Foo(a: MyType, b: Int)
@@ -71,7 +71,7 @@ Example decoding "[N]" to N:Int
 ```scala
 import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 import scala.util.Try
-implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
+given IttoCSVFormat = IttoCSVFormat.default
 import cats.data.NonEmptyList
 
 case class MyType(a: Int)

@@ -8,12 +8,8 @@ import com.github.gekomad.ittocsv.parser.Constants._
  * @author
  *   Giuseppe Cannella
  * @since 0.0.1
- * @see
- *   See test code for more information
- * @see
- *   See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information
  */
-object StringToCsvField {
+object StringToCsvField:
 
   /**
    * @return
@@ -45,7 +41,7 @@ object StringToCsvField {
 
     def parseQuote(string: String)(using csvFormatter: IttoCSVFormat): String = {
       val q = csvFormat.quote
-      string match {
+      string match
         case x if x == s"$q$q"                                        => s"$q$q$q$q$q$q"
         case x if x == s"$q"                                          => s"$q$q$q$q"
         case "" if csvFormatter.quoteEmpty || csvFormatter.forceQuote => s"$q$q"
@@ -53,7 +49,6 @@ object StringToCsvField {
         case s =>
           var c = 0
           var containsQuote = false
-
           while
             if (s(c) == q || s(c) == csvFormat.delimeter || s(c) == CR_char || s(c) == LF_char) containsQuote = true
             c = c + 1
@@ -69,9 +64,9 @@ object StringToCsvField {
           )
             s"${csvFormat.quote}$p${csvFormat.quote}"
           else p
-      }
     }
 
     parseQuote(trim(field))
   }
-}
+
+end StringToCsvField

@@ -5,8 +5,21 @@ import org.junit.{Assert, Test}
 
 import java.io.StringWriter
 
-class CompareTest {
+class CompareTest:
 
+  @Test def TODO(): Unit = {
+    case class Bar(id: String, name: String)
+    import com.github.gekomad.ittocsv.core.Header.csvHeader
+    import com.github.gekomad.ittocsv.parser.io.ToFile.csvToFile
+    import com.github.gekomad.ittocsv.parser.IttoCSVFormat
+    import com.github.gekomad.ittocsv.core.ToCsv._
+
+    given IttoCSVFormat = IttoCSVFormat.tab.withPrintHeader(true).withRecordSeparator("\n")
+    val filePath: String = "/tmp/out.csv"
+    val list = List(Bar("A1", "Jack"), Bar("A2", "Bob"))
+    val tuple = list.map(a => Tuple.fromProductTyped(a))
+    csvToFile(tuple, filePath, Some(csvHeader[Bar]))
+  }
   @Test def CompareWithApacheXommons_csv(): Unit = {
     import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
 
@@ -81,4 +94,4 @@ class CompareTest {
     )
 
   }
-}
+end CompareTest

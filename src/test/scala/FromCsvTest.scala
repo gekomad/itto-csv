@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter
 import java.util.UUID
 import scala.util.Try
 
-class FromCsvTest {
+class FromCsvTest :
 
   @Test def csv_string_to_type_1(): Unit = {
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
@@ -88,13 +88,12 @@ class FromCsvTest {
     final case class Foo(a: Int, b: Double, c: String, d: Boolean)
 
     val csv: Option[List[String]] = tokenizeCsvLine("1,3.14,foo,true")
-    csv match {
+    csv match
       case None => assert(false)
       case Some(g) =>
         assert(g == List("1", "3.14", "foo", "true"))
         val a = list2Product[Foo](g)
         assert(a == Right(Foo(1, 3.14, "foo", true)))
-    }
   }
 
   @Test def tokenizeCsvLine_to_types_boolean_ko(): Unit = {
@@ -108,13 +107,12 @@ class FromCsvTest {
     final case class Foo(a: Int, b: Double, c: String, d: Boolean)
 
     val csv: Option[List[String]] = tokenizeCsvLine("1,3.14,foo,bar")
-    csv match {
+    csv match
       case None => assert(false)
       case Some(g) =>
         assert(g == List("1", "3.14", "foo", "bar"))
         val a = list2Product[Foo](g)
         assert(a == Left(List("bar value is not valid Boolean")))
-    }
   }
 
   @Test def tokenizeCsvLine_to_types_Option_Double__ko(): Unit = {
@@ -127,13 +125,12 @@ class FromCsvTest {
     final case class Foo(a: Int, b: Double, c: String, d: Option[Double])
 
     val csv: Option[List[String]] = tokenizeCsvLine("1,3.14,foo,bar")
-    csv match {
+    csv match
       case None => assert(false)
       case Some(g) =>
         assert(g == List("1", "3.14", "foo", "bar"))
         val a = list2Product[Foo](g)
         assert(a == Left(List("bar value is not valid Double")))
-    }
   }
 
   @Test def fromCsvSha1(): Unit = {
@@ -1211,4 +1208,4 @@ class FromCsvTest {
     }
   }
 
-}
+end FromCsvTest

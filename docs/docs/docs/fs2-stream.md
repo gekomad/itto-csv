@@ -32,10 +32,9 @@ case class Bar(id: UUID, name: String, date: LocalDateTime)
 
 val s: fs2.Stream[IO, Unit] = csvFromFileStream[Bar](filePath, skipHeader = true)
   .map { csvEither =>
-    csvEither match {
+    csvEither match
       case Left(l)    => ??? // l: List[String]
-      case Right(bar) => ??? // Bar
-    }
+      case Right(bar) => ??? // Bar    
   }
 
 ```

@@ -8,13 +8,12 @@ object Header:
   import scala.deriving._
 
   private inline def toNames[T <: Tuple]: List[String] =
-    inline erasedValue[T] match {
+    inline erasedValue[T] match
       case _: (head *: tail) =>
-        (inline constValue[head] match {
+        (inline constValue[head] match
           case str: String => str
-        }) :: toNames[tail]
+        ) :: toNames[tail]
       case _ => Nil
-    }
 
   inline def fieldNames[P](using mirror: Mirror.Of[P]): List[String] = toNames[mirror.MirroredElemLabels]
 

@@ -13,12 +13,8 @@ import fs2.{Chunk, Pure}
  * @author
  *   Giuseppe Cannella
  * @since 0.0.1
- * @see
- *   See test code for more information
- * @see
- *   See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information
  */
-object ToFile {
+object ToFile:
 
   /**
    * @param list
@@ -28,7 +24,7 @@ object ToFile {
    * @param csvFormat
    *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
    * @return
-   *   the filePath into a ` fs2.Stream[IO, Unit]`
+   *   IO[ExitCode]
    */
   def csvToFile[T <: Tuple: RowEncoder](
     list: Seq[T],
@@ -36,10 +32,10 @@ object ToFile {
     head: Option[String]
   )(using csvFormat: IttoCSVFormat): IO[ExitCode] = {
 
-    val l: List[String] = (head match {
+    val l: List[String] = (head match
       case Some(h) => s"$h${csvFormat.recordSeparator}"
       case None    => ""
-    }) :: list.map { y =>
+    ) :: list.map { y =>
       summon[RowEncoder[T]].encodeRow(y).mkString(csvFormat.delimeter.toString)
     }.toList
 
@@ -54,7 +50,7 @@ object ToFile {
    * @param csvFormat
    *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
    * @return
-   *   the filePath into a ` fs2.Stream[IO, Unit]`
+   *   IO[ExitCode]
    */
   inline def csvToFileStream[A <: Product](
     s: fs2.Stream[Pure, A],
@@ -70,4 +66,4 @@ object ToFile {
     ListUtils.writeFileStream(l, filePath, false)
   }
 
-}
+end ToFile

@@ -6,7 +6,7 @@ import org.junit.{Assert, Test}
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class ListToCSV {
+class ListToCSV :
 
   @Test def listToCsv(): Unit = {
 
@@ -21,4 +21,4 @@ class ListToCSV {
     assert(aa == "a,b\r\nBar,42\r\nFoo,24")
   }
 
-}
+end ListToCSV

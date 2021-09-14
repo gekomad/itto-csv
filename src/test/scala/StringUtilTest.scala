@@ -1,6 +1,6 @@
 import org.junit.Test
 
-class StringUtilTest {
+class StringUtilTest :
 
   @Test def split1(): Unit = {
     import com.github.gekomad.ittocsv.util.StringUtils.*
@@ -48,4 +48,4 @@ class StringUtilTest {
 
   }
 
-}
+end StringUtilTest

@@ -11,7 +11,7 @@ import fs2.{text, Stream}
  *   Giuseppe Cannella
  * @since 0.0.1
  */
-object ListUtils {
+object ListUtils:
 
   /**
    * @param list
@@ -21,7 +21,7 @@ object ListUtils {
    * @param addLineSeparator
    *   if true add a line separator, default = true
    * @return
-   *   the filePath into `Stream[IO, Unit]`
+   *   IO[ExitCode]
    */
   def writeFile(list: List[String], filePath: String, addLineSeparator: Boolean = true): IO[ExitCode] = {
     val a: Stream[IO, String] = Stream.emits(list)
@@ -41,7 +41,7 @@ object ListUtils {
    * @param addLineSeparator
    *   if true add a line separator, default = true
    * @return
-   *   the filePath into `Stream[IO, Unit]`
+   *   IO[ExitCode]
    */
   def writeFileStream(
     stream: fs2.Stream[IO, String],
@@ -55,4 +55,5 @@ object ListUtils {
       .drain
       .as(ExitCode.Success)
   }
-}
+
+end ListUtils

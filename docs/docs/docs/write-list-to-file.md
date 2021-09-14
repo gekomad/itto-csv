@@ -10,12 +10,14 @@ permalink: docs/write-list-to-file/
 case class Bar(id: String, name: String)
 import com.github.gekomad.ittocsv.core.Header.csvHeader
 import com.github.gekomad.ittocsv.parser.io.ToFile.csvToFile
-implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.tab.withPrintHeader(true).withRecordSeparator("\n")
+import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 import com.github.gekomad.ittocsv.core.ToCsv._
+
+given IttoCSVFormat = IttoCSVFormat.tab.withPrintHeader(true).withRecordSeparator("\n")
 val filePath: String = "/tmp/out.csv"
 val list = List(Bar("A1", "Jack"), Bar("A2", "Bob"))
 val tuple = list.map(a => Tuple.fromProductTyped(a))
-val a: IO[ExitCode] = csvToFile(tuple, filePath, Some(csvHeader[Bar]))
+csvToFile(tuple, filePath, Some(csvHeader[Bar])) // IO[ExitCode] 
  ```
 
 ### Read List from file

@@ -11,7 +11,7 @@ import com.github.gekomad.ittocsv.core.ToCsv.given
 import java.util.UUID
 import scala.deriving.Mirror
 
-class ToCsvTest {
+class ToCsvTest :
   given IttoCSVFormat = IttoCSVFormat.default
   @Test def toCsvSHA1(): Unit = {
 
@@ -403,7 +403,7 @@ class ToCsvTest {
 
   @Test def toCsvTest(): Unit = {
 
-    object ToCsvT {
+    object ToCsvT:
 
       import com.github.gekomad.ittocsv.core.Header._
 
@@ -411,7 +411,7 @@ class ToCsvTest {
         csvT: (A, Long)
       )(using m: Mirror.ProductOf[A], e: RowEncoder[m.MirroredElemTypes], csvFormat: IttoCSVFormat): String =
         (if (csvT._2 == 0) csvHeader[A] else "") + toCsv(csvT._1, true)
-    }
+    end ToCsvT
 
     given IttoCSVFormat = IttoCSVFormat.default.withDelimiter(';').withRecordSeparator("\n")
     import ToCsvT._
@@ -564,4 +564,4 @@ class ToCsvTest {
 
     assert(header == "\"X\"XdXsXb")
   }
-}
+end ToCsvTest

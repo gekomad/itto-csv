@@ -13,20 +13,17 @@ import java.time.ZonedDateTime
 import java.util.UUID
 import scala.deriving.Mirror
 
-object ToCsv {
+object ToCsv:
   trait FieldEncoder[A]:
     def encodeField(a: A)(using csvFormat: IttoCSVFormat): String
 
-  trait RowEncoder[A] {
+  trait RowEncoder[A]:
     def encodeRow(a: A)(using csvFormat: IttoCSVFormat): List[String]
-  }
 
-  def customFieldEncoder[A](f: A => String) = {
-    new FieldEncoder[A] {
+  def customFieldEncoder[A](f: A => String) =
+    new FieldEncoder[A]:
       def encodeField(x: A)(using csvFormat: IttoCSVFormat) =
         StringToCsvField.stringToCsvField(f(x))
-    }
-  }
 
   given FieldEncoder[Int] = customFieldEncoder[Int](_.toString)
   given FieldEncoder[Boolean] = customFieldEncoder[Boolean](x => if x then "true" else "false")
@@ -116,23 +113,19 @@ object ToCsv {
   given FieldEncoder[MD5] = customFieldEncoder[MD5](_.value.toString)
 
   given [A](using enc: FieldEncoder[A]): FieldEncoder[Option[A]] =
-    new FieldEncoder[Option[A]] {
+    new FieldEncoder[Option[A]]:
       def encodeField(x: Option[A])(using csvFormat: IttoCSVFormat) =
-        x match {
+        x match
           case Some(xx) => enc.encodeField(xx)
           case _        => StringToCsvField.stringToCsvField("")
-        }
-    }
 
   given [A](using enc: FieldEncoder[A]): FieldEncoder[List[A]] =
-    new FieldEncoder[List[A]] {
+    new FieldEncoder[List[A]]:
       def encodeField(x: List[A])(using csvFormat: IttoCSVFormat) =
-        x match {
+        x match
           case x :: Nil => enc.encodeField(x)
           case x :: xs  => enc.encodeField(x) + csvFormat.recordSeparator + encodeField(xs)
           case _        => StringToCsvField.stringToCsvField("")
-        }
-    }
 
   given RowEncoder[EmptyTuple] with
     def encodeRow(empty: EmptyTuple)(using csvFormat: IttoCSVFormat) = List.empty
@@ -152,24 +145,10 @@ object ToCsv {
    *   is the element to convert
    * @param printRecordSeparator
    *   if true, appends the record separator to end of string
-   * @param enc
-   *   the [[com.github.gekomad.ittocsv.core.CsvStringEncoder]] encoder
    * @param csvFormat
    *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
    * @return
    *   the CSV string encoded
-   * {{{
-   * import com.github.gekomad.ittocsv.core.ToCsv._
-   * given IttoCSVFormat = IttoCSVFormat.default
-   *
-   * case class Bar(a: String, b: Int)
-   * assert(toCsv(Bar("侍", 42)) == "侍,42")
-   * case class Baz(x: String)
-   * case class Foo(a: Int, c: Baz)
-   * case class Xyz(a: String, b: Int, c: Foo)
-   *
-   * assert(toCsv(Xyz("hello", 3, Foo(1, Baz("hi, dude")))) == "hello,3,1,\"hi, dude\"")
-   * }}}
    */
   def toCsv[A <: Product](
     a: A,
@@ -214,4 +193,5 @@ object ToCsv {
     val tuple = flatTuple(Tuple.fromProductTyped(a)).toList
     tuple.map(a => StringToCsvField.stringToCsvField(a.toString)).mkString(csvFormat.delimeter.toString)
   }
-}
+  
+end ToCsv

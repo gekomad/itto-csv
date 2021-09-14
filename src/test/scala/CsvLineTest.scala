@@ -1,7 +1,7 @@
 import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 import org.junit.Test
 
-class CsvLineTest {
+class CsvLineTest :
   @Test def csvStringToList(): Unit = {
 
     given IttoCSVFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
@@ -25,4 +25,4 @@ class CsvLineTest {
     }
   }
 
-}
+end CsvLineTest

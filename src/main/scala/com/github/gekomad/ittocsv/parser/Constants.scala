@@ -5,7 +5,7 @@ package com.github.gekomad.ittocsv.parser
  *   Giuseppe Cannella
  * @since 0.0.1
  */
-object Constants {
+object Constants :
   val COMMA = ','
   val SEMICOLON = ';'
   val COMMENT = '#'
@@ -18,4 +18,4 @@ object Constants {
   val SP = ' '
   val PIPE = '|'
   val TAB = '\t'
-}
+end Constants

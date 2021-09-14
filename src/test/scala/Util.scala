@@ -1,4 +1,4 @@
-object Util {
+object Util:
   def deleteFile(fileName: String): Unit = {
     import java.io.File
     val file = File(fileName)
@@ -6,4 +6,4 @@ object Util {
       file.delete()
     }
   }
-}
+end Util

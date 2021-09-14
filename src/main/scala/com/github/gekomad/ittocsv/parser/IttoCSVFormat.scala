@@ -42,10 +42,6 @@ import Constants._
  *   if true skip empty lines
  * @param quoteLowerChar
  *   if true quotes lower chars
- * @see
- *   See test code for more information
- * @see
- *   See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information.
  */
 final case class IttoCSVFormat(
   delimeter: Char,
@@ -77,7 +73,7 @@ final case class IttoCSVFormat(
   def withQuoteLowerChar(c: Boolean): IttoCSVFormat = this.copy(quoteLowerChar = c)
 }
 
-object IttoCSVFormat {
+object IttoCSVFormat:
 
   /**
    * | Method                           |                Descrizione                | default |
@@ -128,4 +124,4 @@ object IttoCSVFormat {
     ignoreEmptyLines = false,
     quoteLowerChar = false
   )
-}
+end IttoCSVFormat

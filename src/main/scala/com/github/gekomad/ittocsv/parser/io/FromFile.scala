@@ -18,10 +18,8 @@ import scala.util.{Failure, Success, Try}
  * @since 1.0.1
  * @see
  *   See test code for more information
- * @see
- *   See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information
  */
-object FromFile {
+object FromFile:
 
   /**
    * @param filePath
@@ -31,17 +29,16 @@ object FromFile {
    * @param csvFormat
    *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
    * @return
-   *   `Try[List[Either[NonEmptyList[FromCsvImpl.ParseFailure], A]]]`
+   *   `Try[List[Either[List[String], A]]]`
    */
   def csvFromFileUnsafe[A](filePath: String, skipHeader: Boolean)(using
     m: Mirror.ProductOf[A],
     d: Decoder[List[String], m.MirroredElemTypes],
     csvFormat: IttoCSVFormat
   ): Try[List[Either[List[String], A]]] =
-    csvFromFileStream(filePath, skipHeader).compile.toList.attempt.unsafeRunSync() match {
+    csvFromFileStream(filePath, skipHeader).compile.toList.attempt.unsafeRunSync() match
       case Left(e)      => Failure(e)
       case Right(value) => Success(value)
-    }
 
   def csvFromFileStream[A](filePath: String, skipHeader: Boolean)(using
     m: Mirror.ProductOf[A],
@@ -54,8 +51,7 @@ object FromFile {
         .through(text.utf8.decode)
         .through(text.lines)
         .map(line => fromCsv[A](line).head)
-
     if (skipHeader) x.drop(1) else x
-
   }
-}
+  
+end FromFile

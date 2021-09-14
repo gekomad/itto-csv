@@ -1,6 +1,6 @@
 import org.junit.Test
 
-class CsvFieldTest {
+class CsvFieldTest :
 
   @Test def stringToCsvFieldTrim(): Unit = {
     import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
@@ -108,4 +108,4 @@ class CsvFieldTest {
     val string = csvFieldToString(csv)
     assert(orig == string)
   }
-}
+end CsvFieldTest

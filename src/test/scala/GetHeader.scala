@@ -5,7 +5,7 @@ import org.junit.{Assert, Test}
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class GetHeader {
+class GetHeader :
 
   @Test def GetHeader(): Unit = {
     case class Foo(i: Int, d: Double, s: Option[String], b: Boolean)
@@ -22,4 +22,4 @@ class GetHeader {
     }
 
   }
-}
+end GetHeader

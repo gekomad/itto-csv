@@ -6,7 +6,7 @@ import org.junit.{Assert, Test}
 import java.time.LocalDateTime
 import scala.io.Source
 
-class WriteToFileTest {
+class WriteToFileTest:
 
   @Test def writeListToFile(): Unit = {
     import java.util.UUID
@@ -33,10 +33,9 @@ class WriteToFileTest {
       Util.deleteFile(filePath)
       val lt = list.map(a => Tuple.fromProductTyped(a))
       val c = csvToFile(lt, filePath, Some(csvHeader[Bar]))
-      c.attempt.unsafeRunSync() match {
+      c.attempt.unsafeRunSync() match
         case Left(value)  => assert(false, value)
         case Right(value) => assert(value == ExitCode.Success)
-      }
 
       val file = Source.fromFile(filePath)
       val lines = file.getLines().mkString
@@ -58,12 +57,11 @@ class WriteToFileTest {
         .compile
         .drain
         .attempt
-        .unsafeRunSync() match {
+        .unsafeRunSync() match
         case Left(e) =>
           println("err " + e)
           false
         case _ => true
-      }
       assert(r)
     }
   }
@@ -91,10 +89,9 @@ class WriteToFileTest {
     Util.deleteFile(filePath)
 
     val k = csvToFileStream(stream, filePath)
-    k.attempt.unsafeRunSync() match {
+    k.attempt.unsafeRunSync() match
       case Left(value)  => assert(false, value)
       case Right(value) => assert(value == ExitCode.Success)
-    }
 
     val file = Source.fromFile(filePath)
     val lines = file.getLines().mkString
@@ -104,4 +101,4 @@ class WriteToFileTest {
     )
   }
 
-}
+end WriteToFileTest

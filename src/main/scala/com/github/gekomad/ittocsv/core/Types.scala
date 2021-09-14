@@ -3,26 +3,24 @@ package com.github.gekomad.ittocsv.core
 import scala.deriving.Mirror
 import com.github.gekomad.regexcollection.Collection.Validator
 
-object Types {
+object Types:
 
-  trait Validate[A] {
+  trait Validate[A]:
     def validate(value: String): Either[List[String], A]
-  }
 
   type Cons[A] = String => A
 
   final case class RegexValidator[A](regex: String)(using apply: Cons[A], m: Mirror.Of[A]) extends Validate[A] {
     given Validator[A] = Validator[A](regex)
 
-    def validate(value: String): Either[List[String], A] = {
+    def validate(value: String): Either[List[String], A] =
       com.github.gekomad.regexcollection.Validate
         .validate[A](value)
         .map(_ => Right(apply(value)))
         .getOrElse(Left(List(s"$value value is not valid ${m.toString}")))
-    }
   }
 
-  object implicits {
+  object implicits:
     final case class Youtube(value: String)
 
     final case class Facebook(value: String)
@@ -298,5 +296,6 @@ object Types {
     given Cons[Coordinate1] = Coordinate1.apply
 
     given Cons[Coordinate2] = Coordinate2.apply
-  }
-}
+    
+  end implicits
+end Types

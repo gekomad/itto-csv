@@ -7,11 +7,11 @@ import java.time.LocalDateTime
 import java.util.UUID
 import scala.util.{Failure, Success, Try}
 
-class ReadFromFileTest {
+class ReadFromFileTest :
 
   @Test def readFromFile(): Unit = {
     import com.github.gekomad.ittocsv.parser.io.FromFile.csvFromFileUnsafe
-    
+
     given IttoCSVFormat = IttoCSVFormat.tab
     final case class Bar(id: UUID, name: String, date: LocalDateTime)
 
@@ -72,25 +72,22 @@ class ReadFromFileTest {
 
       assert(res == Success(errList))
       //read from file - unsafe mode
-//      intercept[Exception]
       val a = Try {
         val _l: Seq[Bar] = {
-          res match {
+          res match
             case Failure(a) => throw new Exception(a)
             case Success(a) =>
               a.map {
                 case Right(rr) => rr
                 case Left(rr)  => throw new Exception(rr.mkString)
               }
-          }
         }
       }
-      a match {
+      a match
         case Failure(a) => assert(a.getMessage == "xxx value is not valid UUID")
         case _          => assert(false)
-      }
 
     }
   }
 
-}
+end ReadFromFileTest
