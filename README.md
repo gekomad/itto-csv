@@ -1,8 +1,4 @@
 [![codecov.io](http://codecov.io/github/gekomad/itto-csv/coverage.svg?branch=master)](http://codecov.io/github/gekomad/itto-csv?branch=master)
-[![Javadocs](https://javadoc.io/badge/com.github.gekomad/itto-csv_3.0.svg)](https://javadoc.io/doc/com.github.gekomad/itto-csv_3.0)
-[![Javadocs](https://javadoc.io/badge/com.github.gekomad/itto-csv_2.13.svg)](https://javadoc.io/doc/com.github.gekomad/itto-csv_2.13)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.gekomad/itto-csv_3.0/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.gekomad/itto-csv_3.0)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.gekomad/itto-csv_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.gekomad/itto-csv_2.13)
 <a href="https://typelevel.org/cats/"><img src="https://typelevel.org/cats/img/cats-badge.svg" height="40px" align="right" alt="Cats friendly" /></a>
 ======
 
@@ -17,7 +13,7 @@ View [microsite](https://gekomad.github.io/itto-csv/v1/docs/) for more informati
 
 Scala 3
 -------
-`libraryDependencies += "com.github.gekomad" %% "itto-csv" % "2.0.0-M1"`
+`libraryDependencies += "com.github.gekomad" %% "itto-csv" % "2.0.0"`
 
 View [microsite](https://gekomad.github.io/itto-csv/v2/docs/) for more information.
 

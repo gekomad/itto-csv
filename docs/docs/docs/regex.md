@@ -45,7 +45,7 @@ Using **encode** for MyType:
 given Decoder[String, MyType] = (s: String) => RegexValidator[MyType](regexString).validate(s)
 ```
 
-Example encoding N:Int to "[N]"  spostarlo TODO
+Example encoding N:Int to "[N]" 
 
 ```scala
 import com.github.gekomad.ittocsv.parser.IttoCSVFormat
@@ -60,7 +60,7 @@ given FieldEncoder[MyType] = customFieldEncoder[MyType](node => s"[${node.a}]")
 assert(toCsv(Foo(MyType(42), 99)) == "[42],99")
 ```
 
-Using **decode** for MyType: spostarlo TODO
+Using **decode** for MyType: 
 
 ```scala
 implicit def _d(implicit csvFormat: IttoCSVFormat): String => Either[ParseFailure, MyType] = (str: String) => ???

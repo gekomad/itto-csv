@@ -794,7 +794,7 @@ class FromCsvTest :
     )
   }
 
-  @Test def decodeCustomType(): Unit = { //TODO add in microsite
+  @Test def decodeCustomType(): Unit = {
 
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     import scala.util.Try
