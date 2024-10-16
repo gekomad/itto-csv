@@ -1,32 +1,28 @@
-ThisBuild / pomIncludeRepository := { _ => false }
-ThisBuild / publishTo := {
-  val nexus = "https://oss.sonatype.org/"
-  if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
-  else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-}
+import xerial.sbt.Sonatype._
 
-pomExtra :=
-  <licenses>
-    <license>
-      <name>Apache 2</name>
-      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-    <developers>
-      <developer>
-        <id>gekomad</id>
-        <name>Giuseppe Cannella</name>
-        <url>https://github.com/gekomad</url>
-      </developer>
-    </developers>
-    <scm>
-      <url>https://github.com/gekomad/itto-csv</url>
-      <connection>scm:git:https://github.com/gekomad/itto-csv</connection>
-    </scm>
-    <url>https://github.com/gekomad/itto-csv</url>
+publishMavenStyle := true
 
+sonatypeProfileName    := "com.github.gekomad"
+sonatypeProjectHosting := Some(GitHubHosting(user = "gekomad", repository = "itto-csv", email = "giuseppe.cannella@gmail.com"))
+developers := List(
+  Developer(id = "gekomad", name = "Giuseppe", email = "giuseppe.cannella@gmail.com", url = url("https://github.com/gekomad"))
+)
+licenses := Seq("APL2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 
-ThisBuild / publishMavenStyle := true
 
 publishConfiguration := publishConfiguration.value.withOverwrite(true)
+sonatypeLogLevel := "DEBUG"
+
+//sonatype
+
+publishTo := sonatypePublishToBundle.value
+
+logLevel := Level.Debug
+publishTo := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value)
+    Some("snapshots".at(nexus + "content/repositories/snapshots/"))
+  else
+    Some("releases".at(nexus + "content/repositories/releases/"))
+}
+
