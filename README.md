@@ -4,15 +4,14 @@
 
 Itto-CSV is a pure scala library for working with the CSV format
 
-Scala 2
--------
-`libraryDependencies += "com.github.gekomad" %% "itto-csv" % "1.2.0"`
+`libraryDependencies += "com.github.gekomad" %% "itto-csv" % "2.1.0"`
 
+Scala 2.12 and 2.13
+-------
 View [microsite](https://gekomad.github.io/itto-csv/v1/docs/) for more information.
 
 Scala 3
 -------
-`libraryDependencies += "com.github.gekomad" %% "itto-csv" % "2.0.0"`
 
 View [microsite](https://gekomad.github.io/itto-csv/v2/docs/) for more information.
 

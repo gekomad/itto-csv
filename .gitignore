@@ -17,3 +17,5 @@ ojdbc6.jar
 .pid
 .attach_pid*
 .bsp
+scala2/project/
+scala3/project/
