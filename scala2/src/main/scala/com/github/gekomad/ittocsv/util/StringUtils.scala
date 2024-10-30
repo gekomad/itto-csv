@@ -5,17 +5,20 @@ import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 import scala.annotation.tailrec
 
 /**
-  * Utils for strings
-  *
-  * @author Giuseppe Cannella
-  * @since 0.0.1
-  */
+ * Utils for strings
+ *
+ * @author
+ *   Giuseppe Cannella
+ * @since 0.0.1
+ */
 object StringUtils {
 
   /**
-    * @return splits the string at positions of separators
-    * @param string the string to split
-    */
+   * @return
+   *   splits the string at positions of separators
+   * @param string
+   *   the string to split
+   */
   def split(string: String, separators: List[Int]): List[String] = {
 
     def sp(s: String, sep: List[Int]): List[String] = sep match {
@@ -39,25 +42,27 @@ object StringUtils {
   }
 
   /**
-    * @return trasforms a CSV string to List of strings
-    * @param csvFormat the CSV formatter
-    * @param csv       the string to trasform
-    * {{{
-    * tokenizeCsvLine("""1,"foo,bar",y,"2,e,","2ne","a""bc""z"""") // List("1", "foo,bar", "y", "2,e,", "2ne", "a\"bc\"z"))
-    * tokenizeCsvLine("1,foo") //   Some(List("1", "foo"))
-    * tokenizeCsvLine("1,\"foo") //  None
-    * }}}
-    *
-    */
+   * @return
+   *   trasforms a CSV string to List of strings
+   * @param csvFormat
+   *   the CSV formatter
+   * @param csv
+   *   the string to trasform
+   * {{{
+   * tokenizeCsvLine("""1,"foo,bar",y,"2,e,","2ne","a""bc""z"""") // List("1", "foo,bar", "y", "2,e,", "2ne", "a\"bc\"z"))
+   * tokenizeCsvLine("1,foo") //   Some(List("1", "foo"))
+   * tokenizeCsvLine("1,\"foo") //  None
+   * }}}
+   */
   def tokenizeCsvLine(csv: String)(implicit csvFormat: IttoCSVFormat): Option[List[String]] = csv match {
-    case _ if !csv.contains(csvFormat.quote) => Some(csv.split(csvFormat.delimeter.toString, -1).toList)
+    case _ if !csv.contains(csvFormat.quote)           => Some(csv.split(csvFormat.delimeter.toString, -1).toList)
     case _ if csv.count(_ == csvFormat.quote) % 2 != 0 => None
     case _ =>
       val delimiter = getDelimiter(csv)
-      val string    = csv.replace(s"${csvFormat.quote}${csvFormat.quote}", delimiter.toString)
+      val string = csv.replace(s"${csvFormat.quote}${csvFormat.quote}", delimiter.toString)
 
       var inside = false
-      val arr    = string.toCharArray
+      val arr = string.toCharArray
       val commas = scala.collection.mutable.ListBuffer.empty[Int]
 
       var c = 0

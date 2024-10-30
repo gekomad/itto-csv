@@ -7,13 +7,16 @@ import cats.effect.unsafe.implicits.global
 import scala.util.{Failure, Success, Try}
 
 /**
-  * Reads a CSV file
-  *
-  * @author Giuseppe Cannella
-  * @since 1.0.1
-  * @see See test code for more information
-  * @see See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information
-  */
+ * Reads a CSV file
+ *
+ * @author
+ *   Giuseppe Cannella
+ * @since 1.0.1
+ * @see
+ *   See test code for more information
+ * @see
+ *   See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information
+ */
 object FromFile {
 
   import cats.data.NonEmptyList
@@ -22,13 +25,17 @@ object FromFile {
   import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 
   /**
-    * @param filePath   the file path of file to read
-    * @param skipHeader if true doesn't read first row
-    * @param csvFormat  the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-    * @return `Try[List[Either[NonEmptyList[FromCsvImpl.ParseFailure], A]]]`
-    */
-  def csvFromFileUnsafe[A: FieldNames: Schema](filePath: String, skipHeader: Boolean)(
-    implicit csvFormat: IttoCSVFormat
+   * @param filePath
+   *   the file path of file to read
+   * @param skipHeader
+   *   if true doesn't read first row
+   * @param csvFormat
+   *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+   * @return
+   *   `Try[List[Either[NonEmptyList[FromCsvImpl.ParseFailure], A]]]`
+   */
+  def csvFromFileUnsafe[A: FieldNames: Schema](filePath: String, skipHeader: Boolean)(implicit
+    csvFormat: IttoCSVFormat
   ): Try[List[Either[NonEmptyList[ParseFailure], A]]] =
     csvFromFileStream(filePath, skipHeader).compile.toList.attempt.unsafeRunSync() match {
       case Left(e)      => Failure(e)
@@ -38,10 +45,10 @@ object FromFile {
   import java.nio.file.Paths
 
   import cats.effect.IO
-  import fs2.{Stream, text}
+  import fs2.{text, Stream}
 
-  def csvFromFileStream[A: FieldNames: Schema](filePath: String, skipHeader: Boolean)(
-    implicit csvFormat: IttoCSVFormat
+  def csvFromFileStream[A: FieldNames: Schema](filePath: String, skipHeader: Boolean)(implicit
+    csvFormat: IttoCSVFormat
   ): Stream[IO, Either[NonEmptyList[ParseFailure], A]] = {
     val x: Stream[IO, Either[NonEmptyList[ParseFailure], A]] =
       Files[IO]

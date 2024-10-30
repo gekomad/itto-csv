@@ -53,5 +53,5 @@ object FromFile:
         .map(line => fromCsv[A](line).head)
     if (skipHeader) x.drop(1) else x
   }
-  
+
 end FromFile

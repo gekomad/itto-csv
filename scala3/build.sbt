@@ -58,4 +58,3 @@ pomExtra :=
       <connection>scm:git:https://github.com/gekomad/itto-csv</connection>
     </scm>
     <url>https://github.com/gekomad/itto-csv</url>
-

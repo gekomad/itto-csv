@@ -7,7 +7,7 @@ package com.github.gekomad.ittocsv.parser
  *   Giuseppe Cannella
  * @since 0.0.1
  */
-object CsvFieldToString :
+object CsvFieldToString:
 
   /**
    * @param csvFormat
