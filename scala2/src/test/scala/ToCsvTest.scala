@@ -3,7 +3,6 @@ import java.time.{Instant, LocalDate, LocalTime, OffsetDateTime, ZonedDateTime}
 
 import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 
-
 class ToCsvTest extends munit.FunSuite {
 
   test("email") {
@@ -115,7 +114,9 @@ class ToCsvTest extends munit.FunSuite {
     final case class Bar(a: USphoneNumber, b: ItalianMobilePhone, c: ItalianPhone)
 
     assert(
-      toCsv(Bar(USphoneNumber("555-555-5555"), ItalianMobilePhone("+393471234561"), ItalianPhone("02 645566"))) == "555-555-5555,+393471234561,02 645566"
+      toCsv(
+        Bar(USphoneNumber("555-555-5555"), ItalianMobilePhone("+393471234561"), ItalianPhone("02 645566"))
+      ) == "555-555-5555,+393471234561,02 645566"
     )
   }
 
@@ -189,7 +190,9 @@ class ToCsvTest extends munit.FunSuite {
     final case class Bar(a: Number1, b: Signed, c: Unsigned32, d: Percentage, e: Scientific)
 
     assert(
-      toCsv(Bar(Number1("99.99"), Signed("-10"), Unsigned32("4294967295"), Percentage("10%"), Scientific("-2.384E-03"))) == "99.99,-10,4294967295,10%,-2.384E-03"
+      toCsv(
+        Bar(Number1("99.99"), Signed("-10"), Unsigned32("4294967295"), Percentage("10%"), Scientific("-2.384E-03"))
+      ) == "99.99,-10,4294967295,10%,-2.384E-03"
     )
   }
 
@@ -318,7 +321,9 @@ class ToCsvTest extends munit.FunSuite {
     final case class Bar(b: ApacheError)
 
     assert(
-      toCsv(Bar(ApacheError("[Fri Dec 16 02:25:55 2005] [error] [client 1.2.3.4] Client sent malformed Host header"))) == "[Fri Dec 16 02:25:55 2005] [error] [client 1.2.3.4] Client sent malformed Host header"
+      toCsv(
+        Bar(ApacheError("[Fri Dec 16 02:25:55 2005] [error] [client 1.2.3.4] Client sent malformed Host header"))
+      ) == "[Fri Dec 16 02:25:55 2005] [error] [client 1.2.3.4] Client sent malformed Host header"
     )
   }
 
@@ -380,7 +385,9 @@ class ToCsvTest extends munit.FunSuite {
     final case class Bar(a: HEX, b: HEX1, c: HEX2, d: HEX3)
 
     assert(
-      toCsv(Bar(HEX("F0F0F0"), HEX1("#F0F0F0"), HEX2("0xF0F0F0"), HEX3("0xF0F0F0"))) == "F0F0F0,#F0F0F0,0xF0F0F0,0xF0F0F0"
+      toCsv(
+        Bar(HEX("F0F0F0"), HEX1("#F0F0F0"), HEX2("0xF0F0F0"), HEX3("0xF0F0F0"))
+      ) == "F0F0F0,#F0F0F0,0xF0F0F0,0xF0F0F0"
     )
   }
 
@@ -429,7 +436,9 @@ class ToCsvTest extends munit.FunSuite {
     final case class Bar(i: Int, a: SHA256)
 
     assert(
-      toCsv(Bar(1, SHA256("000020f89134d831f48541b2d8ec39397bc99fccf4cc86a3861257dbe6d819d1"))) == "1,000020f89134d831f48541b2d8ec39397bc99fccf4cc86a3861257dbe6d819d1"
+      toCsv(
+        Bar(1, SHA256("000020f89134d831f48541b2d8ec39397bc99fccf4cc86a3861257dbe6d819d1"))
+      ) == "1,000020f89134d831f48541b2d8ec39397bc99fccf4cc86a3861257dbe6d819d1"
     )
 
   }
@@ -530,7 +539,7 @@ class ToCsvTest extends munit.FunSuite {
     final case class MyType(a: Int)
     final case class Foo(a: MyType, b: Int)
 
-    //encode
+    // encode
     import com.github.gekomad.ittocsv.core.ToCsv._
 
     implicit def _f(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[MyType] = createEncoder { node =>
@@ -613,7 +622,9 @@ class ToCsvTest extends munit.FunSuite {
     )
     val l: List[Bar] = List(Bar(localDateTime, localTime, Some(localDate), Some(offsetDateTime), zonedDateTime))
     assert(
-      toCsv(l) == "2000-12-31T12:13:14,11:15:30,2019-12-27,2012-12-03T10:15:30+01:00,2019-04-01T17:24:11.252+05:30[Asia/Calcutta]"
+      toCsv(
+        l
+      ) == "2000-12-31T12:13:14,11:15:30,2019-12-27,2012-12-03T10:15:30+01:00,2019-04-01T17:24:11.252+05:30[Asia/Calcutta]"
     )
   }
 
@@ -625,8 +636,8 @@ class ToCsvTest extends munit.FunSuite {
     implicit val csvFormat: IttoCSVFormat =
       com.github.gekomad.ittocsv.parser.IttoCSVFormat.default.withPrintHeader(false)
 
-    implicit def localDateTimeEncoder(
-      implicit csvFormat: com.github.gekomad.ittocsv.parser.IttoCSVFormat
+    implicit def localDateTimeEncoder(implicit
+      csvFormat: com.github.gekomad.ittocsv.parser.IttoCSVFormat
     ): CsvStringEncoder[LocalDateTime] =
       (value: LocalDateTime) => value.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.0"))
 

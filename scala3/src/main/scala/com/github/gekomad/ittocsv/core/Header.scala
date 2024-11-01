@@ -17,12 +17,11 @@ object Header:
 
   private inline def fieldNames[P](using mirror: Mirror.Of[P]): List[String] = toNames[mirror.MirroredElemLabels]
 
-  /**
-   * @param csvFormat
-   *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-   * @return
-   *   the string with class's fields name encoded according to csvFormat
-   */
+  /** @param csvFormat
+    *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+    * @return
+    *   the string with class's fields name encoded according to csvFormat
+    */
   inline def csvHeader[T](using mirror: Mirror.Of[T], csvFormat: IttoCSVFormat): String =
     fieldNames[T].map(StringToCsvField.stringToCsvField).mkString(csvFormat.delimeter.toString)
 

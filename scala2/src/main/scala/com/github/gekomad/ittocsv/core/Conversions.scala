@@ -3,13 +3,15 @@ package com.github.gekomad.ittocsv.core
 import java.util.UUID
 import com.github.gekomad.ittocsv.util.TryTo.tryToEither
 
-/**
-  * Converts a string to type
+/** Converts a string to type
   *
-  * @author Giuseppe Cannella
+  * @author
+  *   Giuseppe Cannella
   * @since 0.0.1
-  * @see See test code for more information
-  * @see See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information.
+  * @see
+  *   See test code for more information
+  * @see
+  *   See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information.
   */
 object Conversions {
 
@@ -41,8 +43,8 @@ object Conversions {
   import java.time._
   import java.time.format.DateTimeFormatter._
 
-  implicit def fromGenericOption[A](
-    implicit f: String => Either[ParseFailure, A]
+  implicit def fromGenericOption[A](implicit
+    f: String => Either[ParseFailure, A]
   ): String => Either[ParseFailure, Option[A]] =
     s => if (s == "") Right(None) else f(s).map(Some(_))
 

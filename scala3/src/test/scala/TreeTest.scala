@@ -9,19 +9,19 @@ class TreeTest extends munit.FunSuite:
 
     object OTree:
 
-      //thanks to amitayh https://gist.github.com/amitayh/373f512c50222e15550869e2ff539b25
+      // thanks to amitayh https://gist.github.com/amitayh/373f512c50222e15550869e2ff539b25
       final case class Tree[A](value: A, left: Option[Tree[A]] = None, right: Option[Tree[A]] = None)
 
       object Serializer:
-        val pattern: Regex = """^(\d+)\((.*)\)$""".r
-        val treeOpen: Char = '('
-        val treeClose: Char = ')'
-        val separator: Char = ','
+        val pattern: Regex       = """^(\d+)\((.*)\)$""".r
+        val treeOpen: Char       = '('
+        val treeClose: Char      = ')'
+        val separator: Char      = ','
         val separatorLength: Int = 1
 
         def serialize[A](nodeOption: Option[Tree[A]]): String = nodeOption match
           case Some(Tree(value, left, right)) =>
-            val leftStr = serialize(left)
+            val leftStr  = serialize(left)
             val rightStr = serialize(right)
             s"$value$treeOpen$leftStr$separator$rightStr$treeClose"
 
@@ -57,7 +57,7 @@ class TreeTest extends munit.FunSuite:
 
     final case class Foo(v: String, a: Tree[Int])
 
-    //encode
+    // encode
     import com.github.gekomad.ittocsv.core.ToCsv.*
     given FieldEncoder[Tree[Int]] = customFieldEncoder[Tree[Int]](x => serialize(Some(x)))
 
@@ -67,7 +67,7 @@ class TreeTest extends munit.FunSuite:
 
     assert(serialized == "abc,\"1(2(3(,),),4(5(,),6(,)))\"")
 
-    //decode
+    // decode
     given Decoder[String, Tree[Int]] = str => {
       deserialize(str, _.toInt) match
         case None    => Left(List(s"Not a Node[Short] $str"))

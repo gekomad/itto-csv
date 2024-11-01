@@ -11,14 +11,14 @@ class FromCsvTest extends munit.FunSuite:
     {
       final case class Foo(a: Int, b: Double, c: String, d: Option[Boolean])
       val csv: List[String] = List("1", "3.14", "foo", "true")
-      val a = list2Product[Foo](csv)
+      val a                 = list2Product[Foo](csv)
       assert(a == Right(Foo(1, 3.14, "foo", Some(true))))
     }
 
     {
       final case class Foo(a: Int, b: Double, c: String, d: Boolean)
       val csv: List[String] = List("1", "3.14", "foo", "False")
-      val a = list2Product[Foo](csv)
+      val a                 = list2Product[Foo](csv)
       assert(a == Right(Foo(1, 3.14, "foo", false)))
     }
 
@@ -40,7 +40,7 @@ class FromCsvTest extends munit.FunSuite:
     )
 
     val csv: List[String] = List("1", "3.14", "foo", "", "", "hi", "", "3.3", "", "100")
-    val a = list2Product[Foo](csv)
+    val a                 = list2Product[Foo](csv)
     assert(a == Right(Foo(1, 3.14, "foo", None, None, Some("hi"), None, Some(3.3), None, Some(100))))
   }
 
@@ -316,10 +316,11 @@ class FromCsvTest extends munit.FunSuite:
     assert(
       fromCsv[Bar]("aa,bb,cc,dd") == List(
         Left(
-          List("aa value is not valid HEX",
-               "bb value is not valid HEX1",
-               "cc value is not valid HEX2",
-               "dd value is not valid HEX3"
+          List(
+            "aa value is not valid HEX",
+            "bb value is not valid HEX1",
+            "cc value is not valid HEX2",
+            "dd value is not valid HEX3"
           )
         )
       )
@@ -515,9 +516,10 @@ class FromCsvTest extends munit.FunSuite:
     assert(
       fromCsv[Bar]("a,b,c") == List(
         Left(
-          List("a value is not valid Coordinate",
-               "b value is not valid Coordinate1",
-               "c value is not valid Coordinate2"
+          List(
+            "a value is not valid Coordinate",
+            "b value is not valid Coordinate1",
+            "c value is not valid Coordinate2"
           )
         )
       )
@@ -934,7 +936,7 @@ class FromCsvTest extends munit.FunSuite:
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     final case class Foo(a: Int)
     given IttoCSVFormat = IttoCSVFormat.default
-    val o = fromCsv[Foo](List("1", "")) // List[Either[List[ParseFailure], Foo]]
+    val o               = fromCsv[Foo](List("1", "")) // List[Either[List[ParseFailure], Foo]]
     assert(o == List(Right(Foo(1)), Left(List(" value is not valid Int"))))
   }
 
@@ -943,7 +945,7 @@ class FromCsvTest extends munit.FunSuite:
     import com.github.gekomad.ittocsv.parser.IttoCSVFormat
     final case class Foo(a: Int)
     given IttoCSVFormat = IttoCSVFormat.default.withIgnoreEmptyLines(true)
-    val o = fromCsv[Foo](List("1", "", "2"))
+    val o               = fromCsv[Foo](List("1", "", "2"))
     assert(o == List(Right(Foo(1)), Right(Foo(2))))
   }
 

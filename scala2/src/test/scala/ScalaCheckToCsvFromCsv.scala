@@ -3,8 +3,7 @@ import com.github.gekomad.ittocsv.parser.CsvFieldToString._
 import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
 import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
 
-/**
-  * from string to csv and to string again, the strings should be the same
+/** from string to csv and to string again, the strings should be the same
   */
 object ScalaCheckToCsvFromCsv extends Properties("Scalacheck - from string to csv and to string again") {
 
@@ -35,10 +34,9 @@ object ScalaCheckToCsvFromCsv extends Properties("Scalacheck - from string to cs
     recordSeparator <- recordSeparators
     quote           <- quotes
     if quote != delimiter
-  } yield
-    property("csvFieldToString") = doubleTrasformation(
-      format1.withDelimiter(delimiter).withRecordSeparator(recordSeparator).withQuote(quote),
-      generator
-    )
+  } yield property("csvFieldToString") = doubleTrasformation(
+    format1.withDelimiter(delimiter).withRecordSeparator(recordSeparator).withQuote(quote),
+    generator
+  )
 
 }

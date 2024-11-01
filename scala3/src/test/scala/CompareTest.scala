@@ -16,8 +16,8 @@ class CompareTest extends munit.FunSuite:
     def doTest(p: IttoCSVFormat, fmt: CSVFormat): Unit = {
       def compare(s: String): Unit = {
         given IttoCSVFormat = p
-        val ittoScala = StringToCsvField.stringToCsvField(s)
-        val apache = fildParser(s, fmt)
+        val ittoScala       = StringToCsvField.stringToCsvField(s)
+        val apache          = fildParser(s, fmt)
         assert(ittoScala == apache, s"            csvScala: $ittoScala apache: $apache")
       }
 
@@ -60,17 +60,17 @@ class CompareTest extends munit.FunSuite:
       (IttoCSVFormat.default.withQuoteEmpty(true).withQuoteLowerChar(true), CSVFormat.DEFAULT),
       (IttoCSVFormat.tab.withQuoteEmpty(true).withQuoteLowerChar(true), CSVFormat.TDF)
     )
-    val delimiters = List(COMMA, SEMICOLON, PIPE)
+    val delimiters       = List(COMMA, SEMICOLON, PIPE)
     val recordSeparators = List(LF, CRLF)
-    val quotes = List(PIPE, DOUBLE_QUOTE)
+    val quotes           = List(PIPE, DOUBLE_QUOTE)
 
     csvFormats.foreach(f => doTest(f._1, f._2))
 
     for {
       (format1, format2) <- csvFormats
-      delimiter <- delimiters
-      recordSeparator <- recordSeparators
-      quote <- quotes
+      delimiter          <- delimiters
+      recordSeparator    <- recordSeparators
+      quote              <- quotes
       if quote != delimiter
     } yield doTest(
       format1.withDelimiter(delimiter).withRecordSeparator(recordSeparator).withQuote(quote),

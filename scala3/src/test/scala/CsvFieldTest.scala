@@ -101,9 +101,9 @@ class CsvFieldTest extends munit.FunSuite:
     import com.github.gekomad.ittocsv.parser.CsvFieldToString.csvFieldToString
     import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
     given IttoCSVFormat = IttoCSVFormat.default.withDelimiter('A')
-    val orig = "aAc"
-    val csv = StringToCsvField.stringToCsvField(orig)
-    val string = csvFieldToString(csv)
+    val orig            = "aAc"
+    val csv             = StringToCsvField.stringToCsvField(orig)
+    val string          = csvFieldToString(csv)
     assert(orig == string)
   }
 

@@ -21,15 +21,15 @@ object Schema {
     def readFrom(input: Map[String, String]): ValidatedNel[Nothing, HNil.type] = HNil.validNel
   }
 
-  implicit def parsing[K <: Symbol, V: Convert, T <: HList](
-    implicit key: Witness.Aux[K],
+  implicit def parsing[K <: Symbol, V: Convert, T <: HList](implicit
+    key: Witness.Aux[K],
     next: Schema[T]
   ): Schema[FieldType[K, V] :: T] = Schema.instance { input =>
     (
       input
         .get(key.value.name)
-        .fold(ParseFailure(s"${key.value.name} is missing").invalidNel: ValidatedNel[ParseFailure, V])(
-          entry => Convert.to[V](entry)
+        .fold(ParseFailure(s"${key.value.name} is missing").invalidNel: ValidatedNel[ParseFailure, V])(entry =>
+          Convert.to[V](entry)
         )
         .map(field[K](_)),
       next.readFrom(input)

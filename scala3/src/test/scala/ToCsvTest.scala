@@ -359,7 +359,7 @@ class ToCsvTest extends munit.FunSuite:
 
     { // use tab formatter
 
-      given IttoCSVFormat = IttoCSVFormat.tab.withRecordSeparator("\n")
+      given IttoCSVFormat                = IttoCSVFormat.tab.withRecordSeparator("\n")
       given FieldEncoder[java.util.Date] = customFieldEncoder[java.util.Date](_.toString)
 
       final case class Bar(name: String, date: java.util.Date, salary: Double)
@@ -390,7 +390,7 @@ class ToCsvTest extends munit.FunSuite:
     final case class MyType(a: Int)
     final case class Foo(a: MyType, b: Int)
 
-    //encode
+    // encode
     import com.github.gekomad.ittocsv.core.ToCsv.*
     given FieldEncoder[MyType] = customFieldEncoder[MyType](x => s"[${x.a}]")
 
@@ -444,11 +444,11 @@ class ToCsvTest extends munit.FunSuite:
 
     given IttoCSVFormat = IttoCSVFormat.default.withPrintHeader(false)
 
-    val localDateTime = LocalDateTime.parse("2000-12-31T12:13:14", ISO_LOCAL_DATE_TIME)
-    val localTime = LocalTime.parse("11:15:30", DateTimeFormatter.ISO_LOCAL_TIME)
-    val localDate = LocalDate.parse("2019-12-27")
+    val localDateTime  = LocalDateTime.parse("2000-12-31T12:13:14", ISO_LOCAL_DATE_TIME)
+    val localTime      = LocalTime.parse("11:15:30", DateTimeFormatter.ISO_LOCAL_TIME)
+    val localDate      = LocalDate.parse("2019-12-27")
     val offsetDateTime = OffsetDateTime.parse("2012-12-03T10:15:30+01:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-    val zonedDateTime = ZonedDateTime.parse("2019-04-01T17:24:11.252+05:30[Asia/Calcutta]")
+    val zonedDateTime  = ZonedDateTime.parse("2019-04-01T17:24:11.252+05:30[Asia/Calcutta]")
 
     final case class Bar(
       a: LocalDateTime,
@@ -478,7 +478,7 @@ class ToCsvTest extends munit.FunSuite:
 
     final case class Bar(a: String, b: Long, c: LocalDateTime, e: Option[Int])
     val l: List[Bar] = List(Bar("Yel,low", 3L, localDateTime, Some(1)), Bar("eee", 7L, localDateTime, None))
-    val x = toCsv(l)
+    val x            = toCsv(l)
     assert(x == "\"Yel,low\",3,2000-11-11 11:11:11.0,1,eee,7,2000-11-11 11:11:11.0,")
   }
 
@@ -526,7 +526,7 @@ class ToCsvTest extends munit.FunSuite:
     final case class Bar(name: String, date: java.util.Date, salary: Double)
 
     import com.github.gekomad.ittocsv.core.ToCsv.*
-    given IttoCSVFormat = IttoCSVFormat.tab
+    given IttoCSVFormat                = IttoCSVFormat.tab
     given FieldEncoder[java.util.Date] = customFieldEncoder[java.util.Date](_.toString)
 
     def g[A <: Product](a: A)(using m: scala.deriving.Mirror.ProductOf[A], e: RowEncoder[m.MirroredElemTypes]): String =

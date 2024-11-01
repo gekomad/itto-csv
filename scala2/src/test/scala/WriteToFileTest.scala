@@ -44,7 +44,7 @@ class WriteToFileTest extends munit.FunSuite {
         lines == "id\tname\tdate1cc3ccbb-c749-3078-e050-1aacbe064651\tbob\t2018-11-20T09:10:253cc3ccbb-c749-3078-e050-1aacbe064653\talice\t2018-11-20T10:12:244cc3ccbb-c749-3078-e050-1aacbe064654\tjim\t2018-11-20T11:18:175cc3ccbb-c749-3078-e050-1aacbe064655\ttom\t2018-11-20T11:36:04"
       )
     }
-    //read file through stream
+    // read file through stream
     {
       import com.github.gekomad.ittocsv.core.Conversions.fromStringToLocalDateTime
       import com.github.gekomad.ittocsv.parser.io.FromFile.csvFromFileStream

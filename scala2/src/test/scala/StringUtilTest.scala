@@ -1,5 +1,3 @@
-
-
 class StringUtilTest extends munit.FunSuite {
 
   test("split") {

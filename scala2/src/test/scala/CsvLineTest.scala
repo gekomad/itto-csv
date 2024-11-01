@@ -1,6 +1,5 @@
 import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 
-
 class CsvLineTest extends munit.FunSuite {
 
   test("csv string to list") {

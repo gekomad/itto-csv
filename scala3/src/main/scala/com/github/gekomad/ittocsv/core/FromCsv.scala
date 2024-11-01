@@ -196,9 +196,9 @@ object FromCsv:
     if (s == "") Right(None) else f(s).map(Some(_))
 
   given [A](using f: Decoder[String, A], csvFormat: IttoCSVFormat): Decoder[String, List[A]] = s =>
-    val a = s.split(csvFormat.delimeter.toString, -1).toList.map(f(_))
+    val a           = s.split(csvFormat.delimeter.toString, -1).toList.map(f(_))
     val (l, rights) = a.partitionMap(identity)
-    val lefts = l.flatten
+    val lefts       = l.flatten
     if (lefts.isEmpty) Right(rights) else Left(lefts)
 
   given Decoder[List[String], EmptyTuple] =
@@ -221,14 +221,13 @@ object FromCsv:
       case Right(r) => Right(m.fromProduct(r))
       case Left(l)  => Left(l)
 
-  /**
-   * @param csvList
-   *   is the List[String] to parse
-   * @param csvFormat
-   *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-   * @return
-   *   `List[Either[List[String], A]]` based on the parsing of `csvList` any errors are reported
-   */
+  /** @param csvList
+    *   is the List[String] to parse
+    * @param csvFormat
+    *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+    * @return
+    *   `List[Either[List[String], A]]` based on the parsing of `csvList` any errors are reported
+    */
   def fromCsv[A](
     csvList: List[String]
   )(using
@@ -258,7 +257,7 @@ object FromCsv:
     x: String
   )(using dec: Decoder[String, A], csvFormat: IttoCSVFormat): List[Either[String, A]] =
     x.split(csvFormat.delimeter.toString, -1).toList.map(dec(_)).map {
-      case Left(a) => Left(a.head)
+      case Left(a)  => Left(a.head)
       case Right(a) => Right(a)
     }
 

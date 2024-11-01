@@ -11,7 +11,7 @@ class WriteToFileTest extends munit.FunSuite:
     import java.util.UUID
 
     final case class Bar(id: UUID, name: String, date: LocalDateTime)
-    val filePath = "/tmp/out_list.csv"
+    val filePath        = "/tmp/out_list.csv"
     given IttoCSVFormat = IttoCSVFormat.tab.withPrintHeader(true).withRecordSeparator("\n")
 
     {
@@ -30,19 +30,19 @@ class WriteToFileTest extends munit.FunSuite:
       import com.github.gekomad.ittocsv.core.Header.*
       Util.deleteFile(filePath)
       val lt = list.map(a => Tuple.fromProductTyped(a))
-      val c = csvToFile(lt, filePath, Some(csvHeader[Bar]))
+      val c  = csvToFile(lt, filePath, Some(csvHeader[Bar]))
       c.attempt.unsafeRunSync() match
         case Left(value)  => assert(false, value)
         case Right(value) => assert(value == ExitCode.Success)
 
-      val file = Source.fromFile(filePath)
+      val file  = Source.fromFile(filePath)
       val lines = file.getLines().mkString
       file.close()
       assert(
         lines == "id\tname\tdate1cc3ccbb-c749-3078-e050-1aacbe064651\tbob\t2018-11-20T09:10:253cc3ccbb-c749-3078-e050-1aacbe064653\talice\t2018-11-20T10:12:244cc3ccbb-c749-3078-e050-1aacbe064654\tjim\t2018-11-20T11:18:175cc3ccbb-c749-3078-e050-1aacbe064655\ttom\t2018-11-20T11:36:04"
       )
     }
-    //read file through stream
+    // read file through stream
     {
 
       import com.github.gekomad.ittocsv.core.FromCsv.*
@@ -90,7 +90,7 @@ class WriteToFileTest extends munit.FunSuite:
       case Left(value)  => assert(false, value)
       case Right(value) => assert(value == ExitCode.Success)
 
-    val file = Source.fromFile(filePath)
+    val file  = Source.fromFile(filePath)
     val lines = file.getLines().mkString
     file.close()
     assert(

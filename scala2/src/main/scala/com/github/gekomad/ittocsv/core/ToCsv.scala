@@ -11,13 +11,15 @@ trait CsvStringEncoder[A] {
   def encode(value: A): String
 }
 
-/**
-  * Converts the type A to CSV
+/** Converts the type A to CSV
   *
-  * @author Giuseppe Cannella
+  * @author
+  *   Giuseppe Cannella
   * @since 0.0.1
-  * @see See test code for more information
-  * @see See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information.
+  * @see
+  *   See test code for more information
+  * @see
+  *   See [[https://github.com/gekomad/itto-csv/blob/master/README.md]] for more information.
   */
 object ToCsv {
 
@@ -85,21 +87,25 @@ object ToCsv {
 
   implicit val hnilEncoder: CsvStringEncoder[HNil] = (_: HNil) => ""
 
-  implicit def genericEncoder[A, R](
-    implicit gen: Generic.Aux[A, R],
+  implicit def genericEncoder[A, R](implicit
+    gen: Generic.Aux[A, R],
     rEncoder: Lazy[CsvStringEncoder[R]]
   ): CsvStringEncoder[A] = createEncoder(value => rEncoder.value.encode(gen.to(value)))
 
   private def header[A: FieldNames](implicit enc: CsvStringEncoder[A], csvFormat: IttoCSVFormat): String =
     if (csvFormat.printHeader) csvHeader[A] + csvFormat.recordSeparator else ""
 
-  /**
-    * @param a                    is the element to convert
-    * @param printRecordSeparator if true, appends the record separator to end of string
-    * @param enc                  the [[com.github.gekomad.ittocsv.core.CsvStringEncoder]] encoder
-    * @param csvFormat            the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-    * @return the CSV string encoded
-    * {{{
+  /** @param a
+    *   is the element to convert
+    * @param printRecordSeparator
+    *   if true, appends the record separator to end of string
+    * @param enc
+    *   the [[com.github.gekomad.ittocsv.core.CsvStringEncoder]] encoder
+    * @param csvFormat
+    *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+    * @return
+    *   the CSV string encoded
+    *   {{{
     * import com.github.gekomad.ittocsv.core.ToCsv._
     * implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
     *
@@ -110,8 +116,7 @@ object ToCsv {
     * case class Xyz(a: String, b: Int, c: Foo)
     *
     * assert(toCsv(Xyz("hello", 3, Foo(1, Baz("hi, dude")))) == "hello,3,1,\"hi, dude\"")
-    * }}}
-    *
+    *   }}}
     */
   def toCsv[A](
     a: A,
@@ -119,37 +124,38 @@ object ToCsv {
   )(implicit enc: CsvStringEncoder[A], csvFormat: IttoCSVFormat): String =
     (if (printRecordSeparator) csvFormat.recordSeparator else "") + enc.encode(a)
 
-  /**
-    * @param a         is the List of elements to convert
-    * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-    * @return the CSV string encoded
-    * {{{
+  /** @param a
+    *   is the List of elements to convert
+    * @param csvFormat
+    *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+    * @return
+    *   the CSV string encoded
+    *   {{{
     * import com.github.gekomad.ittocsv.core.ToCsv._
     * implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
     * case class Bar(a: String, b: Int)
     * assert(toCsv(List(Bar("abc", 42), Bar("def", 24))) == "abc,42,def,24")
-    * }}}
-    *
+    *   }}}
     */
   def toCsv[A](a: Seq[A])(implicit enc: CsvStringEncoder[A], csvFormat: IttoCSVFormat): String =
     a.map(toCsv(_)).mkString(csvFormat.delimeter.toString)
 
-  /**
-    * @param a         is the List of elements to convert
-    * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-    * {{{
+  /** @param a
+    *   is the List of elements to convert
+    * @param csvFormat
+    *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+    *   {{{
     * import com.github.gekomad.ittocsv.core.ToCsv._
     * implicit val csvFormat = com.github.gekomad.ittocsv.parser.IttoCSVFormat.default
     * case class Bar(a: String, b: Int)
     * assert(toCsvL(List(Bar("abc", 42), Bar("def", 24))) == "a,b\r\nabc,42\r\ndef,24")
-    * }}}
-    *
+    *   }}}
     */
   def toCsvL[A: FieldNames](a: Seq[A])(implicit enc: CsvStringEncoder[A], csvFormat: IttoCSVFormat): String =
     header + a.map(toCsv(_)).mkString(csvFormat.recordSeparator)
 
-  implicit def hlistEncoder[H, T <: HList](
-    implicit hEncoder: CsvStringEncoder[H],
+  implicit def hlistEncoder[H, T <: HList](implicit
+    hEncoder: CsvStringEncoder[H],
     tEncoder: CsvStringEncoder[T],
     csvFormat: IttoCSVFormat
   ): CsvStringEncoder[H :: T] = createEncoder {
@@ -162,8 +168,7 @@ object ToCsv {
 
   implicit val cnilEncoder: CsvStringEncoder[CNil] = createEncoder(_ => throw new Exception("Inconceivable!"))
 
-  implicit def coproductEncoder[H, T <: Coproduct](
-    implicit
+  implicit def coproductEncoder[H, T <: Coproduct](implicit
     hEncoder: Lazy[CsvStringEncoder[H]],
     tEncoder: CsvStringEncoder[T]
   ): CsvStringEncoder[H :+: T] = createEncoder {

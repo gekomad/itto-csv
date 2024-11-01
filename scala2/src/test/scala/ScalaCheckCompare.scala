@@ -2,8 +2,7 @@ import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}
 import org.apache.commons.csv.CSVFormat
 import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
 
-/**
-  * compare with apache common-csv
+/** compare with apache common-csv
   */
 object ScalaCheckCompare extends Properties("Scalacheck - Compare with apache common-csv") {
 
@@ -35,10 +34,9 @@ object ScalaCheckCompare extends Properties("Scalacheck - Compare with apache co
     recordSeparator    <- recordSeparators
     quote              <- quotes
     if quote != delimiter
-  } yield
-    property("stringToCsvFieldTest") = stringToCsvFieldTest(
-      format1.withDelimiter(delimiter).withRecordSeparator(recordSeparator).withQuote(quote),
-      format2.builder().setDelimiter(delimiter).setRecordSeparator(recordSeparator).setQuote(quote).build(),
-      generator
-    )
+  } yield property("stringToCsvFieldTest") = stringToCsvFieldTest(
+    format1.withDelimiter(delimiter).withRecordSeparator(recordSeparator).withQuote(quote),
+    format2.builder().setDelimiter(delimiter).setRecordSeparator(recordSeparator).setQuote(quote).build(),
+    generator
+  )
 }

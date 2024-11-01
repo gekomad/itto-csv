@@ -7,25 +7,23 @@ import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 import com.github.gekomad.ittocsv.util.ListUtils
 import fs2.{Chunk, Pure}
 
-/**
- * Write to CSV file
- *
- * @author
- *   Giuseppe Cannella
- * @since 0.0.1
- */
+/** Write to CSV file
+  *
+  * @author
+  *   Giuseppe Cannella
+  * @since 0.0.1
+  */
 object ToFile:
 
-  /**
-   * @param list
-   *   the list to write
-   * @param filePath
-   *   the file path of file to write
-   * @param csvFormat
-   *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-   * @return
-   *   IO[ExitCode]
-   */
+  /** @param list
+    *   the list to write
+    * @param filePath
+    *   the file path of file to write
+    * @param csvFormat
+    *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+    * @return
+    *   IO[ExitCode]
+    */
   def csvToFile[T <: Tuple: RowEncoder](
     list: Seq[T],
     filePath: String,
@@ -42,16 +40,15 @@ object ToFile:
     ListUtils.writeFile(l, filePath, false)
   }
 
-  /**
-   * @param s
-   *   the stream to write
-   * @param filePath
-   *   the file path of file to write
-   * @param csvFormat
-   *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-   * @return
-   *   IO[ExitCode]
-   */
+  /** @param s
+    *   the stream to write
+    * @param filePath
+    *   the file path of file to write
+    * @param csvFormat
+    *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+    * @return
+    *   IO[ExitCode]
+    */
   inline def csvToFileStream[A <: Product](
     s: fs2.Stream[Pure, A],
     filePath: String

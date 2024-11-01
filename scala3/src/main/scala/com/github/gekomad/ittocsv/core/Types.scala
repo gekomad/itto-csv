@@ -296,6 +296,6 @@ object Types:
     given Cons[Coordinate1] = Coordinate1.apply
 
     given Cons[Coordinate2] = Coordinate2.apply
-    
+
   end implicits
 end Types

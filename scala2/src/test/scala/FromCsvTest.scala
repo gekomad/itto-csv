@@ -4,7 +4,6 @@ import cats.data.{NonEmptyList, ValidatedNel}
 
 import com.github.gekomad.ittocsv.core.{Convert, ParseFailure, Schema}
 
-
 class FromCsvTest extends munit.FunSuite {
 
   test("csv string to type - 1") {
@@ -269,7 +268,9 @@ class FromCsvTest extends munit.FunSuite {
     final case class Bar(a: String, b: URL, c: URL1, d: URL2, e: URL3)
 
     assert(
-      fromCsv[Bar]("abc,http://abc.def.com,http://www.aaa.com,http://www.aaa.com,https://www.google.com:8080/url?") == List(
+      fromCsv[Bar](
+        "abc,http://abc.def.com,http://www.aaa.com,http://www.aaa.com,https://www.google.com:8080/url?"
+      ) == List(
         Right(
           Bar(
             "abc",
@@ -478,7 +479,9 @@ class FromCsvTest extends munit.FunSuite {
     )
 
     assert(
-      fromCsv[Bar]("1/12/1902,1-12-1902,01/01/1900,01-12-1902,1/12/1902,1-12-1902,01/12/1902,01-12-1902,8am,23:50:00") == List(
+      fromCsv[Bar](
+        "1/12/1902,1-12-1902,01/01/1900,01-12-1902,1/12/1902,1-12-1902,01/12/1902,01-12-1902,8am,23:50:00"
+      ) == List(
         Right(
           Bar(
             MDY("1/12/1902"),
@@ -817,12 +820,13 @@ class FromCsvTest extends munit.FunSuite {
 
     import com.github.gekomad.ittocsv.core.FromCsv._
 
-    implicit def _l(implicit csvFormat: IttoCSVFormat): String => Either[ParseFailure, MyType] = { str: String =>
-      if (str.startsWith("[") && str.endsWith("]"))
-        Try(str.substring(1, str.length - 1).toInt)
-          .map(f => Right(MyType(f)))
-          .getOrElse(Left(ParseFailure(s"Not a MyType $str")))
-      else Left(ParseFailure(s"Wrong format $str"))
+    implicit def _l(implicit csvFormat: IttoCSVFormat): String => Either[ParseFailure, MyType] = {
+      str: String =>
+        if (str.startsWith("[") && str.endsWith("]"))
+          Try(str.substring(1, str.length - 1).toInt)
+            .map(f => Right(MyType(f)))
+            .getOrElse(Left(ParseFailure(s"Not a MyType $str")))
+        else Left(ParseFailure(s"Wrong format $str"))
 
     }
 
@@ -955,7 +959,7 @@ class FromCsvTest extends munit.FunSuite {
     import com.github.gekomad.ittocsv.core.FromCsv._
     final case class Foo(a: Int, b: Double, c: String, d: Boolean)
     implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default
-    val o                                 = fromCsv[Foo](List("1,3.14,foo,true", "2,3.14,bar,false")) // List[Either[NonEmptyList[ParseFailure], Foo]]
+    val o = fromCsv[Foo](List("1,3.14,foo,true", "2,3.14,bar,false")) // List[Either[NonEmptyList[ParseFailure], Foo]]
     assert(o == List(Right(Foo(1, 3.14, "foo", true)), Right(Foo(2, 3.14, "bar", false))))
   }
 
@@ -973,7 +977,7 @@ class FromCsvTest extends munit.FunSuite {
     import com.github.gekomad.ittocsv.core.FromCsv._
     final case class Foo(a: Int)
     implicit val csvFormat: IttoCSVFormat = IttoCSVFormat.default.withIgnoreEmptyLines(true)
-    val o                                 = fromCsv[Foo](List("1", "", "2")) // List[Either[NonEmptyList[ParseFailure], Foo]]
+    val o = fromCsv[Foo](List("1", "", "2")) // List[Either[NonEmptyList[ParseFailure], Foo]]
     assert(o == List(Right(Foo(1)), Right(Foo(2))))
   }
 

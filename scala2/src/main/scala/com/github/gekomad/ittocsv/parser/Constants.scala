@@ -1,8 +1,7 @@
 package com.github.gekomad.ittocsv.parser
 
-/**
-  *
-  * @author Giuseppe Cannella
+/** @author
+  *   Giuseppe Cannella
   * @since 0.0.1
   */
 object Constants {

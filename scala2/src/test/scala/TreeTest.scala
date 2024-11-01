@@ -1,6 +1,5 @@
 import com.github.gekomad.ittocsv.core.ParseFailure
 
-
 import scala.util.matching.Regex
 
 class TreeTest extends munit.FunSuite {
@@ -8,7 +7,7 @@ class TreeTest extends munit.FunSuite {
   test("encode/decode Tree[Int]") {
     object OTree {
 
-      //thanks to amitayh https://gist.github.com/amitayh/373f512c50222e15550869e2ff539b25
+      // thanks to amitayh https://gist.github.com/amitayh/373f512c50222e15550869e2ff539b25
       final case class Tree[A](value: A, left: Option[Tree[A]] = None, right: Option[Tree[A]] = None)
 
       object Serializer {
@@ -59,7 +58,7 @@ class TreeTest extends munit.FunSuite {
 
     final case class Foo(v: String, a: Tree[Int])
 
-    //encode
+    // encode
     import com.github.gekomad.ittocsv.core.ToCsv._
 
     implicit def _f(implicit csvFormat: IttoCSVFormat): CsvStringEncoder[Tree[Int]] = createEncoder { node =>
@@ -72,14 +71,14 @@ class TreeTest extends munit.FunSuite {
 
     assert(serialized == "abc,\"1(2(3(,),),4(5(,),6(,)))\"")
 
-    //decode
+    // decode
     import com.github.gekomad.ittocsv.core.FromCsv._
     implicit def _l(implicit csvFormat: IttoCSVFormat): String => Either[ParseFailure, Tree[Int]] =
       (str: String) =>
         deserialize(str, _.toInt) match {
           case None    => Left(ParseFailure(s"Not a Node[Short] $str"))
           case Some(a) => Right(a)
-      }
+        }
 
     assert(fromCsv[Foo](serialized) == List(Right(Foo("abc", tree))))
 

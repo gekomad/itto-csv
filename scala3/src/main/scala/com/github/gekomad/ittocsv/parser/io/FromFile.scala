@@ -10,27 +10,25 @@ import fs2.{text, Stream}
 import scala.deriving.Mirror
 import scala.util.{Failure, Success, Try}
 
-/**
- * Reads a CSV file
- *
- * @author
- *   Giuseppe Cannella
- * @since 1.0.1
- * @see
- *   See test code for more information
- */
+/** Reads a CSV file
+  *
+  * @author
+  *   Giuseppe Cannella
+  * @since 1.0.1
+  * @see
+  *   See test code for more information
+  */
 object FromFile:
 
-  /**
-   * @param filePath
-   *   the file path of file to read
-   * @param skipHeader
-   *   if true doesn't read first row
-   * @param csvFormat
-   *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-   * @return
-   *   `Try[List[Either[List[String], A]]]`
-   */
+  /** @param filePath
+    *   the file path of file to read
+    * @param skipHeader
+    *   if true doesn't read first row
+    * @param csvFormat
+    *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+    * @return
+    *   `Try[List[Either[List[String], A]]]`
+    */
   def csvFromFileUnsafe[A](filePath: String, skipHeader: Boolean)(using
     m: Mirror.ProductOf[A],
     d: Decoder[List[String], m.MirroredElemTypes],
@@ -53,5 +51,5 @@ object FromFile:
         .map(line => fromCsv[A](line).head)
     if (skipHeader) x.drop(1) else x
   }
-  
+
 end FromFile

@@ -1,5 +1,3 @@
-
-
 class CsvFieldTest extends munit.FunSuite {
   test("stringToCsvField trim") {
     import com.github.gekomad.ittocsv.parser.{IttoCSVFormat, StringToCsvField}

@@ -32,7 +32,7 @@ class ReadFromFileTest extends munit.FunSuite {
     }
 
     {
-      val path                                                     = getClass.getResource("/csv_with_header.csv").getPath
+      val path = getClass.getResource("/csv_with_header.csv").getPath
       val list: Try[List[Either[NonEmptyList[ParseFailure], Bar]]] = csvFromFileUnsafe[Bar](path, skipHeader = true)
       assert(list.isSuccess && list.get == resList)
     }
@@ -75,7 +75,7 @@ class ReadFromFileTest extends munit.FunSuite {
       val res  = csvFromFileUnsafe[Bar](path, skipHeader = true)
 
       assert(res == Success(errList))
-      //read from file - unsafe mode
+      // read from file - unsafe mode
       intercept[Exception] {
         val _l: Seq[Bar] = {
           res match {

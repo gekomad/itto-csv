@@ -12,15 +12,16 @@ object Header {
     def apply(): List[String]
   }
 
-  implicit def toNames[T, Repr <: HList, KeysRepr <: HList](
-    implicit gen: LabelledGeneric.Aux[T, Repr],
+  implicit def toNames[T, Repr <: HList, KeysRepr <: HList](implicit
+    gen: LabelledGeneric.Aux[T, Repr],
     keys: Keys.Aux[Repr, KeysRepr],
     traversable: ToTraversable.Aux[KeysRepr, List, Symbol]
   ): FieldNames[T] = () => keys().toList.map(_.name)
 
-  /**
-    * @param csvFormat the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
-    * @return the string with class's fields name encoded according with csvFormat
+  /** @param csvFormat
+    *   the [[com.github.gekomad.ittocsv.parser.IttoCSVFormat]] formatter
+    * @return
+    *   the string with class's fields name encoded according with csvFormat
     */
   def csvHeader[T](implicit h: FieldNames[T], csvFormat: IttoCSVFormat): String =
     h().map(StringToCsvField.stringToCsvField).mkString(csvFormat.delimeter.toString)
