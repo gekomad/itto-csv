@@ -7,7 +7,7 @@ scalaVersion := "3.5.2"
 
 val fs2Version = "3.11.0"
 
-libraryDependencies += "com.github.gekomad" %% "scala-regex-collection" % "2.0.0"
+libraryDependencies += "com.github.gekomad" %% "scala-regex-collection" % "2.0.1"
 libraryDependencies += "co.fs2"             %% "fs2-core"               % fs2Version
 libraryDependencies += "co.fs2"             %% "fs2-io"                 % fs2Version
 libraryDependencies += "org.apache.commons"  % "commons-csv"            % "1.12.0" % Test

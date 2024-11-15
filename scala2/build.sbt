@@ -41,7 +41,7 @@ libraryDependencies += "co.fs2" %% "fs2-io"   % fs2Version
 libraryDependencies += "com.chuusai" %% "shapeless" % "2.3.12"
 
 //scala-regex-collection
-libraryDependencies += "com.github.gekomad" %% "scala-regex-collection" % "2.0.0"
+libraryDependencies += "com.github.gekomad" %% "scala-regex-collection" % "2.0.1"
 
 //test
 libraryDependencies += "com.storm-enroute" %% "scalameter"  % "0.21"   % Test
