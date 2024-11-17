@@ -1,8 +1,8 @@
 name         := "itto-csv"
-version      := "2.1.0"
+version      := "2.1.1"
 organization := "com.github.gekomad"
-//scalaVersion := "2.12.20"
 scalaVersion := "2.13.15"
+//scalaVersion := "2.12.20"
 val fs2Version = "3.11.0"
 scalacOptions ++= {
   if (scalaVersion.value.startsWith("2.12")) {
@@ -32,28 +32,20 @@ scalacOptions ++= Seq(
   "-Xfatal-warnings"
 )
 
-//cats
+libraryDependencies += "co.fs2"             %% "fs2-core"               % fs2Version
+libraryDependencies += "co.fs2"             %% "fs2-io"                 % fs2Version
+libraryDependencies += "com.chuusai"        %% "shapeless"              % "2.3.12"
+libraryDependencies += "com.github.gekomad" %% "scala-regex-collection" % "2.0.1"
+libraryDependencies += "com.storm-enroute"  %% "scalameter"             % "0.19"   % Test
+libraryDependencies += "org.scalameta"      %% "munit"                  % "1.0.2"  % Test
+libraryDependencies += "org.apache.commons"  % "commons-csv"            % "1.12.0" % Test
+libraryDependencies += "org.scalacheck"     %% "scalacheck"             % "1.18.1" % Test
 
-libraryDependencies += "co.fs2" %% "fs2-core" % fs2Version
-libraryDependencies += "co.fs2" %% "fs2-io"   % fs2Version
-
-//shapeless
-libraryDependencies += "com.chuusai" %% "shapeless" % "2.3.12"
-
-//scala-regex-collection
-libraryDependencies += "com.github.gekomad" %% "scala-regex-collection" % "2.0.0"
-
-//test
-libraryDependencies += "com.storm-enroute" %% "scalameter"  % "0.21"   % Test
-libraryDependencies += "org.scalameta"     %% "munit"       % "1.0.2"  % Test
-libraryDependencies += "org.apache.commons" % "commons-csv" % "1.12.0" % Test
-libraryDependencies += "org.scalacheck"    %% "scalacheck"  % "1.18.1" % Test
-testFrameworks += new TestFramework("munit.Framework")
 Test / testOptions += Tests.Argument(TestFrameworks.ScalaCheck, "-minSuccessfulTests", "1000")
 
 //sonatype
 publishTo := sonatypePublishToBundle.value
-logLevel  := Level.Debug
+
 pomExtra :=
   <licenses>
     <license>
