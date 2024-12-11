@@ -1,4 +1,4 @@
-name      := "itto-csv"
+name := "itto-csv"
 
 import org.scalajs.linker.interface.{ESVersion, ModuleSplitStyle}
 
@@ -7,7 +7,7 @@ lazy val scala3Js = project
   .enablePlugins(ScalaJSPlugin)
   .settings(
     version                         := "2.1.1",
-    scalaVersion                    := "3.5.2",
+    scalaVersion                    := "3.6.2",
     organization                    := "com.github.gekomad",
     scalaJSUseMainModuleInitializer := false,
     scalaJSLinkerConfig ~= (_.withESFeatures(_.withESVersion(ESVersion.ES2018))),
