@@ -7,9 +7,9 @@ lazy val scala2Js = project
   .in(file("."))
   .enablePlugins(ScalaJSPlugin)
   .settings(
-    version                         := "2.1.1",
-    scalaVersion                    := "2.13.15",
-    //scalaVersion                    := "2.12.20",
+    version      := "2.1.1",
+    scalaVersion := "2.13.15",
+    // scalaVersion                    := "2.12.20",
     organization                    := "com.github.gekomad",
     scalaJSUseMainModuleInitializer := false,
     scalaJSLinkerConfig ~= (_.withESFeatures(_.withESVersion(ESVersion.ES2018))),
@@ -17,7 +17,6 @@ lazy val scala2Js = project
       _.withModuleKind(ModuleKind.ESModule)
         .withModuleSplitStyle(ModuleSplitStyle.SmallModulesFor(List("scala2Js")))
     },
-
     scalacOptions ++= {
       if (scalaVersion.value.startsWith("2.12")) {
         Seq("-Ypartial-unification", "-Xfatal-warnings")
@@ -30,7 +29,7 @@ lazy val scala2Js = project
     libraryDependencies += "com.chuusai"        %%% "shapeless"              % "2.3.12",
     libraryDependencies += "com.github.gekomad" %%% "scala-regex-collection" % "2.0.1",
     libraryDependencies += "org.scala-js"       %%% "scalajs-dom"            % "2.8.0",
-    libraryDependencies += "org.scalameta"      %%% "munit"                  % "1.0.2"  % Test,
+    libraryDependencies += "org.scalameta"      %%% "munit"                  % "1.0.4"  % Test,
     libraryDependencies += "org.scalacheck"     %%% "scalacheck"             % "1.18.1" % Test
   )
 
