@@ -38,7 +38,7 @@ libraryDependencies += "com.chuusai"        %% "shapeless"              % "2.3.1
 libraryDependencies += "com.github.gekomad" %% "scala-regex-collection" % "2.0.1"
 libraryDependencies += "com.storm-enroute"  %% "scalameter"             % "0.19"   % Test
 libraryDependencies += "org.scalameta"      %% "munit"                  % "1.0.2"  % Test
-libraryDependencies += "org.apache.commons"  % "commons-csv"            % "1.12.0" % Test
+libraryDependencies += "org.apache.commons"  % "commons-csv"            % "1.13.0" % Test
 libraryDependencies += "org.scalacheck"     %% "scalacheck"             % "1.18.1" % Test
 
 Test / testOptions += Tests.Argument(TestFrameworks.ScalaCheck, "-minSuccessfulTests", "1000")
