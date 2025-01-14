@@ -1,4 +1,4 @@
-name      := "itto-csv"
+name := "itto-csv"
 
 import org.scalajs.linker.interface.{ESVersion, ModuleSplitStyle}
 
