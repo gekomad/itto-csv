@@ -1,7 +1,7 @@
 name         := "itto-csv"
 version      := "2.1.1"
 organization := "com.github.gekomad"
-scalaVersion := "2.13.15"
+scalaVersion := "2.13.16"
 //scalaVersion := "2.12.20"
 val fs2Version = "3.11.0"
 scalacOptions ++= {
