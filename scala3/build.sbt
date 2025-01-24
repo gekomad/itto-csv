@@ -35,7 +35,6 @@ scalacOptions ++= Seq(
 
 publishTo := sonatypePublishToBundle.value
 
-
 pomExtra :=
   <licenses>
     <license>

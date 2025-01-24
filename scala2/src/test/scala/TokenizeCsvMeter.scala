@@ -2,7 +2,6 @@ import com.github.gekomad.ittocsv.parser.IttoCSVFormat
 import org.scalacheck.Gen
 import org.scalameter.{Key, Warmer, config}
 
-
 class TokenizeCsvMeter extends munit.FunSuite {
 
   test("tokenizeCsvMeter") {
