@@ -12,7 +12,7 @@ class WriteToFileTest extends munit.FunSuite {
     import java.util.UUID
 
     final case class Bar(id: UUID, name: String, date: LocalDateTime)
-    val filePath = "/tmp/out_list.csv"
+    val filePath = java.nio.file.Files.createTempFile("test", ".csv").toString
     implicit val csvFormat: IttoCSVFormat =
       com.github.gekomad.ittocsv.parser.IttoCSVFormat.tab.withPrintHeader(true).withRecordSeparator("\n")
 
@@ -31,7 +31,6 @@ class WriteToFileTest extends munit.FunSuite {
         Bar(UUID.fromString("5CC3CCBB-C749-3078-E050-1AACBE064655"), "tom", toLocalDateTime("2018-11-20T11:36:04"))
       )
 
-      Util.deleteFile(filePath)
       csvToFile(list, filePath).attempt.unsafeRunSync() match {
         case Left(value)  => assert(false, value)
         case Right(value) => assert(value == ExitCode.Success)
@@ -83,8 +82,8 @@ class WriteToFileTest extends munit.FunSuite {
       Bar(UUID.fromString("5CC3CCBB-C749-3078-E050-1AACBE064655"), "tom", getDate("2018-11-20T11:36:04"))
     )
 
-    val filePath = "/tmp/out_stream.csv"
-    Util.deleteFile(filePath)
+    val filePath = java.nio.file.Files.createTempFile("test", ".csv").toString
+
     csvToFileStream(stream, filePath).attempt.unsafeRunSync() match {
       case Left(value)  => assert(false, value)
       case Right(value) => assert(value == ExitCode.Success)

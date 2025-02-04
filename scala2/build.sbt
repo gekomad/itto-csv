@@ -1,7 +1,7 @@
 name         := "itto-csv"
-version      := "2.1.1"
+version      := "2.1.2"
 organization := "com.github.gekomad"
-scalaVersion := "2.13.15"
+scalaVersion := "2.13.16"
 //scalaVersion := "2.12.20"
 val fs2Version = "3.11.0"
 scalacOptions ++= {
@@ -37,8 +37,8 @@ libraryDependencies += "co.fs2"             %% "fs2-io"                 % fs2Ver
 libraryDependencies += "com.chuusai"        %% "shapeless"              % "2.3.12"
 libraryDependencies += "com.github.gekomad" %% "scala-regex-collection" % "2.0.1"
 libraryDependencies += "com.storm-enroute"  %% "scalameter"             % "0.19"   % Test
-libraryDependencies += "org.scalameta"      %% "munit"                  % "1.0.2"  % Test
-libraryDependencies += "org.apache.commons"  % "commons-csv"            % "1.12.0" % Test
+libraryDependencies += "org.scalameta"      %% "munit"                  % "1.1.0"  % Test
+libraryDependencies += "org.apache.commons"  % "commons-csv"            % "1.13.0" % Test
 libraryDependencies += "org.scalacheck"     %% "scalacheck"             % "1.18.1" % Test
 
 Test / testOptions += Tests.Argument(TestFrameworks.ScalaCheck, "-minSuccessfulTests", "1000")
@@ -66,7 +66,6 @@ pomExtra :=
       <connection>scm:git:https://github.com/gekomad/itto-csv</connection>
     </scm>
     <url>https://github.com/gekomad/itto-csv</url>
-
 //microsite
 //enablePlugins(GhpagesPlugin)
 //enablePlugins(MicrositesPlugin)

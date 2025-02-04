@@ -36,7 +36,7 @@ object ScalaCheckCompare extends Properties("Scalacheck - Compare with apache co
     if quote != delimiter
   } yield property("stringToCsvFieldTest") = stringToCsvFieldTest(
     format1.withDelimiter(delimiter).withRecordSeparator(recordSeparator).withQuote(quote),
-    format2.builder().setDelimiter(delimiter).setRecordSeparator(recordSeparator).setQuote(quote).build(),
+    format2.builder().setDelimiter(delimiter).setRecordSeparator(recordSeparator).setQuote(quote).get(),
     generator
   )
 }

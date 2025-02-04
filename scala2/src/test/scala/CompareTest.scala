@@ -67,7 +67,7 @@ class CompareTest extends munit.FunSuite {
       if quote != delimiter
     } yield doTest(
       format1.withDelimiter(delimiter).withRecordSeparator(recordSeparator).withQuote(quote),
-      format2.builder().setDelimiter(delimiter).setRecordSeparator(recordSeparator).setQuote(quote).build()
+      format2.builder().setDelimiter(delimiter).setRecordSeparator(recordSeparator).setQuote(quote).get()
     )
 
   }

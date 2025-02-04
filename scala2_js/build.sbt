@@ -7,8 +7,8 @@ lazy val scala2Js = project
   .in(file("."))
   .enablePlugins(ScalaJSPlugin)
   .settings(
-    version                         := "2.1.1",
-    scalaVersion                    := "2.13.15",
+    version                         := "2.1.2",
+    scalaVersion                    := "2.13.16",
     //scalaVersion                    := "2.12.20",
     organization                    := "com.github.gekomad",
     scalaJSUseMainModuleInitializer := false,
@@ -30,7 +30,7 @@ lazy val scala2Js = project
     libraryDependencies += "com.chuusai"        %%% "shapeless"              % "2.3.12",
     libraryDependencies += "com.github.gekomad" %%% "scala-regex-collection" % "2.0.1",
     libraryDependencies += "org.scala-js"       %%% "scalajs-dom"            % "2.8.0",
-    libraryDependencies += "org.scalameta"      %%% "munit"                  % "1.0.2"  % Test,
+    libraryDependencies += "org.scalameta"      %%% "munit"                  % "1.1.0"  % Test,
     libraryDependencies += "org.scalacheck"     %%% "scalacheck"             % "1.18.1" % Test
   )
 
