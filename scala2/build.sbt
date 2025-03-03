@@ -34,7 +34,7 @@ scalacOptions ++= Seq(
 
 libraryDependencies += "co.fs2"             %% "fs2-core"               % fs2Version
 libraryDependencies += "co.fs2"             %% "fs2-io"                 % fs2Version
-libraryDependencies += "com.chuusai"        %% "shapeless"              % "2.3.12"
+libraryDependencies += "com.chuusai"        %% "shapeless"              % "2.3.13"
 libraryDependencies += "com.github.gekomad" %% "scala-regex-collection" % "2.0.1"
 libraryDependencies += "com.storm-enroute"  %% "scalameter"             % "0.19"   % Test
 libraryDependencies += "org.scalameta"      %% "munit"                  % "1.1.0"  % Test
