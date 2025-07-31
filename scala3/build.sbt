@@ -10,7 +10,7 @@ val fs2Version = "3.11.0"
 libraryDependencies += "com.github.gekomad" %% "scala-regex-collection" % "2.0.1"
 libraryDependencies += "co.fs2"             %% "fs2-core"               % fs2Version
 libraryDependencies += "co.fs2"             %% "fs2-io"                 % fs2Version
-libraryDependencies += "org.apache.commons"  % "commons-csv"            % "1.13.0" % Test
+libraryDependencies += "org.apache.commons"  % "commons-csv"            % "1.14.1" % Test
 libraryDependencies += "org.scalameta"      %% "munit"                  % "1.1.0"  % Test
 
 scalacOptions ++= Seq(
@@ -33,7 +33,6 @@ scalacOptions ++= Seq(
 
 //sonatype
 publishTo := sonatypePublishToBundle.value
-
 
 pomExtra :=
   <licenses>
