@@ -1,4 +1,4 @@
-name      := "itto-csv"
+name := "itto-csv"
 
 import org.scalajs.linker.interface.{ESVersion, ModuleSplitStyle}
 
@@ -21,7 +21,7 @@ lazy val scala3Js = project
     libraryDependencies += "com.github.gekomad" %%% "scala-regex-collection" % "2.0.1",
     libraryDependencies += "org.scala-js"       %%% "scalajs-dom"            % "2.8.0",
     libraryDependencies += "org.scalameta"      %%% "munit"                  % "1.1.0"  % Test,
-    libraryDependencies += "org.scalacheck"     %%% "scalacheck"             % "1.18.1" % Test
+    libraryDependencies += "org.scalacheck"     %%% "scalacheck"             % "1.19.0" % Test
   )
 
 //sonatype
