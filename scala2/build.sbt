@@ -2,7 +2,7 @@ name         := "itto-csv"
 version      := "2.1.2"
 organization := "com.github.gekomad"
 scalaVersion := "2.13.16"
-//scalaVersion := "2.12.20"
+//scalaVersion := "2.12.21"
 val fs2Version = "3.11.0"
 scalacOptions ++= {
   if (scalaVersion.value.startsWith("2.12")) {
