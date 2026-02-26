@@ -3,7 +3,7 @@ name := "itto-csv"
 version      := "2.1.2"
 organization := "com.github.gekomad"
 
-scalaVersion := "3.5.2"
+scalaVersion := "3.8.2"
 
 val fs2Version = "3.11.0"
 
@@ -33,7 +33,6 @@ scalacOptions ++= Seq(
 
 //sonatype
 publishTo := sonatypePublishToBundle.value
-
 
 pomExtra :=
   <licenses>
