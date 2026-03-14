@@ -3,7 +3,7 @@ version      := "2.1.2"
 organization := "com.github.gekomad"
 scalaVersion := "2.13.16"
 //scalaVersion := "2.12.20"
-val fs2Version = "3.11.0"
+val fs2Version = "3.13.0"
 scalacOptions ++= {
   if (scalaVersion.value.startsWith("2.12")) {
     Seq("-Ypartial-unification")

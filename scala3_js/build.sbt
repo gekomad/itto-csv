@@ -1,4 +1,4 @@
-name      := "itto-csv"
+name := "itto-csv"
 
 import org.scalajs.linker.interface.{ESVersion, ModuleSplitStyle}
 
@@ -16,8 +16,8 @@ lazy val scala3Js = project
         .withModuleSplitStyle(ModuleSplitStyle.SmallModulesFor(List("scala3Js")))
     },
     scalacOptions ++= Seq("-Xfatal-warnings"),
-    libraryDependencies += "co.fs2"             %%% "fs2-core"               % "3.11.0",
-    libraryDependencies += "co.fs2"             %%% "fs2-io"                 % "3.11.0",
+    libraryDependencies += "co.fs2"             %%% "fs2-core"               % "3.13.0",
+    libraryDependencies += "co.fs2"             %%% "fs2-io"                 % "3.13.0",
     libraryDependencies += "com.github.gekomad" %%% "scala-regex-collection" % "2.0.1",
     libraryDependencies += "org.scala-js"       %%% "scalajs-dom"            % "2.8.0",
     libraryDependencies += "org.scalameta"      %%% "munit"                  % "1.1.0"  % Test,

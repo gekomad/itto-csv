@@ -5,7 +5,7 @@ organization := "com.github.gekomad"
 
 scalaVersion := "3.5.2"
 
-val fs2Version = "3.11.0"
+val fs2Version = "3.13.0"
 
 libraryDependencies += "com.github.gekomad" %% "scala-regex-collection" % "2.0.1"
 libraryDependencies += "co.fs2"             %% "fs2-core"               % fs2Version
@@ -33,7 +33,6 @@ scalacOptions ++= Seq(
 
 //sonatype
 publishTo := sonatypePublishToBundle.value
-
 
 pomExtra :=
   <licenses>
